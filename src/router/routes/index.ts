@@ -2,13 +2,17 @@ import type { CustomRoute, ElegantConstRoute, ElegantRoute } from '@elegant-rout
 import { generatedRoutes } from '../elegant/routes';
 import { layouts, views } from '../elegant/imports';
 import { transformElegantRoutesToVueRoutes } from '../elegant/transform';
+import { moduleRoutes } from '../modules';
 
 /**
  * custom routes
  *
  * @link https://github.com/soybeanjs/elegant-router?tab=readme-ov-file#custom-route
  */
-const customRoutes: CustomRoute[] = [];
+const customRoutes: CustomRoute[] = [
+  ...moduleRoutes
+  // ... other custom routes
+];
 
 /** create routes when the auth route mode is static */
 export function createStaticRoutes() {

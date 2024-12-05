@@ -46,6 +46,16 @@ declare namespace Api {
       /** record status */
       status: EnableStatus | null;
     } & T;
+
+    interface PaginationParams {
+      page?: number;
+      size?: number;
+    }
+
+    interface PaginationResult<T> {
+      list: T[];
+      total: number;
+    }
   }
 
   /**
@@ -69,7 +79,7 @@ declare namespace Api {
     /** register params */
     interface RegisterParams {
       username: string;
-      email: string; 
+      email: string;
       password: string;
       role?: string;
     }
@@ -90,6 +100,50 @@ declare namespace Api {
     interface UserRoute {
       routes: MenuRoute[];
       home: import('@elegant-router/types').LastLevelRouteKey;
+    }
+  }
+
+  namespace Customer {
+    interface CustomerInfo {
+      _id: string;
+      name: string;
+      phone: string;
+      email: string;
+      address: string;
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface CreateCustomerParams {
+      name: string;
+      phone: string;
+      email: string;
+      address: string;
+    }
+
+    interface UpdateCustomerParams extends Partial<CreateCustomerParams> {}
+
+    interface GetCustomersQuery {
+      page?: number;
+      size?: number;
+    }
+
+    interface CustomerStats {
+      total: number;
+      todayNew: number;
+      monthNew: number;
+      yearNew: number;
+    }
+
+    type BatchImportParams = CreateCustomerParams[];
+
+    interface CustomerSearchParams {
+      name?: string;
+      gender?: string;
+      email?: string;
+      phone?: string;
+      address?: string;
+      userStatus?: string;
     }
   }
 }

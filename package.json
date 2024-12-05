@@ -39,7 +39,7 @@
     "dev": "vite --mode test",
     "dev:prod": "vite --mode prod",
     "gen-route": "sa gen-route",
-    "lint": "eslint . --fix",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "prepare": "simple-git-hooks",
     "preview": "vite preview",
     "release": "sa release",
@@ -66,10 +66,12 @@
     "vue": "3.5.7",
     "vue-draggable-plus": "0.5.3",
     "vue-i18n": "10.0.1",
-    "vue-router": "4.4.5"
+    "vue-router": "4.4.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@elegant-router/vue": "0.3.8",
+    "@iconify-json/material-symbols": "^1.2.8",
     "@iconify/json": "2.2.251",
     "@sa/scripts": "workspace:*",
     "@sa/uno-preset": "workspace:*",
@@ -84,6 +86,7 @@
     "@unocss/vite": "0.62.4",
     "@vitejs/plugin-vue": "5.1.4",
     "@vitejs/plugin-vue-jsx": "4.0.1",
+    "commitizen": "^4.3.1",
     "eslint": "9.11.0",
     "eslint-plugin-vue": "9.28.0",
     "lint-staged": "15.2.10",

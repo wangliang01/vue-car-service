@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'Soybean 管理系统',
+    title: '汽车维修管理系统',
     updateTitle: '系统版本更新通知',
     updateContent: '检测到系统有新版本发布，是否立即刷新页面？',
     updateConfirm: '立即刷新',
@@ -47,7 +47,17 @@ const local: App.I18n.Schema = {
     yesOrNo: {
       yes: '是',
       no: '否'
-    }
+    },
+    gender: {
+      male: '男',
+      female: '女'
+    },
+    status: {
+      enable: '启用',
+      disable: '禁用'
+    },
+    export: '导出',
+    exportSuccess: '导出成功'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -154,7 +164,9 @@ const local: App.I18n.Schema = {
     404: '页面不存在',
     500: '服务器错误',
     'iframe-page': '外链页面',
-    home: '首页'
+    home: '首页',
+    customer: '客户管理',
+    customer_list: '客户列表'
   },
   page: {
     login: {
@@ -176,7 +188,7 @@ const local: App.I18n.Schema = {
         registerError: '注册失败，请稍后重试'
       },
       pwdLogin: {
-        title: '密码登录',
+        title: '密码��录',
         rememberMe: '记住我',
         forgetPassword: '忘记密码？',
         register: '注册账号',
@@ -244,7 +256,7 @@ const local: App.I18n.Schema = {
     },
     phone: {
       required: '请输入手机号',
-      invalid: '手机号格式不正确'
+      invalid: '手机号格式不正'
     },
     pwd: {
       required: '请输入密码',
@@ -284,6 +296,26 @@ const local: App.I18n.Schema = {
   },
   datatable: {
     itemCount: '共 {total} 条'
+  },
+  menu: {
+    customer: {
+      _value: '客户管理',
+      list: '客户列表',
+      name: '客户名称',
+      phone: '手机号',
+      email: '邮箱',
+      address: '地址',
+      createdAt: '创建时间',
+      nameSearch: '请输入客户名称',
+      phoneSearch: '请输入手机号',
+      gender: '性别',
+      genderSearch: '请选择性别',
+      emailSearch: '请输入邮箱',
+      addressSearch: '请输入地址',
+      userStatus: '用户状态',
+      statusSearch: '请选择状态',
+      export: '导出'
+    }
   }
 };
 

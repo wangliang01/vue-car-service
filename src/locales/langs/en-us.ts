@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'SoybeanAdmin',
+    title: 'CarAdmin',
     updateTitle: 'System Version Update Notification',
     updateContent: 'A new version of the system has been detected. Do you want to refresh the page immediately?',
     updateConfirm: 'Refresh immediately',
@@ -284,6 +284,19 @@ const local: App.I18n.Schema = {
   },
   datatable: {
     itemCount: 'Total {total} items'
+  },
+  menu: {
+    customer: {
+      _value: 'Customer',
+      list: 'Customer List',
+      name: 'Customer Name',
+      phone: 'Phone',
+      email: 'Email',
+      address: 'Address',
+      createdAt: 'Created At',
+      nameSearch: 'Enter customer name',
+      phoneSearch: 'Enter phone number'
+    }
   }
 };
 
