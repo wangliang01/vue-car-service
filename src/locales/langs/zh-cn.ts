@@ -166,7 +166,9 @@ const local: App.I18n.Schema = {
     'iframe-page': '外链页面',
     home: '首页',
     customer: '客户管理',
-    customer_list: '客户列表'
+    customer_list: '客户列表',
+    vehicle: '车辆管理',
+    vehicle_list: '车辆列表'
   },
   page: {
     login: {
@@ -314,6 +316,20 @@ const local: App.I18n.Schema = {
       addressSearch: '请输入地址',
       userStatus: '用户状态',
       statusSearch: '请选择状态',
+      export: '导出'
+    },
+    vehicle: {
+      _value: '车辆管理',
+      list: '车辆列表',
+      brand: '品牌',
+      model: '型号',
+      year: '年份',
+      licensePlate: '车牌号',
+      vin: '车架号',
+      mileage: '里程数',
+      brandPlaceholder: '请选择品牌',
+      modelPlaceholder: '请选择型号',
+      licensePlateSearch: '请输入车牌号',
       export: '导出'
     }
   }

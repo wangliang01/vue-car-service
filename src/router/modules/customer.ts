@@ -5,7 +5,7 @@ const customer: GeneratedRoute = {
   path: '/customer',
   component: 'layout.base',
   meta: {
-    order: 2,
+    order: 3,
     requiresAuth: true,
     title: 'menu.customer',
     i18nKey: 'route.customer',

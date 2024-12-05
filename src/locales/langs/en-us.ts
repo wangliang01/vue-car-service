@@ -154,7 +154,11 @@ const local: App.I18n.Schema = {
     404: 'Page Not Found',
     500: 'Server Error',
     'iframe-page': 'Iframe',
-    home: 'Home'
+    home: 'Home',
+    customer: 'Customer',
+    customer_list: 'CustomerList',
+    vehicle: 'Vehicle',
+    vehicle_list: 'VehicleList'
   },
   page: {
     login: {
@@ -296,6 +300,20 @@ const local: App.I18n.Schema = {
       createdAt: 'Created At',
       nameSearch: 'Enter customer name',
       phoneSearch: 'Enter phone number'
+    },
+    vehicle: {
+      _value: 'Vehicle',
+      list: 'Vehicle List',
+      brand: 'Brand',
+      model: 'Model',
+      year: 'Year',
+      licensePlate: 'License Plate',
+      vin: 'VIN',
+      mileage: 'Mileage',
+      brandPlaceholder: 'Please select brand',
+      modelPlaceholder: 'Please select model',
+      licensePlateSearch: 'Please input license plate',
+      export: 'Export'
     }
   }
 };

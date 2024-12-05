@@ -25,6 +25,8 @@ declare module "@elegant-router/types" {
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
+    "vehicle": "/vehicle";
+    "vehicle_list": "/vehicle/list";
   };
 
   /**
@@ -63,6 +65,7 @@ declare module "@elegant-router/types" {
     | "home"
     | "iframe-page"
     | "login"
+    | "vehicle"
   >;
 
   /**
@@ -86,6 +89,7 @@ declare module "@elegant-router/types" {
     | "login"
     | "customer_list"
     | "home"
+    | "vehicle_list"
   >;
 
   /**

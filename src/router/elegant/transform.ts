@@ -170,7 +170,9 @@ const routeMap: RouteMap = {
   "customer_list": "/customer/list",
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
-  "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?"
+  "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
+  "vehicle": "/vehicle",
+  "vehicle_list": "/vehicle/list"
 };
 
 /**

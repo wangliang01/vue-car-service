@@ -85,6 +85,30 @@ declare namespace Api {
     }
   }
 
+  namespace Vehicle {
+    interface VehicleInfo {
+      _id?: string;
+      customerId: string;
+      brand: string;
+      model: string;
+      year: number;
+      licensePlate: string;
+      vin: string;
+      mileage: number;
+      createdAt?: string;
+      updatedAt?: string;
+    }
+
+    interface VehicleSearchParams {
+      customerId?: string;
+      brand?: string;
+      model?: string;
+      licensePlate?: string;
+      page?: number;
+      size?: number;
+    }
+  }
+
   /**
    * namespace Route
    *

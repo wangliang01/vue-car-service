@@ -56,7 +56,7 @@ async function search() {
 <template>
   <NCard :bordered="false" size="small">
     <NCollapse>
-      <NCollapseItem :title="t('common.search')" name="customer-search text-16px!">
+      <NCollapseItem :title="t('common.search')" name="customer-search">
         <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.name')" path="name" class="pr-24px">
