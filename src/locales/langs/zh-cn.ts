@@ -84,7 +84,7 @@ const local: App.I18n.Schema = {
       'horizontal-mix': '顶部菜单混合模式',
       reverseHorizontalMix: '一级菜单与子级菜单位置反转'
     },
-    recommendColor: '应用推荐算法的颜色',
+    recommendColor: '应推荐算法的颜色',
     recommendColorDesc: '推荐颜色的算法参照',
     themeColor: {
       title: '主题颜色',
@@ -190,7 +190,7 @@ const local: App.I18n.Schema = {
         registerError: '注册失败，请稍后重试'
       },
       pwdLogin: {
-        title: '密码��录',
+        title: '密码录',
         rememberMe: '记住我',
         forgetPassword: '忘记密码？',
         register: '注册账号',
@@ -308,7 +308,7 @@ const local: App.I18n.Schema = {
       email: '邮箱',
       address: '地址',
       createdAt: '创建时间',
-      nameSearch: '请输入客户名称',
+      nameSearch: '请输入客户名称搜索',
       phoneSearch: '请输入手机号',
       gender: '性别',
       genderSearch: '请选择性别',
@@ -330,7 +330,13 @@ const local: App.I18n.Schema = {
       brandPlaceholder: '请选择品牌',
       modelPlaceholder: '请选择型号',
       licensePlateSearch: '请输入车牌号',
-      export: '导出'
+      export: '导出',
+      yearPlaceholder: '请输入年份',
+      licensePlatePlaceholder: '请输入车牌号',
+      vinPlaceholder: '请输入车架号',
+      mileagePlaceholder: '请输入里程数',
+      brandSearch: '请选择品牌',
+      modelSearch: '请选择型号',
     }
   }
 };

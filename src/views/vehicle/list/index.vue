@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { reactive, h, ref } from 'vue';
+import { reactive, h, ref, computed } from 'vue';
 import { NButton, NSpace, NCard, NDataTable, NSelect, useDialog, useMessage } from 'naive-ui';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
+import { useAppStore } from '@/store/modules/app';
 import {
   fetchVehicleList,
   fetchDeleteVehicle,
@@ -12,9 +13,9 @@ import {
 } from '@/service/api/vehicle';
 import VehicleSearch from './modules/search.vue';
 import VehicleForm from './modules/form.vue';
+import { BRAND_LOGOS, DEFAULT_BRAND_LOGO, getBrandLogo, getBrandLabel } from '@/constants/brand';
 
 defineOptions({ name: 'VehicleList' });
-
 const { t } = useI18n();
 
 const searchModel = reactive<Api.Vehicle.VehicleSearchParams>({
@@ -24,15 +25,35 @@ const searchModel = reactive<Api.Vehicle.VehicleSearchParams>({
   licensePlate: ''
 });
 
-const columns = [
+const appStore = useAppStore();
+
+const columns = computed(() => [
   { type: 'selection' as const },
   { title: t('common.index'), key: 'index', width: 80 },
-  { title: t('menu.vehicle.brand'), key: 'brand', width: 120 },
+  { 
+    title: t('menu.vehicle.brand'), 
+    key: 'brand', 
+    width: 120,
+    render: (row: Api.Vehicle.VehicleInfo) => {
+      return h(NSpace, { align: 'center' }, () => [
+        h('img', {
+          src: getBrandLogo(row.brand),
+          alt: row.brand,
+          style: {
+            width: '24px',
+            height: '24px',
+            objectFit: 'contain'
+          }
+        }),
+        h('span', null, row.brand)
+      ]);
+    }
+  },
   { title: t('menu.vehicle.model'), key: 'model', width: 120 },
   { title: t('menu.vehicle.year'), key: 'year', width: 100 },
   { title: t('menu.vehicle.licensePlate'), key: 'licensePlate', width: 120 },
   { title: t('menu.vehicle.vin'), key: 'vin', width: 180 },
-  { title: t('menu.vehicle.mileage'), key: 'mileage', width: 120 },
+  { title: t('menu.vehicle.mileage'), key: 'mileage', width: 120, render: (row: Api.Vehicle.VehicleInfo) => `${row.mileage}公里` },
   {
     title: t('common.action'),
     key: 'actions',
@@ -63,7 +84,7 @@ const columns = [
       ]);
     }
   }
-];
+]);
 
 const checkedRowKeys = ref<string[]>([]);
 const brands = ref<string[]>([]);
@@ -79,7 +100,7 @@ const {
   resetSearchParams
 } = useTable({
   apiFn: fetchVehicleList,
-  columns: () => columns,
+  columns: () => columns.value,
   apiParams: {
     customerId: '',
     brand: '',
@@ -174,7 +195,18 @@ const handleReset = () => {
 const handleAdd = () => {
   showDrawer.value = true;
   drawerType.value = 'add';
-  editData.value = undefined;
+  editData.value = {
+    _id: '',
+    customerId: '',
+    brand: '',
+    model: '',
+    year: '',
+    licensePlate: '',
+    vin: '',
+    mileage: '',
+    createdAt: '',
+    updatedAt: ''
+  };
 };
 
 const handleBatchDelete = async () => {
@@ -220,6 +252,7 @@ const handleExport = async () => {
 const handleSubmitSuccess = () => {
   showDrawer.value = false;
   getData();
+  $message.success(t('common.saveSuccess'));
 };
 
 // 初始化加载品牌列表

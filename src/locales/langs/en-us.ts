@@ -47,6 +47,14 @@ const local: App.I18n.Schema = {
     yesOrNo: {
       yes: 'Yes',
       no: 'No'
+    },
+    gender: {
+      male: 'Male',
+      female: 'Female'
+    },
+    status: {
+      enable: 'Enable',
+      disable: 'Disable'
     }
   },
   request: {
@@ -291,18 +299,24 @@ const local: App.I18n.Schema = {
   },
   menu: {
     customer: {
-      _value: 'Customer',
+      _value: 'Customer Management',
       list: 'Customer List',
       name: 'Customer Name',
+      nameSearch: 'Please input customer name to search',
       phone: 'Phone',
       email: 'Email',
       address: 'Address',
       createdAt: 'Created At',
-      nameSearch: 'Enter customer name',
-      phoneSearch: 'Enter phone number'
+      gender: 'Gender',
+      genderSearch: 'Please select gender',
+      emailSearch: 'Please input email',
+      addressSearch: 'Please input address',
+      userStatus: 'Status',
+      statusSearch: 'Please select status',
+      export: 'Export'
     },
     vehicle: {
-      _value: 'Vehicle',
+      _value: 'Vehicle Management',
       list: 'Vehicle List',
       brand: 'Brand',
       model: 'Model',
@@ -312,6 +326,10 @@ const local: App.I18n.Schema = {
       mileage: 'Mileage',
       brandPlaceholder: 'Please select brand',
       modelPlaceholder: 'Please select model',
+      yearPlaceholder: 'Please input year',
+      licensePlatePlaceholder: 'Please input license plate',
+      vinPlaceholder: 'Please input VIN',
+      mileagePlaceholder: 'Please input mileage',
       licensePlateSearch: 'Please input license plate',
       export: 'Export'
     }

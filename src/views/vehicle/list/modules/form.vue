@@ -1,137 +1,214 @@
 <template>
-  <n-drawer v-model:show="props.show" :width="500" :title="drawerTitle">
-    <n-form
-      ref="formRef"
-      :model="formModel"
-      :rules="rules"
-      label-placement="left"
-      :label-width="100"
-      class="py-4 px-4"
-    >
-      <n-form-item :label="t('menu.vehicle.brand')" path="brand">
-        <n-select
-          v-model:value="formModel.brand"
-          :options="props.brands.map(brand => ({ label: brand, value: brand }))"
-          :placeholder="t('common.pleaseSelect')"
-          @update:value="handleBrandChange"
-        />
-      </n-form-item>
-      <n-form-item :label="t('menu.vehicle.model')" path="model">
-        <n-select
-          v-model:value="formModel.model"
-          :options="props.models.map(model => ({ label: model, value: model }))"
-          :placeholder="t('common.pleaseSelect')"
-        />
-      </n-form-item>
-      <n-form-item :label="t('menu.vehicle.licensePlate')" path="licensePlate">
-        <n-input
-          v-model:value="formModel.licensePlate"
-          :placeholder="t('common.pleaseInput')"
-        />
-      </n-form-item>
-    </n-form>
-    <template #footer>
-      <n-space>
-        <n-button @click="closeDrawer">{{ t('common.cancel') }}</n-button>
-        <n-button type="primary" :loading="submitLoading" @click="handleSubmit">
-          {{ t('common.confirm') }}
-        </n-button>
-      </n-space>
-    </template>
-  </n-drawer>
+  <NDrawer v-model:show="props.show" :width="500">
+    <NDrawerContent :title="props.type === 'add' ? t('common.add') : t('common.edit')">
+      <NForm 
+        ref="formRef" 
+        :model="formModel" 
+        :rules="rules" 
+        label-placement="left" 
+        :label-width="80"
+      >
+        <NFormItem :label="t('menu.customer.name')" path="customerId">
+          <NSelect
+            v-model:value="formModel.customerId"
+            :options="customerOptions"
+            :placeholder="t('menu.customer.nameSearch')"
+            filterable
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.brand')" path="brand">
+          <NSelect
+            v-model:value="formModel.brand"
+            :options="BRAND_OPTIONS"
+            :placeholder="t('menu.vehicle.brandPlaceholder')"
+            filterable
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.model')" path="model">
+          <NInput
+            v-model:value="formModel.model"
+            :placeholder="t('menu.vehicle.modelPlaceholder')"
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.year')" path="year">
+          <NInputNumber
+            v-model:value="formModel.year"
+            :placeholder="t('menu.vehicle.yearPlaceholder')"
+            :min="1900"
+            :max="new Date().getFullYear()"
+            style="width: 100%"
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.licensePlate')" path="licensePlate">
+          <NInput
+            v-model:value="formModel.licensePlate"
+            :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.vin')" path="vin">
+          <NInput
+            v-model:value="formModel.vin"
+            :placeholder="t('menu.vehicle.vinPlaceholder')"
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.mileage')" path="mileage">
+          <NInputNumber
+            v-model:value="formModel.mileage"
+            :placeholder="t('menu.vehicle.mileagePlaceholder')"
+            :min="0"
+            style="width: 100%"
+          />
+        </NFormItem>
+      </NForm>
+
+      <template #footer>
+        <NSpace justify="end">
+          <NButton @click="handleClose">{{ t('common.cancel') }}</NButton>
+          <NButton type="primary" :loading="loading" @click="handleSubmit">
+            {{ t('common.confirm') }}
+          </NButton>
+        </NSpace>
+      </template>
+    </NDrawerContent>
+  </NDrawer>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, reactive } from 'vue';
+import { ref, reactive, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { FormInst } from 'naive-ui';
+import { useFormRules, useNaiveForm } from '@/hooks/common/form';
 import {
   NDrawer,
+  NDrawerContent,
   NForm,
   NFormItem,
   NInput,
+  NInputNumber,
   NButton,
   NSpace,
   NSelect,
 } from 'naive-ui';
+import { fetchCreateVehicle, fetchUpdateVehicle } from '@/service/api/vehicle';
+import { fetchCustomers } from '@/service/api/customer';
+import { BRAND_OPTIONS, DEFAULT_BRAND_LOGO, getBrandLogo, getBrandLabel } from '@/constants/brand';
 
-const { t } = useI18n();
+defineOptions({ name: 'VehicleForm' });
 
 const props = defineProps<{
   show: boolean;
-  editData?: Partial<Api.Vehicle.VehicleInfo>;
+  type: 'add' | 'edit';
+  editData?: Api.Vehicle.VehicleInfo;
   brands: string[];
   models: string[];
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:show', show: boolean): void;
+  (e: 'update:show', value: boolean): void;
   (e: 'submit-success'): void;
   (e: 'brand-change', brand: string): void;
 }>();
 
-const formRef = ref<FormInst | null>(null);
-const submitLoading = ref(false);
+const { t } = useI18n();
+const { formRef, validate } = useNaiveForm();
 
-const defaultFormModel: Api.Vehicle.VehicleInfo = {
+const formModel = reactive({
+  customerId: '',
   brand: '',
   model: '',
   licensePlate: '',
-  customerId: '',
-  year: 0,
+  year: new Date().getFullYear(),
   vin: '',
-  mileage: 0,
-};
-
-const formModel = reactive({ ...defaultFormModel, ...props.editData });
-
-const rules = {
-  brand: {
-    required: true,
-    message: t('common.required'),
-    trigger: ['blur', 'change'],
-  },
-  model: {
-    required: true,
-    message: t('common.required'),
-    trigger: ['blur', 'change'],
-  },
-  licensePlate: {
-    required: true,
-    message: t('common.required'),
-    trigger: ['blur', 'input'],
-  },
-};
-
-const drawerTitle = computed(() => {
-  return props.editData?._id
-    ? t('common.edit')
-    : t('common.add');
+  mileage: 0
 });
 
-const closeDrawer = () => {
-  emit('update:show', false);
+const customerOptions = ref<{ label: string; value: string }[]>([]);
+
+// 获取所有客户列表
+async function loadCustomers() {
+  try {
+    const { data } = await fetchCustomers();
+    customerOptions.value = data.map(customer => ({
+      label: customer.name,
+      value: customer._id
+    }));
+  } catch (error) {
+    console.error('Failed to load customers:', error);
+  }
+}
+
+const rules = {
+  customerId: { required: true, message: t('common.required') },
+  brand: { required: true, message: t('common.required') },
+  model: { required: true, message: t('common.required') },
+  licensePlate: { required: true, message: t('common.required') },
+  year: { required: true, message: t('common.required') },
+  vin: { required: true, message: t('common.required') },
+  mileage: { required: true, message: t('common.required') }
 };
 
-const resetForm = () => {
-  formRef.value?.restoreValidation();
-  Object.assign(formModel, defaultFormModel);
-};
+const loading = ref(false);
 
-const handleSubmit = (e: MouseEvent) => {
-  e.preventDefault();
-  formRef.value?.validate((errors) => {
-    if (!errors) {
-      submitLoading.value = true;
-      emit('submit-success');
-      submitLoading.value = false;
-      resetForm();
-      closeDrawer();
-    }
+function resetForm() {
+  Object.assign(formModel, {
+    customerId: '',
+    brand: '',
+    model: '',
+    licensePlate: '',
+    year: new Date().getFullYear(),
+    vin: '',
+    mileage: 0
   });
-};
+}
+
+function handleClose() {
+  emit('update:show', false);
+  resetForm();
+}
+
+async function handleSubmit() {
+  await validate();
+  loading.value = true;
+  try {
+    if (props.type === 'add') {
+      await fetchCreateVehicle(formModel);
+      window.$message?.success(t('common.addSuccess'));
+    } else {
+      await fetchUpdateVehicle(props.editData!._id, formModel);
+      window.$message?.success(t('common.updateSuccess'));
+    }
+    emit('submit-success');
+    handleClose();
+  } finally {
+    loading.value = false;
+  }
+}
 
 const handleBrandChange = (brand: string) => {
+  formModel.model = '';  // 清空型号
   emit('brand-change', brand);
 };
+
+// 编辑时填充单
+watch(
+  () => props.editData,
+  newData => {
+    if (newData && props.type === 'edit') {
+      Object.assign(formModel, {
+        customerId: newData.customerId,
+        brand: newData.brand,
+        model: newData.model,
+        licensePlate: newData.licensePlate,
+        year: newData.year,
+        vin: newData.vin,
+        mileage: newData.mileage
+      });
+    }
+  },
+  { immediate: true }
+);
+
+// 组件挂载时加载客户列表
+onMounted(() => {
+  loadCustomers();
+});
 </script>

@@ -18,6 +18,14 @@ export function fetchCustomerList(params: Api.Common.CommonSearchParams) {
   });
 }
 
+/** 获取客户列表(不分页) */
+export function fetchCustomers() {
+  return request<Api.Customer.CustomerInfo[]>({
+    url: '/customer',
+    method: 'get'
+  });
+}
+
 /** 获取客户详情 */
 export function fetchCustomerDetail(id: string) {
   return request<Api.Customer.CustomerInfo>({
