@@ -40,6 +40,33 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'customer',
+    path: '/customer',
+    component: 'layout.base',
+    meta: {
+      order: 2,
+      requiresAuth: true,
+      title: 'menu.customer',
+      i18nKey: 'route.customer',
+      i18nTitle: true,
+      icon: 'material-symbols:person-outline'
+    },
+    children: [
+      {
+        name: 'customer_list',
+        path: '/customer/list',
+        component: 'view.customer_list',
+        meta: {
+          title: 'menu.customer.list',
+          i18nKey: 'route.customer_list',
+          i18nTitle: true,
+          icon: 'material-symbols:group-outline',
+          requiresAuth: true
+        }
+      }
+    ]
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
@@ -75,4 +102,31 @@ export const generatedRoutes: GeneratedRoute[] = [
       hideInMenu: true
     }
   },
+  {
+    name: 'vehicle',
+    path: '/vehicle',
+    component: 'layout.base',
+    meta: {
+      order: 3,
+      requiresAuth: true,
+      title: 'menu.vehicle',
+      i18nKey: 'route.vehicle',
+      i18nTitle: true,
+      icon: 'material-symbols:directions-car'
+    },
+    children: [
+      {
+        name: 'vehicle_list',
+        path: '/vehicle/list',
+        component: 'view.vehicle_list',
+        meta: {
+          title: 'menu.vehicle.list',
+          i18nKey: 'route.vehicle_list',
+          i18nTitle: true,
+          icon: 'material-symbols:directions-car-outline',
+          requiresAuth: true
+        }
+      }
+    ]
+  }
 ];
