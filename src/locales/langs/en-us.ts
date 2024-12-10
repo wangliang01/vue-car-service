@@ -10,6 +10,7 @@ const local: App.I18n.Schema = {
     action: 'Action',
     add: 'Add',
     addSuccess: 'Add Success',
+    view: 'View',
     backToHome: 'Back to home',
     batchDelete: 'Batch Delete',
     cancel: 'Cancel',
@@ -55,6 +56,9 @@ const local: App.I18n.Schema = {
     status: {
       enable: 'Enable',
       disable: 'Disable'
+    },
+    unit: {
+      kilometer: 'km'
     }
   },
   request: {
@@ -166,7 +170,9 @@ const local: App.I18n.Schema = {
     customer: 'Customer',
     customer_list: 'CustomerList',
     vehicle: 'Vehicle',
-    vehicle_list: 'VehicleList'
+    vehicle_list: 'VehicleList',
+    'repair-order': 'Repair Order',
+    'repair-order_list': 'Order List'
   },
   page: {
     login: {
@@ -332,6 +338,22 @@ const local: App.I18n.Schema = {
       mileagePlaceholder: 'Please input mileage',
       licensePlateSearch: 'Please input license plate',
       export: 'Export'
+    },
+    repairOrder: {
+      _value: 'Repair Orders',
+      list: 'Order List',
+      orderNo: 'Order No.',
+      orderNoSearch: 'Please input order number',
+      customerNameSearch: 'Please input customer name',
+      status: 'Status',
+      faultDesc: 'Fault Description',
+      customer: 'Customer Info',
+      vehicle: 'Vehicle Info',
+      mechanic: 'Mechanic',
+      createTime: 'Create Time',
+      estimatedTime: 'Estimated Time',
+      actualTime: 'Actual Time',
+      deliveryTime: 'Delivery Time'
     }
   }
 };

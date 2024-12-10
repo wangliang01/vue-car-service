@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, h, ref } from 'vue';
-import { NButton, NSpace, NInput, NCard, NDataTable, NSelect } from 'naive-ui';
+import { NButton, NSpace, NInput, NCard, NDataTable, NSelect, NDrawer } from 'naive-ui';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
 import { fetchCustomerList, fetchDeleteCustomer, fetchExportCustomer } from '@/service/api/customer';
@@ -178,7 +178,7 @@ async function handleExport() {
 
   exporting.value = true;
   try {
-    const blob = await fetchExportCustomer(searchModel as Api.Customer.CustomerInfo);
+    const { data: blob } = await fetchExportCustomer(searchModel as Api.Customer.CustomerInfo);
 
     if(blob instanceof Blob) {
       // 创建下载链接

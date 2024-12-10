@@ -83,3 +83,11 @@ export const themeSettings: App.Theme.ThemeSetting = {
  * If publish new version, use `overrideThemeSettings` to override certain theme settings
  */
 export const overrideThemeSettings: Partial<App.Theme.ThemeSetting> = {};
+
+import {GlobalThemeOverrides} from 'naive-ui'
+
+export const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: '#646cff'
+  }
+};

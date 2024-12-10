@@ -10,9 +10,11 @@ const local: App.I18n.Schema = {
     action: '操作',
     add: '新增',
     addSuccess: '添加成功',
+    view: '查看',
     backToHome: '返回首页',
     batchDelete: '批量删除',
     cancel: '取消',
+    ok: '确定',
     close: '关闭',
     check: '勾选',
     expandColumn: '展开列',
@@ -21,7 +23,7 @@ const local: App.I18n.Schema = {
     confirm: '确认',
     delete: '删除',
     deleteSuccess: '删除成功',
-    confirmDelete: '确认删除吗？',
+    confirmDelete: '确认删除 {name} ?',
     edit: '编辑',
     warning: '警告',
     error: '错误',
@@ -34,7 +36,7 @@ const local: App.I18n.Schema = {
     modifySuccess: '修改成功',
     noData: '无数据',
     operate: '操作',
-    pleaseCheckValue: '请检查输入的值是否合法',
+    pleaseCheckValue: '请选择要操作的数据',
     refresh: '刷新',
     reset: '重置',
     search: '搜索',
@@ -57,7 +59,16 @@ const local: App.I18n.Schema = {
       disable: '禁用'
     },
     export: '导出',
-    exportSuccess: '导出成功'
+    exportSuccess: '导出成功',
+    batchDeleteConfirm: '确认删除选中的 {count} 条记录?',
+    unit: {
+      kilometer: '公里'
+    },
+    remark: '备注',
+    remarkPlaceholder: '请输入备注信息',
+    isNew: '新客户',
+    searchSuccess: '查询成功',
+    searchError: '查询失败'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -79,7 +90,7 @@ const local: App.I18n.Schema = {
     layoutMode: {
       title: '布局模式',
       vertical: '左侧菜单模式',
-      'vertical-mix': '左侧菜单混合模式',
+      'vertical-mix': '侧菜单混合模式',
       horizontal: '顶部菜单模式',
       'horizontal-mix': '顶部菜单混合模式',
       reverseHorizontalMix: '一级菜单与子级菜单位置反转'
@@ -101,7 +112,7 @@ const local: App.I18n.Schema = {
       content: '主体滚动'
     },
     page: {
-      animate: '页面切换动画',
+      animate: '页面切换��画',
       mode: {
         title: '页面切换动画类型',
         'fade-slide': '滑动',
@@ -126,7 +137,7 @@ const local: App.I18n.Schema = {
       cache: '缓存标签页',
       height: '标签栏高度',
       mode: {
-        title: '标签栏风格',
+        title: '标签风格',
         chrome: '谷歌风格',
         button: '按钮风格'
       }
@@ -168,7 +179,9 @@ const local: App.I18n.Schema = {
     customer: '客户管理',
     customer_list: '客户列表',
     vehicle: '车辆管理',
-    vehicle_list: '车辆列表'
+    vehicle_list: '车辆列表',
+    'repair-order': '维修工单',
+    'repair-order_list': '工单列表'
   },
   page: {
     login: {
@@ -223,7 +236,7 @@ const local: App.I18n.Schema = {
     home: {
       branchDesc:
         '为了方便大家开发和更新合并，我们对main分支的代码进行了精简，只保留了首页菜单，其余内容已移至example分支进行维护。预览地址显示的内容即为example分支的内容。',
-      greeting: '早安，{userName}, 今天又是充满活力的一天!',
+      greeting: '欢迎，{userName}, 今天又是充满活力的一天!',
       weatherDesc: '今日多云转晴，20℃ - 25℃!',
       projectCount: '项目数',
       todo: '待办',
@@ -242,8 +255,8 @@ const local: App.I18n.Schema = {
         title: '项目动态',
         moreNews: '更多动态',
         desc1: 'Soybean 在2021年5月28日创建了开源项目 soybean-admin!',
-        desc2: 'Yanbowe 向 soybean-admin 提交了一个bug，多标签栏不会自适应。',
-        desc3: 'Soybean 准备为 soybean-admin 的发布做充分的准备工作!',
+        desc2: 'Yanbowe 向 soybean-admin 提交了��个bug，多标签栏不会自适应。',
+        desc3: 'Soybean 准为 soybean-admin 的发布做充分的准备工作!',
         desc4: 'Soybean 正在忙于为soybean-admin写项目说明文档！',
         desc5: 'Soybean 刚才把工作台页面随便写了一些，凑合能看了！'
       },
@@ -266,7 +279,7 @@ const local: App.I18n.Schema = {
     },
     confirmPwd: {
       required: '请输入确认密码',
-      invalid: '两次输入密码不一致'
+      invalid: '两次输入密码一致'
     },
     code: {
       required: '请输入验证码',
@@ -311,7 +324,7 @@ const local: App.I18n.Schema = {
       nameSearch: '请输入客户名称搜索',
       phoneSearch: '请输入手机号',
       gender: '性别',
-      genderSearch: '请选择性别',
+      genderSearch: '请选择性',
       emailSearch: '请输入邮箱',
       addressSearch: '请输入地址',
       userStatus: '用户状态',
@@ -337,6 +350,38 @@ const local: App.I18n.Schema = {
       mileagePlaceholder: '请输入里程数',
       brandSearch: '请选择品牌',
       modelSearch: '请选择型号',
+    },
+    repairOrder: {
+      _value: '维修工单',
+      list: '工单列表',
+      orderNo: '工单编号',
+      orderNoSearch: '请输入工单编号',
+      customerNameSearch: '请输入客户名称',
+      status: '工单状态',
+      faultDesc: '故障描述',
+      customer: '客户信息',
+      vehicle: '车辆信息',
+      mechanic: '维修技师',
+      createTime: '创建时间',
+      estimatedTime: '预计完工时间',
+      actualTime: '实际完工时间',
+      deliveryTime: '交车时间',
+      statusSearch: '请选择工单状态',
+      faultDescPlaceholder: '请输入故障描述',
+      orderNoPlaceholder: '请输入工单编号',
+      customerNamePlaceholder: '请输入客户名称',
+      licensePlatePlaceholder: '请输入车牌号',
+      statusPlaceholder: '请选择工单状态',
+      faultDescPlaceholder: '请输入故障描述'
+    }
+  },
+  repairOrder: {
+    status: {
+      pending: '待处理',
+      inspecting: '检查中',
+      repairing: '维修中', 
+      completed: '已完工',
+      delivered: '已交车'
     }
   }
 };

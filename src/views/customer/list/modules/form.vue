@@ -97,7 +97,7 @@ watch(
 </script>
 
 <template>
-  <NDrawer v-model:show="props.show" :width="500">
+  <NDrawer v-model:show="props.show" :width="500" :mask-closable="true">
     <NDrawerContent :title="props.type === 'add' ? t('common.add') : t('common.edit')">
       <NForm ref="formRef" :model="formModel" :rules="rules" label-placement="left" :label-width="80">
         <NFormItem :label="t('menu.customer.name')" path="name">

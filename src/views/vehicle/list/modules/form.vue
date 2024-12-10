@@ -1,5 +1,5 @@
 <template>
-  <NDrawer v-model:show="props.show" :width="500">
+  <NDrawer v-model:show="props.show" :width="500" :mask-closable="true">
     <NDrawerContent :title="props.type === 'add' ? t('common.add') : t('common.edit')">
       <NForm 
         ref="formRef" 
@@ -102,6 +102,8 @@ const props = defineProps<{
   models: string[];
 }>();
 
+// const show = defineModel<boolean>('show', { required: true });
+
 const emit = defineEmits<{
   (e: 'update:show', value: boolean): void;
   (e: 'submit-success'): void;
@@ -171,13 +173,10 @@ async function handleSubmit() {
   try {
     if (props.type === 'add') {
       await fetchCreateVehicle(formModel);
-      window.$message?.success(t('common.addSuccess'));
     } else {
       await fetchUpdateVehicle(props.editData!._id, formModel);
-      window.$message?.success(t('common.updateSuccess'));
     }
     emit('submit-success');
-    handleClose();
   } finally {
     loading.value = false;
   }
@@ -188,23 +187,31 @@ const handleBrandChange = (brand: string) => {
   emit('brand-change', brand);
 };
 
-// 编辑时填充单
+// 监听editData变化，当编辑时自动加载客户信息
 watch(
   () => props.editData,
-  newData => {
-    if (newData && props.type === 'edit') {
+  async newVal => {
+    if (newVal && props.type === 'edit') {
+      await loadCustomers();
+      console.log("newVal", newVal);
+      // 设置表单数据
       Object.assign(formModel, {
-        customerId: newData.customerId,
-        brand: newData.brand,
-        model: newData.model,
-        licensePlate: newData.licensePlate,
-        year: newData.year,
-        vin: newData.vin,
-        mileage: newData.mileage
+        ...newVal,
+        customerId: newVal.customer._id // 确保客户ID被正确设置
       });
     }
   },
   { immediate: true }
+);
+
+// 监听抽屉显示状态，当关闭时重置表单
+watch(
+  () => props.show,
+  (newVal) => {
+    if (!newVal) {
+      resetForm();
+    }
+  }
 );
 
 // 组件挂载时加载客户列表

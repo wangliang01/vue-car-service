@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, h, ref, computed } from 'vue';
-import { NButton, NSpace, NCard, NDataTable, NSelect, useDialog, useMessage } from 'naive-ui';
+import { NButton, NSpace, NCard, NDataTable, NSelect, useDialog, useMessage, NDrawer } from 'naive-ui';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
 import { useAppStore } from '@/store/modules/app';
@@ -9,7 +9,8 @@ import {
   fetchDeleteVehicle,
   fetchExportVehicle,
   fetchVehicleBrands,
-  fetchVehicleModels
+  fetchVehicleModels,
+  fetchDeleteVehicleBatch
 } from '@/service/api/vehicle';
 import VehicleSearch from './modules/search.vue';
 import VehicleForm from './modules/form.vue';
@@ -30,6 +31,7 @@ const appStore = useAppStore();
 const columns = computed(() => [
   { type: 'selection' as const },
   { title: t('common.index'), key: 'index', width: 80 },
+  
   { 
     title: t('menu.vehicle.brand'), 
     key: 'brand', 
@@ -50,10 +52,23 @@ const columns = computed(() => [
     }
   },
   { title: t('menu.vehicle.model'), key: 'model', width: 120 },
+  { 
+    title: t('menu.customer.name'), 
+    key: 'customer', 
+    width: 120,
+    render: (row: Api.Vehicle.VehicleInfo) => {
+      return row.customer?.name || '-';
+    }
+  },
   { title: t('menu.vehicle.year'), key: 'year', width: 100 },
   { title: t('menu.vehicle.licensePlate'), key: 'licensePlate', width: 120 },
   { title: t('menu.vehicle.vin'), key: 'vin', width: 180 },
-  { title: t('menu.vehicle.mileage'), key: 'mileage', width: 120, render: (row: Api.Vehicle.VehicleInfo) => `${row.mileage}公里` },
+  { 
+    title: t('menu.vehicle.mileage'), 
+    key: 'mileage', 
+    width: 120, 
+    render: (row: Api.Vehicle.VehicleInfo) => `${row.mileage}${t('common.unit.kilometer')}` 
+  },
   {
     title: t('common.action'),
     key: 'actions',
@@ -129,8 +144,8 @@ const handleDelete = async (row: Api.Vehicle.VehicleInfo) => {
   try {
     await $dialog.warning({
       title: t('common.warning'),
-      content: t('common.deleteConfirm'),
-      positiveText: t('common.ok'),
+      content: t('common.confirmDelete', { name:  row.licensePlate }),
+      positiveText: t('common.confirm'),
       negativeText: t('common.cancel'),
       onPositiveClick: async () => {
         if (!row._id) {
@@ -211,24 +226,25 @@ const handleAdd = () => {
 
 const handleBatchDelete = async () => {
   if (!checkedRowKeys.value.length) {
-    $message.warning(t('common.pleaseSelectData'));
+    $message.warning(t('common.pleaseCheckValue'));
     return;
   }
   try {
     await $dialog.warning({
       title: t('common.warning'),
-      content: t('common.deleteConfirm'),
-      positiveText: t('common.ok'),
+      content: t('common.batchDeleteConfirm', { count: checkedRowKeys.value.length }),
+      positiveText: t('common.confirm'),
       negativeText: t('common.cancel'),
       onPositiveClick: async () => {
-        await fetchDeleteVehicle(checkedRowKeys.value);
+        await fetchDeleteVehicleBatch({ ids: checkedRowKeys.value });
         $message.success(t('common.deleteSuccess'));
         checkedRowKeys.value = [];
         getData();
       }
     });
   } catch (error) {
-    console.error('Delete failed:', error);
+    console.error('批量删除失败:', error);
+    $message.error(t('common.error')); 
   }
 };
 
@@ -236,23 +252,43 @@ const handleRefresh = () => {
   getData();
 };
 
-const handleExport = async () => {
+// 导出函数
+async function handleExport() {
   if (exporting.value) return;
+
+  exporting.value = true;
   try {
-    exporting.value = true;
-    await fetchExportVehicle(searchModel);
-    $message.success(t('common.exportSuccess'));
+    const {data:blob}= await fetchExportVehicle(searchModel);
+
+    console.log(blob);
+
+    if(blob instanceof Blob) {
+      // 创建下载链接
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `车辆列表_${new Date().toLocaleDateString()}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+
+      // 清理
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      window.$message?.success(t('common.exportSuccess'));
+    }
   } catch (error) {
-    console.error('Failed to export vehicles:', error);
+    console.error('导出失败:', error);
+    window.$message?.error(error instanceof Error ? error.message : t('common.error'));
   } finally {
     exporting.value = false;
   }
-};
+}
 
 const handleSubmitSuccess = () => {
   showDrawer.value = false;
   getData();
-  $message.success(t('common.saveSuccess'));
+  $message.success(drawerType.value === 'add' ? t('common.addSuccess') : t('common.updateSuccess'));
 };
 
 // 初始化加载品牌列表

@@ -87,8 +87,12 @@ declare namespace Api {
 
   namespace Vehicle {
     interface VehicleInfo {
-      _id?: string;
+      _id: string;
       customerId: string;
+      customer?: {
+        _id: string;
+        name: string;
+      };
       brand: string;
       model: string;
       year: number;
@@ -168,6 +172,46 @@ declare namespace Api {
       phone?: string;
       address?: string;
       userStatus?: string;
+    }
+  }
+
+  namespace RepairOrder {
+    interface RepairOrderInfo {
+      _id: string;
+      orderNo: string;
+      status: 'pending' | 'inspecting' | 'repairing' | 'completed' | 'delivered';
+      customer: Customer.CustomerInfo;
+      vehicle: Vehicle.VehicleInfo;
+      faultDesc: string;
+      mechanic?: string;
+      estimatedCompletionTime?: string;
+      actualCompletionTime?: string;
+      deliveryTime?: string;
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface SearchParams extends Common.PaginationParams {
+      status?: string;
+      orderNo?: string;
+      customerName?: string;
+      licensePlate?: string;
+    }
+
+    interface CreateParams {
+      isNewCustomer: boolean;
+      customer: Customer.CustomerInfo | { _id: string };
+      vehicle: Vehicle.VehicleInfo | { _id: string };
+      faultDesc: string;
+      remark?: string;
+    }
+
+    interface StatusUpdateParams {
+      status: RepairOrderInfo['status'];
+      mechanic?: string;
+      estimatedCompletionTime?: string;
+      actualCompletionTime?: string;
+      deliveryTime?: string;
     }
   }
 }

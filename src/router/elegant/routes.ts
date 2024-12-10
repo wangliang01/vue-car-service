@@ -103,6 +103,29 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'repair-order',
+    path: '/repair-order',
+    component: 'layout.base',
+    meta: {
+      title: 'repair-order',
+      i18nKey: 'route.repair-order',
+      order: 4,
+      icon: 'material-symbols:build-outline'
+    },
+    children: [
+      {
+        name: 'repair-order_list',
+        path: '/repair-order/list',
+        component: 'view.repair-order_list',
+        meta: {
+          title: 'repair-order_list',
+          i18nKey: 'route.repair-order_list',
+          icon: 'material-symbols:build'
+        }
+      }
+    ]
+  },
+  {
     name: 'vehicle',
     path: '/vehicle',
     component: 'layout.base',

@@ -79,3 +79,11 @@ export function fetchExportCustomer(params: Api.Customer.CustomerInfo) {
     }
   });
 }
+
+/** 获取客户详情 */
+export function fetchCustomerById(id: string) {
+  return request<Api.Customer.CustomerInfo>({
+    url: `/customer/${id}`,
+    method: 'get'
+  });
+}

@@ -1,187 +1,142 @@
 # 新增模块指南
 
-本文档说明如何在 Soybean Admin 中新增一个完整的功能模块。以客户管理(customer)模块为例。
+本文档说明如何在系统中新增一个完整的功能模块。以维修工单(repair-order)模块为例。
 
-## 目录结构
+## 1. 目录结构
 
 ```bash
-src
-├── router
-│   ├── modules
-│   │   ├── customer.ts     # 客户模块路由配置
-│   │   └── index.ts        # 导出所有模块路由
+src   
 ├── service
 │   └── api
-│       └── customer.ts     # API接口定义
+│       └── repair-order.ts   # API接口定义
 ├── typings
-│   └── api.d.ts           # API类型定义
+│   └── api.d.ts             # API类型定义
 ├── views
-│   └── customer           # 客户模块目录
-│       └── list           # 列表页面
-│           └── index.vue  # 页面组件
+│   └── repair-order         # 模块目录
+│       ├── list             # 列表页面
+│       │   ├── index.vue    # 页面组件
+│       │   └── modules      # 子组件
+│       │       ├── search.vue   # 搜索组件
+│       │       └── form.vue     # 表单组件
+│       └── detail           # 详情页面
 └── locales
     └── langs
-        ├── en-us.ts       # 英文翻译
-        └── zh-cn.ts       # 中文翻译
+        ├── en-us.ts         # 英文翻译
+        └── zh-cn.ts         # 中文翻译
 ```
 
-## 文件内容示例
+## 2. 开发步骤
 
-### 1. 路由配置
+### 2.1 定义API类型
 
-```typescript:src/router/modules/customer.ts
-import type { GeneratedRoute } from '@elegant-router/types';
+首先在 `src/typings/api.d.ts` 中定义模块相关的类型:
 
-const customer: GeneratedRoute = {
-  name: 'customer',
-  path: '/customer',
-  component: 'layout.base',
-  meta: {
-    order: 2,
-    requiresAuth: true,
-    title: 'menu.customer',
-    i18nKey: 'route.customer',
-    i18nTitle: true,
-    icon: 'material-symbols:person-outline',
-  },
-  children: [
-    {
-      name: 'customer_list',
-      path: '/customer/list',
-      component: 'view.customer_list',
-      meta: {
-        title: 'menu.customer.list',
-        i18nKey: 'route.customer_list',
-        i18nTitle: true,
-        icon: 'material-symbols:group-outline',
-        requiresAuth: true
-      }
+```typescript
+declare namespace Api {
+  namespace RepairOrder {
+    // 工单信息类型
+    interface RepairOrderInfo {
+      _id: string;
+      orderNo: string;
+      status: 'pending' | 'inspecting' | 'repairing' | 'completed' | 'delivered';
+      customer: Customer.CustomerInfo;
+      vehicle: Vehicle.VehicleInfo;
+      faultDesc: string;
+      mechanic?: string;
+      estimatedCompletionTime?: string;
+      actualCompletionTime?: string;
+      deliveryTime?: string;
+      createdAt: string;
+      updatedAt: string;
     }
-  ]
-};
 
-export default customer;
-```
-
-### 2. 国际化配置
-
-```typescript:src/locales/langs/zh-cn.ts
-const local: App.I18n.Schema = {
-  route: {
-    customer: '客户管理',
-    customer_list: '客户列表'
-  },
-  menu: {
-    customer: {
-      _value: '客户管理',
-      list: '客户列表',
-      name: '客户名称',
-      phone: '手机号',
-      email: '邮箱',
-      address: '地址',
-      createdAt: '创建时间',
-      nameSearch: '请输入客户名称',
-      phoneSearch: '请输入手机号'
+    // 搜索参数类型
+    interface SearchParams extends Common.PaginationParams {
+      status?: string;
+      orderNo?: string;
+      customerName?: string;
+      licensePlate?: string;
     }
+
+    // 其他类型定义...
   }
-};
+}
 ```
 
-### 3. API 接口
+### 2.2 添加API接口
 
-```typescript:src/service/api/customer.ts
+在 `src/service/api/repair-order.ts` 中定义接口:
+
+```typescript
 import { request } from '../request';
 
-/** 获取客户列表(分页) */
-export function fetchCustomerList(params: Api.Common.PaginationParams) {
-  return request.get<Api.Common.PaginationResult<Api.Customer.CustomerInfo>>('/customer', { params });
+/** 获取维修工单列表 */
+export function fetchRepairOrderList(params: Api.RepairOrder.SearchParams) {
+  return request<Api.Common.PaginationResult<Api.RepairOrder.RepairOrderInfo>>({
+    url: '/repair-order',
+    method: 'get',
+    params
+  });
 }
 
-/** 删除客户 */
-export function fetchDeleteCustomer(id: string) {
-  return request.delete(`/customer/${id}`);
-}
-
-/** 创建客户 */
-export function fetchCreateCustomer(params: Api.Customer.CreateCustomerParams) {
-  return request.post<Api.Customer.CustomerInfo>('/customer', params);
-}
-
-/** 更新客户 */
-export function fetchUpdateCustomer(id: string, params: Api.Customer.UpdateCustomerParams) {
-  return request.put<Api.Customer.CustomerInfo>(`/customer/${id}`, params);
-}
+// 其他接口定义...
 ```
 
-### 4. API 类型定义
+### 2.3 添加国际化配置
 
-```typescript:src/typings/api.d.ts
-declare namespace Api {
-  namespace Customer {
-    interface CustomerInfo {
-      _id: string;
-      name: string;
-      phone: string;
-      email: string;
-      address: string;
-      createdAt: string;
-    }
+在 `src/locales/langs/zh-cn.ts` 中添加翻译:
 
-    interface CreateCustomerParams {
-      name: string;
-      phone: string;
-      email: string;
-      address: string;
-    }
-
-    interface UpdateCustomerParams extends Partial<CreateCustomerParams> {}
-  }
-
-  namespace Common {
-    interface PaginationParams {
-      page?: number;
-      size?: number;
-    }
-
-    interface PaginationResult<T> {
-      list: T[];
-      total: number;
+```typescript
+const local: App.I18n.Schema = {
+  route: {
+    repairOrder: '维修工单',
+    repairOrder_list: '工单列表'
+  },
+  menu: {
+    repairOrder: {
+      _value: '维修工单',
+      list: '工单列表',
+      status: '工单状态',
+      orderNo: '工单编号',
+      customerName: '客户名称',
+      licensePlate: '车牌号'
     }
   }
-}
+};
 ```
 
-### 5. 视图组件
+### 2.4 添加视图组件
 
-```vue:src/views/customer/list/index.vue
+在 `src/views/repair-order/list/index.vue` 中添加视图组件:
+
+```vue
 <script setup lang="ts">
 import { reactive, h } from 'vue';
 import { NButton, NSpace, NInput, NCard, NDataTable } from 'naive-ui';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
-import { fetchCustomerList, fetchDeleteCustomer } from '@/service/api/customer';
+import { fetchRepairOrderList, fetchDeleteRepairOrder } from '@/service/api/repair-order';
 
-defineOptions({ name: 'CustomerList' });
+defineOptions({ name: 'RepairOrderList' });
 
 const { t } = useI18n();
 
 const searchForm = reactive({
-  name: '',
-  phone: ''
+  orderNo: '',
+  customerName: ''
 });
 
 const columns = [
   { type: 'selection' },
   { title: t('common.index'), key: 'index' },
-  { title: t('menu.customer.name'), key: 'name' },
-  { title: t('menu.customer.phone'), key: 'phone' },
-  { title: t('menu.customer.email'), key: 'email' },
-  { title: t('menu.customer.address'), key: 'address' },
-  { title: t('menu.customer.createdAt'), key: 'createdAt' },
+  { title: t('menu.repairOrder.orderNo'), key: 'orderNo' },
+  { title: t('menu.repairOrder.customerName'), key: 'customerName' },
+  { title: t('menu.repairOrder.licensePlate'), key: 'licensePlate' },
+  { title: t('menu.repairOrder.status'), key: 'status' },
   {
     title: t('common.action'),
     key: 'actions',
-    render: (row: Api.Customer.CustomerInfo) => {
+    render: (row: Api.RepairOrder.RepairOrderInfo) => {
       return h(NSpace, {}, () => [
         h(
           NButton,
@@ -207,12 +162,12 @@ const columns = [
 ];
 
 const { loading, data: dataList, pagination, getData } = useTable({
-  apiFn: fetchCustomerList,
+  apiFn: fetchRepairOrderList,
   columns: () => columns,
   immediate: true
 });
 
-async function handleDelete(row: Api.Customer.CustomerInfo) {
+async function handleDelete(row: Api.RepairOrder.RepairOrderInfo) {
   try {
     await window.$dialog?.warning({
       title: t('common.warning'),
@@ -220,7 +175,7 @@ async function handleDelete(row: Api.Customer.CustomerInfo) {
       positiveText: t('common.confirm'),
       negativeText: t('common.cancel')
     });
-    await fetchDeleteCustomer(row._id);
+    await fetchDeleteRepairOrder(row._id);
     window.$message?.success(t('common.deleteSuccess'));
     getData();
   } catch {}
@@ -232,8 +187,8 @@ function handleSearch() {
 
 function handleReset() {
   Object.assign(searchForm, {
-    name: '',
-    phone: ''
+    orderNo: '',
+    customerName: ''
   });
   getData();
 }
@@ -241,11 +196,11 @@ function handleReset() {
 
 <template>
   <div class="h-full">
-    <NCard :title="t('menu.customer.list')" class="h-full">
+    <NCard :title="t('menu.repairOrder.list')" class="h-full">
       <div class="mb-16px">
         <NSpace>
-          <NInput v-model:value="searchForm.name" :placeholder="t('menu.customer.nameSearch')" />
-          <NInput v-model:value="searchForm.phone" :placeholder="t('menu.customer.phoneSearch')" />
+          <NInput v-model:value="searchForm.orderNo" :placeholder="t('menu.repairOrder.orderNoSearch')" />
+          <NInput v-model:value="searchForm.customerName" :placeholder="t('menu.repairOrder.customerNameSearch')" />
           <NButton type="primary" @click="handleSearch">{{ t('common.search') }}</NButton>
           <NButton @click="handleReset">{{ t('common.reset') }}</NButton>
           <NButton type="primary" @click="handleAdd">{{ t('common.add') }}</NButton>

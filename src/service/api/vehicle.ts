@@ -35,13 +35,22 @@ export function fetchDeleteVehicle(id: string) {
   });
 }
 
+/** 批量删除车辆 */
+export function fetchDeleteVehicleBatch( ids: string[] ) {
+  return request({
+    url: '/vehicle/batch-delete',
+    method: 'post',
+    data: ids
+  });
+}
+
 /** 导出车辆数据 */
-export function fetchExportVehicle(params?: Api.Vehicle.VehicleSearchParams) {
+export function fetchExportVehicle(params: Api.Vehicle.VehicleSearchParams) {
   return request({
     url: '/vehicle/export',
     method: 'get',
-    params,
-    responseType: 'blob'
+    data: params,
+    responseType: 'blob',
   });
 }
 
@@ -77,5 +86,14 @@ export function fetchUpdateVehicleMileage(id: string, mileage: number) {
     url: `/vehicle/${id}/mileage`,
     method: 'patch',
     data: { mileage }
+  });
+}
+
+/** 根据车牌号查询车辆信息 */
+export function fetchVehicleByPlate(licensePlate: string) {
+  return request<Api.Vehicle.VehicleInfo>({
+    url: '/vehicle/by-plate',
+    method: 'get',
+    params: { licensePlate }
   });
 }
