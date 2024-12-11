@@ -51,4 +51,29 @@ export function fetchUpdateRepairOrder(id: string, data: Api.RepairOrder.UpdateP
     method: 'put',
     data
   });
+}
+
+/** 检查工单 */
+export function checkRepairOrder(id: string) {
+  return request({
+    url: `/repair-orders/${id}/check`,
+    method: 'POST'
+  })
+}
+
+/** 维修工单 */
+export function repairRepairOrder(id: string) {
+  return request({
+    url: `/repair-orders/${id}/repair`,
+    method: 'POST'
+  })
+}
+
+/** 更新检查记录 */
+export function updateInspection(id: string, data: Api.RepairOrder.InspectionParams) {
+  return request({
+    url: `/repair-order/${id}/inspection`,
+    method: 'PATCH',
+    data
+  });
 } 

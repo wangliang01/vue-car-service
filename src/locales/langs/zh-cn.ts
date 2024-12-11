@@ -68,7 +68,11 @@ const local: App.I18n.Schema = {
     remarkPlaceholder: '请输入备注信息',
     isNew: '新客户',
     searchSuccess: '查询成功',
-    searchError: '查询失败'
+    searchError: '查询失败',
+    upload: '上传图片',
+    preview: '预览',
+    success: '成功',
+    failed: '失败'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -112,7 +116,7 @@ const local: App.I18n.Schema = {
       content: '主体滚动'
     },
     page: {
-      animate: '页面切换��画',
+      animate: '页面切换动画',
       mode: {
         title: '页面切换动画类型',
         'fade-slide': '滑动',
@@ -200,7 +204,7 @@ const local: App.I18n.Schema = {
         loginSuccess: '登录成功',
         welcomeBack: '欢迎回来，{userName} ！',
         registerSuccess: '注册成功',
-        registerError: '注册失败，请稍后重试'
+        registerError: '注册失败，请��后重试'
       },
       pwdLogin: {
         title: '密码录',
@@ -255,7 +259,7 @@ const local: App.I18n.Schema = {
         title: '项目动态',
         moreNews: '更多动态',
         desc1: 'Soybean 在2021年5月28日创建了开源项目 soybean-admin!',
-        desc2: 'Yanbowe 向 soybean-admin 提交了��个bug，多标签栏不会自适应。',
+        desc2: 'Yanbowe 向 soybean-admin 提交了个bug，多标签栏不会自适应。',
         desc3: 'Soybean 准为 soybean-admin 的发布做充分的准备工作!',
         desc4: 'Soybean 正在忙于为soybean-admin写项目说明文档！',
         desc5: 'Soybean 刚才把工作台页面随便写了一些，凑合能看了！'
@@ -372,17 +376,44 @@ const local: App.I18n.Schema = {
       customerNamePlaceholder: '请输入客户名称',
       licensePlatePlaceholder: '请输入车牌号',
       statusPlaceholder: '请选择工单状态',
-      faultDescPlaceholder: '请输入故障描述'
+      inspection: '检查登记',
+      inspectionItems: '车辆检查项目',
+      customerItems: '客户物品登记',
+      itemName: '项目名称',
+      result: '检查结果',
+      normal: '正常',
+      abnormal: '异常',
+      quantity: '数量',
+      remark: '备注',
+      images: '图片',
+      checkSuccess: '检查成功',
+      checkFailed: '检查失败'
     }
   },
   repairOrder: {
     status: {
       pending: '待处理',
-      inspecting: '检查中',
+      checked: '已检查',
       repairing: '维修中', 
       completed: '已完工',
       delivered: '已交车'
-    }
+    },
+    check: '检查',
+    repair: '维修',
+    checkSuccess: '检查成功',
+    repairSuccess: '维修成功',
+    checkFailed: '检查失败',
+    repairFailed: '维修失败',
+    inspection: '检查登记',
+    inspectionItems: '车辆检查项目',
+    customerItems: '客户物品登记',
+    itemName: '项目名称',
+    result: '检查结果',
+    normal: '正常',
+    abnormal: '异常',
+    quantity: '数量',
+    remark: '备注',
+    images: '图片'
   }
 };
 

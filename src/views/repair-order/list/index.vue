@@ -4,9 +4,10 @@ import { NButton, NSpace, NCard, NDataTable, NSelect, NTag, useDialog, useMessag
 import dayjs from 'dayjs';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
-import { fetchRepairOrderList, fetchUpdateRepairOrderStatus } from '@/service/api/repair-order';
+import { fetchRepairOrderList, fetchUpdateRepairOrderStatus, checkRepairOrder, repairRepairOrder, updateInspection } from '@/service/api/repair-order';
 import RepairOrderSearch from './modules/search.vue';
 import RepairOrderForm from './modules/form.vue';
+import RepairOrderInspection from './modules/inspection.vue';
 
 defineOptions({ name: 'RepairOrderList' });
 
@@ -129,6 +130,27 @@ const columns = computed(() => [
             },
             { default: () => t('common.edit') }
           ),
+         
+          row.status === 'pending' && h(
+            NButton,
+            {
+              type: 'primary',
+              size: 'small',
+              ghost: true,
+              onClick: () => handleCheck(row)
+            },
+            { default: () => t('repairOrder.check') }
+          ),
+          row.status === 'checked' && h(
+            NButton,
+            {
+              type: 'success',
+              size: 'small',
+              ghost: true,
+              onClick: () => handleRepair(row)
+            },
+            { default: () => t('repairOrder.repair') }
+          ),
           h(
             NButton,
             {
@@ -137,7 +159,7 @@ const columns = computed(() => [
               onClick: () => handleView(row)
             },
             { default: () => t('common.view') }
-          )
+          ),
         ]
       });
     }
@@ -160,8 +182,10 @@ const {
 });
 
 const showDrawer = ref(false);
-const drawerType = ref<'add' | 'edit'>('add');
+const showInspectionDrawer = ref(false);
+const drawerType = ref<'add' | 'edit' | 'view'>('add');
 const editData = ref<Api.RepairOrder.RepairOrderInfo | null>(null);
+const currentOrderId = ref<string | null>(null);
 
 function handleAdd() {
   showDrawer.value = true;
@@ -207,6 +231,33 @@ function handleView(row: Api.RepairOrder.RepairOrderInfo) {
 
 function handleDrawerClose() {
   editData.value = null;
+}
+
+async function handleCheck(row: Api.RepairOrder.RepairOrderInfo) {
+  currentOrderId.value = row._id;
+  showInspectionDrawer.value = true;
+}
+
+async function handleRepair(row: Api.RepairOrder.RepairOrderInfo) {
+  try {
+    await repairRepairOrder(row._id);
+    window.$message?.success('维修成功');
+    await getData();
+  } catch (error) {
+    window.$message?.error('维修失败');
+  }
+}
+
+async function handleInspectionSubmit(orderId: string, data: Api.RepairOrder.InspectionData) {
+  try {
+    await updateInspection(orderId, data);
+    await checkRepairOrder(orderId);
+    window.$message?.success(t('repairOrder.checkSuccess'));
+    showInspectionDrawer.value = false;
+    await getData();
+  } catch (error) {
+    window.$message?.error(t('repairOrder.checkFailed'));
+  }
 }
 </script>
 
@@ -256,6 +307,11 @@ function handleDrawerClose() {
       :edit-data="editData"
       @submit-success="handleSubmitSuccess"
       @update:show="handleDrawerClose"
+    />
+    <RepairOrderInspection
+      v-model:show="showInspectionDrawer"
+      :order-id="currentOrderId"
+      @submit="handleInspectionSubmit"
     />
   </div>
 </template> 

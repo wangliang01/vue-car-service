@@ -179,7 +179,7 @@ declare namespace Api {
     interface RepairOrderInfo {
       _id: string;
       orderNo: string;
-      status: 'pending' | 'inspecting' | 'repairing' | 'completed' | 'delivered';
+      status: 'pending' | 'checked' | 'repairing' | 'completed' | 'delivered';
       customer: Customer.CustomerInfo;
       vehicle: Vehicle.VehicleInfo;
       faultDesc: string;
