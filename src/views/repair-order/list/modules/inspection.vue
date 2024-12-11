@@ -211,8 +211,7 @@ function handlePreview(item: InspectionItem) {
                           :on-success="(options) => handleUploadSuccess(item, options)"
                         >
                           <div class="upload-trigger">
-                            <div class="i-material-symbols:add" />
-                            <div class="upload-text">{{ t('common.upload') }}</div>
+                            <div class="i-material-symbols:add text-2xl" />
                           </div>
                         </NUpload>
                       </div>
