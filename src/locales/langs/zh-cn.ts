@@ -72,7 +72,9 @@ const local: App.I18n.Schema = {
     upload: '上传图片',
     preview: '预览',
     success: '成功',
-    failed: '失败'
+    failed: '失败',
+    uploadSuccess: '上传成功',
+    uploadFailed: '上传失败'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -164,7 +166,7 @@ const local: App.I18n.Schema = {
       visible: '显示全屏水印',
       text: '水印文本'
     },
-    themeDrawerTitle: '主题配置',
+    themeDrawerTitle: '���题配置',
     pageFunTitle: '页面功能',
     configOperation: {
       copyConfig: '复制配置',
@@ -204,7 +206,7 @@ const local: App.I18n.Schema = {
         loginSuccess: '登录成功',
         welcomeBack: '欢迎回来，{userName} ！',
         registerSuccess: '注册成功',
-        registerError: '注册失败，请��后重试'
+        registerError: '注册失败，请稍后重试'
       },
       pwdLogin: {
         title: '密码录',
@@ -282,7 +284,7 @@ const local: App.I18n.Schema = {
       invalid: '密码格式不正确，6-18位字符，包含字母、数字、下划线'
     },
     confirmPwd: {
-      required: '请输入确认密码',
+      required: '请输入���认密码',
       invalid: '两次输入密码一致'
     },
     code: {

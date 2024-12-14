@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { InspectionData } from '@/types/repair-order'
 import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSelect, NInputNumber, NSpace, NButton, NGrid, NGridItem, NCard, NUpload, NImage } from 'naive-ui'
+import { uploadFile } from '@/service/api/upload';
+import { deleteFile } from '@/service/api/upload';
 
 const { t } = useI18n()
 
@@ -72,30 +74,34 @@ function handleSubmit() {
   }
 }
 
-// 图片上传相关配置
+// 修改上传配置
 const uploadConfig = {
-  action: '/api/upload', // 上传接口
-  max: 5, // 最大上传数量
-  accept: '.jpg,.jpeg,.png', // 接受的文件类型
-  'show-file-list': false // 不显示文件列表
+  max: 5,
+  accept: '.jpg,.jpeg,.png',
+  listType: 'image-card' as const,
+  'show-file-list': true,
+  customRequest: handleCustomUpload,
+  beforeUpload
 }
 
-function handleUploadSuccess(item: InspectionItem, { file }: { file: { id: string; url: string } }) {
-  if (!item.images) {
-    item.images = []
+// 自定义上传方法
+async function handleCustomUpload({ file, onFinish, onError }: {
+  file: { file: File }
+  onFinish: (response: any) => void
+  onError: (err: Error) => void
+}) {
+  try {
+    const { data } = await uploadFile(file.file, 'inspection');
+    console.log("data", data)
+    onFinish(data);
+    window.$message?.success(t('common.uploadSuccess'));
+  } catch (error: any) {
+    onError(error);
+    window.$message?.error(error.message || t('common.uploadFailed'));
   }
-  item.images.push({
-    id: file.id,
-    url: file.url
-  })
 }
 
-function handleRemoveImage(item: InspectionItem, imageId: string) {
-  const index = item.images?.findIndex(img => img.id === imageId)
-  if (index !== undefined && index > -1) {
-    item.images?.splice(index, 1)
-  }
-}
+
 
 // 预览相关
 const showPreview = ref(false)
@@ -109,6 +115,27 @@ function handlePreview(item: InspectionItem) {
     showPreview.value = true
   }
 }
+
+// 上传前验证
+function beforeUpload(file: File) {
+  // 验证文件大小(例如最大5MB)
+  const maxSize = 5 * 1024 * 1024
+  if (file.size > maxSize) {
+    window.$message?.error(t('common.fileTooLarge'))
+    return false
+  }
+  
+  // 验证文件类型
+  const allowTypes = ['image/jpeg', 'image/png']
+  if (!allowTypes.includes(file.type)) {
+    window.$message?.error(t('common.invalidFileType'))
+    return false
+  }
+  
+  return true
+}
+
+
 </script>
 
 <template>
@@ -178,37 +205,8 @@ function handlePreview(item: InspectionItem) {
                   <NFormItem :label="t('repairOrder.images')">
                     <div class="upload-container">
                       <div class="image-preview-list">
-                        <div 
-                          v-for="image in item.images" 
-                          :key="image.id" 
-                          class="image-preview-item"
-                        >
-                          <NImage
-                            :src="image.url"
-                            :width="100"
-                            :height="100"
-                            class="preview-image"
-                            preview-disabled
-                            @click="handlePreview(item)"
-                          />
-                          <div class="image-actions">
-                            <NButton
-                              circle
-                              size="tiny"
-                              type="error"
-                              @click.stop="handleRemoveImage(item, image.id)"
-                            >
-                              <template #icon>
-                                <div class="i-material-symbols:close" />
-                              </template>
-                            </NButton>
-                          </div>
-                        </div>
-                        
                         <NUpload
-                          v-if="!item.images?.length || item.images.length < 5"
                           v-bind="uploadConfig"
-                          :on-success="(options) => handleUploadSuccess(item, options)"
                         >
                           <div class="upload-trigger">
                             <div class="i-material-symbols:add text-2xl" />
@@ -271,6 +269,21 @@ function handlePreview(item: InspectionItem) {
                     <NInput v-model:value="item.remark" type="textarea" :rows="1" />
                   </NFormItem>
                 </NGridItem>
+                <NGridItem :span="24">
+                  <NFormItem :label="t('repairOrder.images')">
+                    <div class="upload-container">
+                      <div class="image-preview-list">
+                        <NUpload
+                          v-bind="uploadConfig"
+                        >
+                          <div class="upload-trigger">
+                            <div class="i-material-symbols:add text-2xl" />
+                          </div>
+                        </NUpload>                   
+                      </div>
+                    </div>
+                  </NFormItem>
+                </NGridItem>
               </NGrid>
             </NCard>
           </NSpace>
@@ -289,18 +302,6 @@ function handlePreview(item: InspectionItem) {
       </template>
     </NDrawerContent>
   </NDrawer>
-
-  <!-- 图片预览 -->
-  <NImage
-    v-if="showPreview"
-    v-model:show="showPreview"
-    :src="previewImages[previewIndex]"
-    :show-toolbar="true"
-    :show-next="previewImages.length > 1"
-    :show-prev="previewImages.length > 1"
-    @prev="previewIndex = Math.max(0, previewIndex - 1)"
-    @next="previewIndex = Math.min(previewImages.length - 1, previewIndex + 1)"
-  />
 </template>
 
 <style scoped>
