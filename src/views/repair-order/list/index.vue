@@ -8,6 +8,7 @@ import { fetchRepairOrderList, fetchUpdateRepairOrderStatus, checkRepairOrder, r
 import RepairOrderSearch from './modules/search.vue';
 import RepairOrderForm from './modules/form.vue';
 import RepairOrderInspection from './modules/inspection.vue';
+import RepairOrderRepair from './modules/repair.vue';
 
 defineOptions({ name: 'RepairOrderList' });
 
@@ -22,7 +23,7 @@ const searchModel = reactive<Api.RepairOrder.SearchParams>({
 
 const statusOptions = computed(() => [
   { label: t('repairOrder.status.pending'), value: 'pending' },
-  { label: t('repairOrder.status.inspecting'), value: 'inspecting' },
+  { label: t('repairOrder.status.checked'), value: 'checked' },
   { label: t('repairOrder.status.repairing'), value: 'repairing' },
   { label: t('repairOrder.status.completed'), value: 'completed' },
   { label: t('repairOrder.status.delivered'), value: 'delivered' }
@@ -30,7 +31,7 @@ const statusOptions = computed(() => [
 
 const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' | 'error'> = {
   pending: 'default',
-  inspecting: 'warning',
+  checked: 'warning',
   repairing: 'info',
   completed: 'success',
   delivered: 'success'
@@ -149,7 +150,7 @@ const columns = computed(() => [
               ghost: true,
               onClick: () => handleRepair(row)
             },
-            { default: () => t('repairOrder.repair') }
+            { default: () => t('repairOrder.repair.action') }
           ),
           h(
             NButton,
@@ -183,6 +184,7 @@ const {
 
 const showDrawer = ref(false);
 const showInspectionDrawer = ref(false);
+const showRepairDrawer = ref(false);
 const drawerType = ref<'add' | 'edit' | 'view'>('add');
 const editData = ref<Api.RepairOrder.RepairOrderInfo | null>(null);
 const currentOrderId = ref<string | null>(null);
@@ -239,24 +241,32 @@ async function handleCheck(row: Api.RepairOrder.RepairOrderInfo) {
 }
 
 async function handleRepair(row: Api.RepairOrder.RepairOrderInfo) {
-  try {
-    await repairRepairOrder(row._id);
-    window.$message?.success('维修成功');
-    await getData();
-  } catch (error) {
-    window.$message?.error('维修失败');
-  }
+  currentOrderId.value = row._id;
+  showRepairDrawer.value = true;
 }
 
 async function handleInspectionSubmit(orderId: string, data: Api.RepairOrder.InspectionData) {
+  console.log("data", data)
   try {
-    await updateInspection(orderId, data);
-    await checkRepairOrder(orderId);
+    await checkRepairOrder(orderId, data);
     window.$message?.success(t('repairOrder.checkSuccess'));
     showInspectionDrawer.value = false;
     await getData();
   } catch (error) {
     window.$message?.error(t('repairOrder.checkFailed'));
+  }
+}
+
+async function handleRepairSubmit(orderId: string, data: Api.RepairOrder.RepairData) {
+  try {
+    console.log("data", orderId, data) 
+    await repairRepairOrder(orderId, {...data, status: 'repaired'});
+    window.$message?.success(t('repairOrder.repairSuccess'));
+    showRepairDrawer.value = false;
+    await getData();
+  } catch (error) {
+    console.error(error)
+    window.$message?.error(t('repairOrder.repairFailed'));
   }
 }
 </script>
@@ -312,6 +322,11 @@ async function handleInspectionSubmit(orderId: string, data: Api.RepairOrder.Ins
       v-model:show="showInspectionDrawer"
       :order-id="currentOrderId"
       @submit="handleInspectionSubmit"
+    />
+    <RepairOrderRepair
+      v-model:show="showRepairDrawer"
+      :order-id="currentOrderId"
+      @submit="handleRepairSubmit"
     />
   </div>
 </template> 

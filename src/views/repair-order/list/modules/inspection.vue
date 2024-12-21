@@ -36,7 +36,7 @@ const inspectionData = ref<InspectionData>({
   customerItems: []
 })
 
-const drawerTitle = computed(() => t('repairOrder.inspection'))
+const drawerTitle = computed(() => t('repairOrder.inspection.title'))
 
 function addInspectionItem() {
   inspectionData.value.inspectionItems.push({
@@ -68,9 +68,116 @@ function handleClose() {
   emit('update:show', false)
 }
 
-function handleSubmit() {
-  if (props.orderId) {
-    emit('submit', props.orderId, inspectionData.value)
+// 添加表单引用和校验方法
+const formRef = ref<typeof NForm | null>(null)
+
+// 定义校验规则
+const rules = {
+  inspectionItems: {
+    type: 'array',
+    message: t('common.required'),
+    trigger: 'submit',
+    validator: (rule: any, value: InspectionItem[]) => {
+      if (!value || value.length === 0) {
+        return new Error(t('repairOrder.inspection.atLeastOneItem'))
+      }
+      return true
+    }
+  },
+  'inspectionItems.*': {
+    type: 'object',
+    trigger: 'submit',
+    rule: {
+      name: {
+        required: true,
+        trigger: 'blur',
+        validator: (rule: any, value: string) => {
+          if (!value?.trim()) {
+            return new Error(t('repairOrder.inspection.nameRequired'))
+          }
+          return true
+        }
+      },
+      result: {
+        required: true,
+        trigger: 'change',
+        validator: (rule: any, value: string) => {
+          if (!value) {
+            return new Error(t('repairOrder.inspection.resultRequired'))
+          }
+          return true
+        }
+      }
+    }
+  },
+  customerItems: {
+    type: 'array',
+    trigger: 'submit',
+    validator: (rule: any, value: CustomerItem[]) => {
+      if (value && value.length > 0) {
+        return true
+      }
+      return true
+    }
+  },
+  'customerItems.*': {
+    type: 'object',
+    trigger: 'submit',
+    rule: {
+      name: {
+        required: true,
+        trigger: 'blur',
+        validator: (rule: any, value: string) => {
+          if (!value?.trim()) {
+            return new Error(t('repairOrder.inspection.customerItemNameRequired'))
+          }
+          return true
+        }
+      },
+      quantity: {
+        required: true,
+        trigger: ['input', 'change'],
+        validator: (rule: any, value: number) => {
+          if (typeof value !== 'number' || value < 0) {
+            return new Error(t('repairOrder.inspection.quantityInvalid'))
+          }
+          return true
+        }
+      }
+    }
+  }
+}
+
+// 修改提交方法
+async function handleSubmit() {
+  try {
+    // 表单校验
+    await formRef.value?.validate()
+    
+    // 在提交前再次确认数据的完整性
+    const { inspectionItems } = inspectionData.value
+    if (!inspectionItems.length) {
+      window.$message?.warning(t('repairOrder.inspection.atLeastOneItem'))
+      return
+    }
+
+    // 检查所有必填字段
+    const hasInvalidItem = inspectionItems.some(item => 
+      !item.name?.trim() || !item.result
+    )
+    
+    if (hasInvalidItem) {
+      window.$message?.warning(t('repairOrder.inspection.completeAllRequired'))
+      return
+    }
+    
+    if (props.orderId) {
+      emit('submit', props.orderId, inspectionData.value)
+      handleClose() // 提交成功后关闭抽屉
+    }
+  } catch (errors) {
+    console.error('Validation error:', errors)
+    window.$message?.error(t('common.invalidForm'))
   }
 }
 
@@ -85,14 +192,23 @@ const uploadConfig = {
 }
 
 // 自定义上传方法
-async function handleCustomUpload({ file, onFinish, onError }: {
+async function handleCustomUpload({ file, onFinish, onError, item }: {
   file: { file: File }
   onFinish: (response: any) => void
   onError: (err: Error) => void
+  item: InspectionItem
 }) {
   try {
     const { data } = await uploadFile(file.file, 'inspection');
-    console.log("data", data)
+    // 将文件id和url添加到对应item的images数组中
+    if (!item.images) {
+      item.images = [];
+    }
+    item.images.push({
+      id: data.id,
+      url: data.url
+    });
+    
     onFinish(data);
     window.$message?.success(t('common.uploadSuccess'));
   } catch (error: any) {
@@ -101,7 +217,19 @@ async function handleCustomUpload({ file, onFinish, onError }: {
   }
 }
 
-
+// 添加删除图片的方法
+async function handleRemoveImage(item: InspectionItem, imageId: string) {
+  try {
+    await deleteFile(imageId);
+    const index = item.images?.findIndex(img => img.id === imageId);
+    if (index !== undefined && index > -1) {
+      item.images?.splice(index, 1);
+    }
+    window.$message?.success(t('common.deleteSuccess'));
+  } catch (error) {
+    window.$message?.error(t('common.error'));
+  }
+}
 
 // 预览相关
 const showPreview = ref(false)
@@ -146,11 +274,15 @@ function beforeUpload(file: File) {
     placement="right"
   >
     <NDrawerContent :title="drawerTitle">
-      <NForm>
+      <NForm
+        ref="formRef"
+        :model="inspectionData"
+        :rules="rules"
+      >
         <div class="section">
           <div class="section-header">
             <div class="flex justify-between items-center">
-              <span>{{ t('repairOrder.inspectionItems') }}</span>
+              <span>{{ t('repairOrder.inspection.items') }}</span>
               <NButton size="small" type="primary" ghost @click="addInspectionItem">
                 <template #icon>
                   <div class="i-material-symbols:add" />
@@ -181,32 +313,64 @@ function beforeUpload(file: File) {
               </div>
               <NGrid :cols="24" :x-gap="12">
                 <NGridItem :span="6">
-                  <NFormItem :label="t('repairOrder.itemName')">
+                  <NFormItem 
+                    :label="t('repairOrder.inspection.itemName')"
+                    required
+                  >
                     <NInput v-model:value="item.name" />
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="6">
-                  <NFormItem :label="t('repairOrder.result')">
+                  <NFormItem 
+                    :label="t('repairOrder.inspection.result')"
+                    required
+                  >
                     <NSelect
                       v-model:value="item.result"
                       :options="[
-                        { label: t('repairOrder.normal'), value: 'normal' },
-                        { label: t('repairOrder.abnormal'), value: 'abnormal' }
+                        { label: t('repairOrder.inspection.normal'), value: 'normal' },
+                        { label: t('repairOrder.inspection.abnormal'), value: 'abnormal' }
                       ]"
                     />
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="12">
-                  <NFormItem :label="t('repairOrder.remark')">
+                  <NFormItem :label="t('repairOrder.inspection.remark')">
                     <NInput v-model:value="item.remark" type="textarea" :rows="1" />
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="24">
-                  <NFormItem :label="t('repairOrder.images')">
+                  <NFormItem :label="t('repairOrder.inspection.images')">
                     <div class="upload-container">
                       <div class="image-preview-list">
+                        <div 
+                          v-for="image in item.images" 
+                          :key="image.id"
+                          class="image-preview-item"
+                          @click="() => handlePreview(item)"
+                        >
+                          <NImage
+                            :src="image.url"
+                            class="preview-image"
+                            object-fit="contain"
+                          />
+                          <div class="image-actions">
+                            <NButton
+                              circle
+                              size="tiny"
+                              type="error"
+                              ghost
+                              @click.stop="() => handleRemoveImage(item, image.id)"
+                            >
+                              <template #icon>
+                                <div class="i-material-symbols:close" />
+                              </template>
+                            </NButton>
+                          </div>
+                        </div>
                         <NUpload
                           v-bind="uploadConfig"
+                          :custom-request="(options) => handleCustomUpload({ ...options, item })"
                         >
                           <div class="upload-trigger">
                             <div class="i-material-symbols:add text-2xl" />
@@ -224,7 +388,7 @@ function beforeUpload(file: File) {
         <div class="section">
           <div class="section-header">
             <div class="flex justify-between items-center">
-              <span>{{ t('repairOrder.customerItems') }}</span>
+              <span>{{ t('repairOrder.inspection.customerItems.title') }}</span>
               <NButton size="small" type="primary" ghost @click="addCustomerItem">
                 <template #icon>
                   <div class="i-material-symbols:add" />
@@ -255,31 +419,63 @@ function beforeUpload(file: File) {
               </div>
               <NGrid :cols="24" :x-gap="12">
                 <NGridItem :span="8">
-                  <NFormItem :label="t('repairOrder.itemName')">
+                  <NFormItem 
+                    :label="t('repairOrder.inspection.customerItems.name')"
+                    required
+                  >
                     <NInput v-model:value="item.name" />
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="4">
-                  <NFormItem :label="t('repairOrder.quantity')">
+                  <NFormItem 
+                    :label="t('repairOrder.inspection.customerItems.quantity')"
+                    required
+                  >
                     <NInputNumber v-model:value="item.quantity" :min="0" />
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="12">
-                  <NFormItem :label="t('repairOrder.remark')">
+                  <NFormItem :label="t('repairOrder.inspection.customerItems.remark')">
                     <NInput v-model:value="item.remark" type="textarea" :rows="1" />
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="24">
-                  <NFormItem :label="t('repairOrder.images')">
+                  <NFormItem :label="t('repairOrder.inspection.customerItems.images')">
                     <div class="upload-container">
                       <div class="image-preview-list">
+                        <div 
+                          v-for="image in item.images" 
+                          :key="image.id"
+                          class="image-preview-item"
+                          @click="() => handlePreview(item)"
+                        >
+                          <NImage
+                            :src="image.url"
+                            class="preview-image"
+                            object-fit="contain"
+                          />
+                          <div class="image-actions">
+                            <NButton
+                              circle
+                              size="tiny"
+                              type="error"
+                              ghost
+                              @click.stop="() => handleRemoveImage(item, image.id)"
+                            >
+                              <template #icon>
+                                <div class="i-material-symbols:close" />
+                              </template>
+                            </NButton>
+                          </div>
+                        </div>
                         <NUpload
                           v-bind="uploadConfig"
+                          :custom-request="(options) => handleCustomUpload({ ...options, item })"
                         >
                           <div class="upload-trigger">
                             <div class="i-material-symbols:add text-2xl" />
                           </div>
-                        </NUpload>                   
+                        </NUpload>
                       </div>
                     </div>
                   </NFormItem>

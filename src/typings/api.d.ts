@@ -213,5 +213,15 @@ declare namespace Api {
       actualCompletionTime?: string;
       deliveryTime?: string;
     }
+
+    interface RepairData {
+      repairItems: string[];
+      repairDesc: string;
+      cost: number;
+      laborCost: number;
+      partsCost: number;
+      estimatedCompletionTime?: string;
+      // 根据实际需求添加其他必要字段
+    }
   }
 }

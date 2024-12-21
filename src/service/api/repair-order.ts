@@ -45,7 +45,7 @@ export function fetchVehicleByPlate(licensePlate: string) {
 }
 
 /** 更新维修工单 */
-export function fetchUpdateRepairOrder(id: string, data: Api.RepairOrder.UpdateParams) {
+export function fetchUpdateRepairOrder(id: string, data: Api.RepairOrder.InspectionData) {
   return request<Api.RepairOrder.RepairOrderInfo>({
     url: `/repair-order/${id}`,
     method: 'put',
@@ -53,27 +53,20 @@ export function fetchUpdateRepairOrder(id: string, data: Api.RepairOrder.UpdateP
   });
 }
 
-/** 检查工单 */
-export function checkRepairOrder(id: string) {
+  /** 检查工单 */
+export function checkRepairOrder(id: string, data: Api.RepairOrder.InspectionData) {
   return request({
-    url: `/repair-orders/${id}/check`,
-    method: 'POST'
+    url: `/repair-order/${id}/check`,
+    method: 'patch',
+    data
   })
 }
 
 /** 维修工单 */
-export function repairRepairOrder(id: string) {
-  return request({
-    url: `/repair-orders/${id}/repair`,
-    method: 'POST'
-  })
-}
-
-/** 更新检查记录 */
-export function updateInspection(id: string, data: Api.RepairOrder.InspectionParams) {
-  return request({
-    url: `/repair-order/${id}/inspection`,
-    method: 'PATCH',
+export function repairRepairOrder(id: string, data: Api.RepairOrder.RepairData) {
+  return request<Api.RepairOrder.RepairOrderInfo>({
+    url: `/repair-order/${id}/repair-items-and-status`,
+    method: 'patch',
     data
   });
-} 
+}

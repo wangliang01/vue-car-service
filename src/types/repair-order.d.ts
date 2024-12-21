@@ -10,3 +10,9 @@ export interface InspectionData {
     remark: string
   }>
 } 
+
+export interface RepairData {
+  repairItems: RepairItem[]
+  estimatedCompletionTime: string | null
+  mechanic: string
+} 

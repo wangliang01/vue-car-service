@@ -166,7 +166,7 @@ const local: App.I18n.Schema = {
       visible: '显示全屏水印',
       text: '水印文本'
     },
-    themeDrawerTitle: '���题配置',
+    themeDrawerTitle: '主题配置',
     pageFunTitle: '页面功能',
     configOperation: {
       copyConfig: '复制配置',
@@ -284,7 +284,7 @@ const local: App.I18n.Schema = {
       invalid: '密码格式不正确，6-18位字符，包含字母、数字、下划线'
     },
     confirmPwd: {
-      required: '请输入���认密码',
+      required: '请输入确认密码',
       invalid: '两次输入密码一致'
     },
     code: {
@@ -377,19 +377,7 @@ const local: App.I18n.Schema = {
       orderNoPlaceholder: '请输入工单编号',
       customerNamePlaceholder: '请输入客户名称',
       licensePlatePlaceholder: '请输入车牌号',
-      statusPlaceholder: '请选择工单状态',
-      inspection: '检查登记',
-      inspectionItems: '车辆检查项目',
-      customerItems: '客户物品登记',
-      itemName: '项目名称',
-      result: '检查结果',
-      normal: '正常',
-      abnormal: '异常',
-      quantity: '数量',
-      remark: '备注',
-      images: '图片',
-      checkSuccess: '检查成功',
-      checkFailed: '检查失败'
+      statusPlaceholder: '请选择工单状态'
     }
   },
   repairOrder: {
@@ -401,21 +389,60 @@ const local: App.I18n.Schema = {
       delivered: '已交车'
     },
     check: '检查',
-    repair: '维修',
+    repair: {
+      action: '维修',
+      title: '维修登记',
+      items: '维修项目',
+      itemName: '项目名称',
+      price: '维修费用',
+      parts: '配件清单',
+      partName: '配件名称',
+      quantity: '数量',
+      partPrice: '配件单价',
+      estimatedTime: '预计完工时间',
+      mechanic: '维修技师',
+      atLeastOneItem: '请至少添加一个维修项目',
+      nameRequired: '项目名称不能为空',
+      priceInvalid: '费用必须大于等于0',
+      estimatedTimeRequired: '请选择预计完工时间',
+      mechanicRequired: '请输入维修技师'
+    },
     checkSuccess: '检查成功',
     repairSuccess: '维修成功',
     checkFailed: '检查失败',
     repairFailed: '维修失败',
-    inspection: '检查登记',
-    inspectionItems: '车辆检查项目',
-    customerItems: '客户物品登记',
-    itemName: '项目名称',
-    result: '检查结果',
-    normal: '正常',
-    abnormal: '异常',
-    quantity: '数量',
-    remark: '备注',
-    images: '图片'
+    inspection: {
+      title: '检查登记',
+      items: '车辆检查项目',
+      customerItems: {
+        title: '客户物品登记',
+        name: '物品名称',
+        quantity: '数量',
+        remark: '备注',
+        images: '图片'
+      },
+      itemName: '项目名称',
+      result: '检查结果',
+      normal: '正常',
+      abnormal: '异常',
+      remark: '备注',
+      images: '图片',
+      atLeastOneItem: '请至少添加一个检查项目',
+      nameRequired: '检查项目名称不能为空',
+      resultRequired: '请选择检查结果',
+      completeAllRequired: '请完整填写所有必填项',
+      customerItemNameRequired: '客户物品名称不能为空',
+      quantityInvalid: '数量必须大于等于0',
+      validation: {
+        nameRequired: '检查项目名称不能为空',
+        resultRequired: '请选择检查结果',
+        atLeastOneItem: '请至少添加一个检查项目',
+        completeAllRequired: '请完整填写所有必填项',
+        customerItemNameRequired: '客户物品名称不能为空',
+        quantityInvalid: '数量必须大于等于0',
+        quantityRequired: '请输入数量'
+      }
+    }
   }
 };
 
