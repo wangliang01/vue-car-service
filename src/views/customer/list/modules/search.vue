@@ -87,7 +87,7 @@ async function search() {
                 clearable
               />
             </NFormItemGi>
-            <NFormItemGi span="24 m:12" class="pr-24px">
+            <NFormItemGi span="18 m:18">
               <NSpace class="w-full" justify="end">
                 <NButton @click="reset" ghost>
                   <template #icon>

@@ -126,6 +126,33 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'system',
+    path: '/system',
+    component: 'layout.base',
+    meta: {
+      order: 5,
+      requiresAuth: true,
+      title: 'menu.system',
+      i18nKey: 'route.system',
+      i18nTitle: true,
+      icon: 'material-symbols:settings-outline'
+    },
+    children: [
+      {
+        name: 'system_store',
+        path: '/system/store',
+        component: 'view.system_store',
+        meta: {
+          title: 'menu.system.store',
+          i18nKey: 'route.system_store',
+          i18nTitle: true,
+          icon: 'material-symbols:store-outline',
+          requiresAuth: true
+        }
+      }
+    ]
+  },
+  {
     name: 'vehicle',
     path: '/vehicle',
     component: 'layout.base',

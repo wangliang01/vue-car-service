@@ -27,6 +27,8 @@ declare module "@elegant-router/types" {
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "repair-order": "/repair-order";
     "repair-order_list": "/repair-order/list";
+    "system": "/system";
+    "system_store": "/system/store";
     "vehicle": "/vehicle";
     "vehicle_list": "/vehicle/list";
   };
@@ -68,6 +70,7 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "repair-order"
+    | "system"
     | "vehicle"
   >;
 
@@ -93,6 +96,7 @@ declare module "@elegant-router/types" {
     | "customer_list"
     | "home"
     | "repair-order_list"
+    | "system_store"
     | "vehicle_list"
   >;
 

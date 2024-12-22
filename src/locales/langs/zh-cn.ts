@@ -4,7 +4,32 @@ const local: App.I18n.Schema = {
     updateTitle: '系统版本更新通知',
     updateContent: '检测到系统有新版本发布，是否立即刷新页面？',
     updateConfirm: '立即刷新',
-    updateCancel: '稍后再说'
+    updateCancel: '稍后再说',
+    store: {
+      name: '门店名称',
+      nameSearch: '请输入门店名称',
+      code: '门店编号',
+      codeSearch: '请输入门店编号',
+      statusText: '状态',
+      statusSearch: '请选择门店状态',
+      province: '省份',
+      provinceSearch: '请输入省份',
+      city: '城市',
+      citySearch: '请输入城市',
+      address: '详细地址',
+      contact: '联系方式',
+      batchDeactivate: '批量停用',
+      batchActivate: '批量启用',
+      statusOptions: {
+        active: '启用',
+        inactive: '停用'
+      },
+      status: {
+        _value: '状态',
+        active: '已启用',
+        inactive: '已停用'
+      }
+    }
   },
   common: {
     action: '操作',
@@ -74,7 +99,8 @@ const local: App.I18n.Schema = {
     success: '成功',
     failed: '失败',
     uploadSuccess: '上传成功',
-    uploadFailed: '上传失败'
+    uploadFailed: '上传失败',
+    invalidForm: '表单验证失败'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -187,7 +213,9 @@ const local: App.I18n.Schema = {
     vehicle: '车辆管理',
     vehicle_list: '车辆列表',
     'repair-order': '维修工单',
-    'repair-order_list': '工单列表'
+    'repair-order_list': '工单列表',
+    system: '系统管理',
+    'system_store': '门店管理'
   },
   page: {
     login: {
@@ -378,6 +406,9 @@ const local: App.I18n.Schema = {
       customerNamePlaceholder: '请输入客户名称',
       licensePlatePlaceholder: '请输入车牌号',
       statusPlaceholder: '请选择工单状态'
+    },
+    system: {
+      store: '门店管理'
     }
   },
   repairOrder: {

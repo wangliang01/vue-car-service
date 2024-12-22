@@ -8,13 +8,11 @@ import { fetchCreateCustomer, fetchUpdateCustomer } from '@/service/api/customer
 defineOptions({ name: 'CustomerForm' });
 
 interface Props {
-  show: boolean;
   type: 'add' | 'edit';
   editData?: Api.Customer.CustomerInfo;
 }
 
 interface Emits {
-  (e: 'update:show', value: boolean): void;
   (e: 'submit-success'): void;
 }
 
@@ -23,6 +21,8 @@ const emit = defineEmits<Emits>();
 
 const { t } = useI18n();
 const { formRef, validate } = useNaiveForm();
+
+const show = defineModel()
 
 const formModel = reactive({
   name: '',
@@ -57,7 +57,7 @@ function resetForm() {
 }
 
 function handleClose() {
-  emit('update:show', false);
+  show.value = false
   resetForm();
 }
 
@@ -97,7 +97,7 @@ watch(
 </script>
 
 <template>
-  <NDrawer v-model:show="props.show" :width="500" :mask-closable="true">
+  <NDrawer v-model:show="show" :width="500" :mask-closable="true">
     <NDrawerContent :title="props.type === 'add' ? t('common.add') : t('common.edit')">
       <NForm ref="formRef" :model="formModel" :rules="rules" label-placement="left" :label-width="80">
         <NFormItem :label="t('menu.customer.name')" path="name">

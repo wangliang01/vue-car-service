@@ -48,12 +48,12 @@ declare namespace Api {
     } & T;
 
     interface PaginationParams {
-      page?: number;
+      current?: number;
       size?: number;
     }
 
     interface PaginationResult<T> {
-      list: T[];
+      records: T[];
       total: number;
     }
   }
@@ -222,6 +222,62 @@ declare namespace Api {
       partsCost: number;
       estimatedCompletionTime?: string;
       // 根据实际需求添加其他必要字段
+    }
+  }
+
+  namespace Store {
+    interface StoreInfo {
+      _id: string;
+      name: string;
+      code: string;
+      status: 'active' | 'inactive';
+      address: {
+        province: string;
+        city: string;
+        district: string;
+        detail: string;
+      };
+      contact: {
+        phone: string;
+        email: string;
+      };
+      businessHours: {
+        openTime: string;
+        closeTime: string;
+        workDays: number[];
+      };
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface CreateStoreParams {
+      name: string;
+      code: string;
+      address: {
+        province: string;
+        city: string;
+        district: string;
+        detail: string;
+      };
+      contact: {
+        phone: string;
+        email: string;
+      };
+      businessHours: {
+        openTime: string;
+        closeTime: string;
+        workDays: number[];
+      };
+    }
+
+    interface UpdateStoreParams extends Partial<CreateStoreParams> {}
+
+    interface SearchParams extends Common.PaginationParams {
+      name?: string;
+      code?: string;
+      status?: string;
+      province?: string;
+      city?: string;
     }
   }
 }
