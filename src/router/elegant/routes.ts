@@ -149,7 +149,17 @@ export const generatedRoutes: GeneratedRoute[] = [
           icon: 'material-symbols:store-outline',
           requiresAuth: true
         }
-      }
+      },
+      {
+        name: 'system_permission',
+        path: '/system/permission',
+        component: 'view.system_permission',
+        meta: {
+          title: 'system_permission',
+          icon: 'material-symbols:admin-panel-settings',
+          i18nKey: 'route.system_permission'
+        }
+      },
     ]
   },
   {

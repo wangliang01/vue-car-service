@@ -275,4 +275,33 @@ declare namespace Api {
       city?: string;
     }
   }
+
+  namespace Permission {
+    interface PermissionInfo {
+      _id: string;
+      name: string; // 权限名称
+      code: string; // 权限编码
+      type: 'menu' | 'operation'; // 权限类型:菜单/操作
+      parentId: string | null; // 父级ID
+      path?: string; // 路由路径
+      component?: string; // 组件路径
+      sort: number; // 排序
+      icon?: string; // 图标
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface CreatePermissionParams {
+      name: string;
+      code: string;
+      type: 'menu' | 'operation';
+      parentId?: string | null;
+      path?: string;
+      component?: string;
+      sort?: number;
+      icon?: string;
+    }
+
+    interface UpdatePermissionParams extends Partial<CreatePermissionParams> {}
+  }
 }

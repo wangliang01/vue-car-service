@@ -29,6 +29,24 @@ const local: App.I18n.Schema = {
         active: '已启用',
         inactive: '已停用'
       }
+    },
+    permission: {
+      title: '权限管理',
+      name: '权限名称',
+      code: '权限编码',
+      type: '权限类型',
+      menu: '菜单',
+      operation: '操作',
+      path: '路由路径',
+      component: '组件路径',
+      sort: '排序',
+      icon: '图标',
+      nameRequired: '请输入权限名称',
+      codeRequired: '请输入权限编码',
+      typeRequired: '请选择权限类型',
+      nameSearch: '请输入权限名称',
+      codeSearch: '请输入权限编码',
+      typeSearch: '请选择权限类型'
     }
   },
   common: {
@@ -215,7 +233,8 @@ const local: App.I18n.Schema = {
     'repair-order': '维修工单',
     'repair-order_list': '工单列表',
     system: '系统管理',
-    'system_store': '门店管理'
+    'system_store': '门店管理',
+    'system_permission': '权限管理'
   },
   page: {
     login: {
