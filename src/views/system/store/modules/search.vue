@@ -88,23 +88,7 @@ function handleReset() {
               />
             </NFormItemGi>
 
-            <NFormItemGi :span="6" :label="t('system.store.province')" path="province">
-              <NInput 
-                v-model:value="model.province" 
-                :placeholder="t('system.store.provinceSearch')"
-                @keyup.enter="handleSearch"
-              />
-            </NFormItemGi>
-
-            <NFormItemGi :span="6" :label="t('system.store.city')" path="city">
-              <NInput 
-                v-model:value="model.city" 
-                :placeholder="t('system.store.citySearch')"
-                @keyup.enter="handleSearch"
-              />
-            </NFormItemGi>
-
-            <NFormItemGi :span="18">
+            <NFormItemGi :span="6">
               <NSpace class="w-full" justify="end">
                 <NButton :loading="loading" @click="handleReset">
                   <template #icon>

@@ -253,12 +253,7 @@ declare namespace Api {
     interface CreateStoreParams {
       name: string;
       code: string;
-      address: {
-        province: string;
-        city: string;
-        district: string;
-        detail: string;
-      };
+      address: string;
       contact: {
         phone: string;
         email: string;

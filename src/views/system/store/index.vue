@@ -64,16 +64,7 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
     title: t('system.store.address'),
     key: 'address',
     render(row) {
-      const { province, city, district, detail } = row.address;
-      return `${province}${city}${district}${detail}`;
-    }
-  },
-  { 
-    title: t('system.store.contact'),
-    key: 'contact',
-    render(row) {
-      const { phone, email } = row.contact;
-      return `${phone} / ${email}`;
+      return row.address;
     }
   },
   {
@@ -135,8 +126,6 @@ function handleReset() {
     name: '',
     code: '',
     status: null,
-    province: '',
-    city: ''
   });
   getData(1);
 }
@@ -146,7 +135,6 @@ function handleAdd() {
   formMode.value = 'create';
   editingRecord.value = null;
   formVisible.value = true;
-  console.log(formVisible.value);
 }
 
 // 编辑
