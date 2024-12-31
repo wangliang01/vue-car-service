@@ -1,18 +1,23 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NSpace, NButton, NDataTable, NPagination, NTag } from 'naive-ui';
+import { NCard, NSpace, NButton, NDataTable, NPagination, NTag, NPopconfirm, useMessage } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { 
   fetchStoreList, 
   fetchDeleteStore,
   fetchBatchUpdateStoreStatus,
-  fetchExportStores 
+  fetchExportStores,
+  getStoreUsers,
+  updateStoreUsers,
+  fetchUpdateStoreStatus
 } from '@/service/api/store';
 import StoreForm from './modules/form.vue';
 import StoreSearch from './modules/search.vue';
+import LinkUser from './modules/link-user.vue';
 
 const { t } = useI18n();
+const message = useMessage();
 
 // 搜索表单
 const searchModel = ref<Api.Store.SearchParams>({
@@ -43,6 +48,13 @@ const formVisible = ref(false);
 const formMode = ref<'create' | 'edit'>('create');
 const editingRecord = ref<Api.Store.StoreInfo | null>(null);
 
+// 关联用户控制
+const showLinkUser = ref(false);
+const linkUserLoading = ref(false);
+const currentStoreId = ref<string>();
+const currentStoreName = ref('');
+const linkedUserIds = ref<string[]>([]);
+
 // 表格列定义
 const columns: DataTableColumns<Api.Store.StoreInfo> = [
   { type: 'selection' },
@@ -68,33 +80,64 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
     }
   },
   {
-    title: t('common.action'),
+    title: t('common.operation'),
     key: 'actions',
+    width: 280,
+    fixed: 'right',
+
     render(row) {
-      return h(NSpace, {}, {
-        default: () => [
-          h(
-            NButton,
-            {
-              size: 'small',
-              type: 'primary',
-              ghost: true,
-              onClick: () => handleEdit(row)
-            },
-            { default: () => t('common.edit') }
-          ),
-          h(
-            NButton,
-            {
-              size: 'small',
-              type: 'error',
-              ghost: true,
-              onClick: () => handleDelete(row._id)
-            },
-            { default: () => t('common.delete') }
-          )
-        ]
-      });
+      return h(
+        NSpace,
+        {},
+        {
+          default: () => [
+            h(
+              NButton,
+              {
+                size: 'small',
+                onClick: () => handleEdit(row)
+              },
+              { default: () => t('common.edit') }
+            ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                type: 'info',
+                onClick: () => handleLinkUser(row)
+              },
+              { default: () => t('system.store.linkUser.action') }
+            ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                type: row.status === 'active' ? 'warning' : 'success',
+                onClick: () => handleUpdateStatus(row)
+              },
+              { default: () => row.status === 'active' ? t('system.store.status.deactivate') : t('system.store.status.activate') }
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => handleDelete(row)
+              },
+              {
+                default: () => t('common.confirmDelete'),
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      size: 'small',
+                      type: 'error'
+                    },
+                    { default: () => t('common.delete') }
+                  )
+              }
+            )
+          ]
+        }
+      );
     }
   }
 ];
@@ -209,6 +252,53 @@ function handleFormSubmit() {
   );
 }
 
+// 处理关联用户
+async function handleLinkUser(row: Api.Store.StoreInfo) {
+  currentStoreId.value = row._id;
+  currentStoreName.value = row.name;
+  showLinkUser.value = true;
+  
+  try {
+    const { data } = await getStoreUsers(row._id);
+
+    console.log("data", data);  
+    linkedUserIds.value = data.list.map(item => item._id);
+  } catch (err) {
+    message.error(t('common.loadError'));
+  }
+}
+
+// 处理关联用户提交
+async function handleLinkUserSubmit(userIds: string[]) {
+  if (!currentStoreId.value) return;
+  
+  linkUserLoading.value = true;
+  try {
+    await updateStoreUsers(currentStoreId.value, userIds);
+    message.success(t('common.updateSuccess'));
+    showLinkUser.value = false;
+    getData();
+  } catch (err) {
+    message.error(t('common.updateError'));
+  } finally {
+    linkUserLoading.value = false;
+  }
+}
+
+// 更新门店状态
+async function handleUpdateStatus(row: Api.Store.StoreInfo) {
+  const newStatus = row.status === 'active' ? 'inactive' : 'active';
+  const actionText = newStatus === 'active' ? t('system.store.status.activate') : t('system.store.status.deactivate');
+  
+  try {
+    await fetchUpdateStoreStatus(row._id, newStatus);
+    message.success(actionText + t('common.success'));
+    getData();
+  } catch (err) {
+    message.error(actionText + t('common.failed'));
+  }
+}
+
 onMounted(() => {
   getData();
 });
@@ -278,6 +368,15 @@ onMounted(() => {
       :mode="formMode"
       :editing-record="editingRecord"
       @submit="handleFormSubmit"
+    />
+
+    <LinkUser
+      v-model:show="showLinkUser"
+      :loading="linkUserLoading"
+      :store-id="currentStoreId"
+      :store-name="currentStoreName"
+      :linked-user-ids="linkedUserIds"
+      @submit="handleLinkUserSubmit"
     />
   </div>
 </template>

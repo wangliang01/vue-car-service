@@ -143,9 +143,23 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/system/permission',
         component: 'view.system_permission',
         meta: {
+          order: 4,
           title: 'system_permission',
           icon: 'material-symbols:admin-panel-settings',
           i18nKey: 'route.system_permission'
+        }
+      },
+      {
+        name: 'system_role',
+        path: '/system/role',
+        component: 'view.system_role',
+        meta: {
+          order: 3,
+          title: 'system.role.title',
+          i18nKey: 'route.system_role',
+          i18nTitle: true,
+          icon: 'material-symbols:shield-person-outline',
+          requiresAuth: true
         }
       },
       {
@@ -153,6 +167,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/system/store',
         component: 'view.system_store',
         meta: {
+
+          order: 1,
           title: 'menu.system.store',
           i18nKey: 'route.system_store',
           i18nTitle: true,
@@ -165,22 +181,11 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/system/user',
         component: 'view.system_user',
         meta: {
+          order: 2,
           title: 'system.user.title',
           i18nKey: 'route.system_user',
           i18nTitle: true,
           icon: 'material-symbols:person-outline',
-          requiresAuth: true
-        }
-      },
-      {
-        name: 'system_role',
-        path: '/system/role',
-        component: 'view.system_role',
-        meta: {
-          title: 'system.role.title',
-          i18nKey: 'route.system_role',
-          i18nTitle: true,
-          icon: 'material-symbols:shield-person-outline',
           requiresAuth: true
         }
       }

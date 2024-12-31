@@ -27,7 +27,13 @@ const local: App.I18n.Schema = {
       status: {
         _value: '状态',
         active: '已启用',
-        inactive: '已停用'
+        inactive: '已停用',
+        activate: '启用',
+        deactivate: '停用'
+      },
+      linkUser: {
+        title: '关联用户',
+        action: '关联用户'
       }
     },
     permission: {
@@ -157,7 +163,9 @@ const local: App.I18n.Schema = {
     failed: '失败',
     uploadSuccess: '上传成功',
     uploadFailed: '上传失败',
-    invalidForm: '表单验证失败'
+    invalidForm: '表单验证失败',
+    loadError: '加载失败',
+    loadSuccess: '加载成功'
   },
   request: {
     logout: '请求失败后登出用户',

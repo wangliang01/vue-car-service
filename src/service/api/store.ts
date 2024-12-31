@@ -1,4 +1,5 @@
 import { request } from '../request';
+import type { BaseResponse } from '@/typings/api';
 
 /** 获取门店列表(分页) */
 export function fetchStoreList(params: Api.Store.SearchParams) {
@@ -59,5 +60,22 @@ export function fetchExportStores() {
     url: '/store/export',
     method: 'get',
     responseType: 'blob'
+  });
+}
+
+/** 获取门店关联的用户列表 */
+export function getStoreUsers(storeId: string) {
+  return request<BaseResponse<string[]>>({
+    url: `/store/${storeId}/users`,
+    method: 'get'
+  });
+}
+
+/** 更新门店关联的用户 */
+export function updateStoreUsers(storeId: string, userIds: string[]) {
+  return request<BaseResponse<null>>({
+    url: `/store/${storeId}/users`,
+    method: 'put',
+    data: { userIds }
   });
 } 
