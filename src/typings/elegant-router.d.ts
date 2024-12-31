@@ -29,7 +29,9 @@ declare module "@elegant-router/types" {
     "repair-order_list": "/repair-order/list";
     "system": "/system";
     "system_permission": "/system/permission";
+    "system_role": "/system/role";
     "system_store": "/system/store";
+    "system_user": "/system/user";
     "vehicle": "/vehicle";
     "vehicle_list": "/vehicle/list";
   };
@@ -98,7 +100,9 @@ declare module "@elegant-router/types" {
     | "home"
     | "repair-order_list"
     | "system_permission"
+    | "system_role"
     | "system_store"
+    | "system_user"
     | "vehicle_list"
   >;
 

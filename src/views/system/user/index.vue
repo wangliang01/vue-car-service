@@ -1,0 +1,256 @@
+<script setup lang="ts">
+import { h, ref, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { NCard, NDataTable, NSpace, NButton, NPopconfirm, useMessage, NTag } from 'naive-ui';
+import type { DataTableColumns } from 'naive-ui';
+import { getUserList, createUser, updateUser, deleteUser } from '@/service/api/user';
+import type { UserInfo, UserForm } from '@/service/api/user';
+import Search from './modules/search.vue';
+import Form from './modules/form.vue';
+
+defineOptions({ name: 'UserManagement' });
+
+const { t } = useI18n();
+const message = useMessage();
+
+// 表格数据
+const tableData = ref<UserInfo[]>([]);
+const loading = ref(false);
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  itemCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 30, 40]
+});
+
+// 搜索条件
+const searchModel = ref({
+  username: '',
+  name: '',
+  phone: '',
+  email: ''
+});
+
+// 表单控制
+const showForm = ref(false);
+const formRef = ref();
+const currentId = ref<string>();
+const formLoading = ref(false);
+const editData = ref<UserForm | null>(null);
+
+// 表格列定义
+const columns: DataTableColumns<UserInfo> = [
+  {
+    title: t('system.user.username'),
+    key: 'username'
+  },
+  {
+    title: t('system.user.name'),
+    key: 'name'
+  },
+  {
+    title: t('system.user.phone'),
+    key: 'phone'
+  },
+  {
+    title: t('system.user.email'),
+    key: 'email'
+  },
+  {
+    title: t('system.user.type'),
+    key: 'type',
+    render(row) {
+      const tag = row.type === 'admin' ? t('system.user.typeAdmin') : t('system.user.typeUser');
+      return h(NTag, { type: row.type === 'admin' ? 'success' : 'info' }, tag);
+    }
+  },
+  {
+    title: t('common.createTime'),
+    key: 'createdAt'
+  },
+  {
+    title: t('common.operation'),
+    key: 'actions',
+    render(row) {
+      return h(
+        NSpace,
+        {},
+        {
+          default: () => [
+            h(
+              NButton,
+              {
+                size: 'small',
+                onClick: () => handleEdit(row)
+              },
+              { default: () => t('common.edit') }
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => handleDelete(row)
+              },
+              {
+                default: () => t('common.confirmDelete'),
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      size: 'small',
+                      type: 'error'
+                    },
+                    { default: () => t('common.delete') }
+                  )
+              }
+            )
+          ]
+        }
+      );
+    }
+  }
+];
+
+// 加载表格数据
+async function loadTableData() {
+  loading.value = true;
+  try {
+    const { data } = await getUserList({
+      page: pagination.page,
+      limit: pagination.pageSize,
+      ...searchModel.value
+    });
+    tableData.value = data.list;
+    pagination.itemCount = data.total;
+  } catch (err) {
+    // message.error(t('common.loadError'));
+  } finally {
+    loading.value = false;
+  }
+}
+
+// 处理搜索
+function handleSearch() {
+  pagination.page = 1;
+  loadTableData();
+}
+
+// 处理重置
+function handleReset() {
+  pagination.page = 1;
+  loadTableData();
+}
+
+// 处理分页变化
+function handlePageChange(page: number) {
+  pagination.page = page;
+  loadTableData();
+}
+
+// 处理每页条数变化
+function handlePageSizeChange(pageSize: number) {
+  pagination.pageSize = pageSize;
+  pagination.page = 1;
+  loadTableData();
+}
+
+// 新增用户
+function handleAdd() {
+  currentId.value = undefined;
+  editData.value = null;
+  showForm.value = true;
+}
+
+// 编辑用户
+function handleEdit(row: UserInfo) {
+  currentId.value = row._id;
+  editData.value = {
+    username: row.username,
+    name: row.name,
+    phone: row.phone,
+    email: row.email,
+    type: row.isAdmin ? 'admin' : 'user'
+  };
+  showForm.value = true;
+}
+
+// 删除用户
+async function handleDelete(row: UserInfo) {
+  try {
+    await deleteUser(row.id);
+    message.success(t('common.deleteSuccess'));
+    if (tableData.value.length === 1 && pagination.page > 1) {
+      pagination.page -= 1;
+    }
+    loadTableData();
+  } catch (err) {
+    message.error(t('common.deleteError'));
+  }
+}
+
+// 处理表单提交
+async function handleFormSubmit(data: UserForm) {
+  formLoading.value = true;
+  try {
+    if (currentId.value) {
+      const { password, ...updateData } = data;
+      await updateUser(currentId.value, updateData);
+      message.success(t('common.updateSuccess'));
+    } else {
+      await createUser(data);
+      message.success(t('common.createSuccess'));
+    }
+    showForm.value = false;
+    loadTableData();
+  } catch (err) {
+    message.error(currentId.value ? t('common.updateError') : t('common.createError'));
+  } finally {
+    formLoading.value = false;
+  }
+}
+
+// 初始加载
+loadTableData();
+</script>
+
+<template>
+  <div>
+    <Search
+      v-model:model="searchModel"
+      @search="handleSearch"
+      @reset="handleReset"
+    />
+
+    <NCard>
+      <template #header>
+        <NSpace justify="space-between">
+          <span>{{ t('system.user.title') }}</span>
+          <NButton type="primary" @click="handleAdd">
+            <template #icon>
+              <div class="i-material-symbols:add" />
+            </template>
+            {{ t('common.add') }}
+          </NButton>
+        </NSpace>
+      </template>
+
+      <NDataTable
+        :loading="loading"
+        :columns="columns"
+        :data="tableData"
+        :pagination="pagination"
+        @update:page="handlePageChange"
+        @update:page-size="handlePageSizeChange"
+      />
+    </NCard>
+
+    <Form
+      ref="formRef"
+      v-model:show="showForm"
+      :loading="formLoading"
+      :is-edit="!!currentId"
+      :edit-data="editData"
+      @submit="handleFormSubmit"
+    />
+  </div>
+</template> 

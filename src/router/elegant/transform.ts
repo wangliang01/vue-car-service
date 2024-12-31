@@ -175,7 +175,9 @@ const routeMap: RouteMap = {
   "repair-order_list": "/repair-order/list",
   "system": "/system",
   "system_permission": "/system/permission",
+  "system_role": "/system/role",
   "system_store": "/system/store",
+  "system_user": "/system/user",
   "vehicle": "/vehicle",
   "vehicle_list": "/vehicle/list"
 };

@@ -139,6 +139,16 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'system_permission',
+        path: '/system/permission',
+        component: 'view.system_permission',
+        meta: {
+          title: 'system_permission',
+          icon: 'material-symbols:admin-panel-settings',
+          i18nKey: 'route.system_permission'
+        }
+      },
+      {
         name: 'system_store',
         path: '/system/store',
         component: 'view.system_store',
@@ -151,15 +161,29 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
-        name: 'system_permission',
-        path: '/system/permission',
-        component: 'view.system_permission',
+        name: 'system_user',
+        path: '/system/user',
+        component: 'view.system_user',
         meta: {
-          title: 'system_permission',
-          icon: 'material-symbols:admin-panel-settings',
-          i18nKey: 'route.system_permission'
+          title: 'system.user.title',
+          i18nKey: 'route.system_user',
+          i18nTitle: true,
+          icon: 'material-symbols:person-outline',
+          requiresAuth: true
         }
       },
+      {
+        name: 'system_role',
+        path: '/system/role',
+        component: 'view.system_role',
+        meta: {
+          title: 'system.role.title',
+          i18nKey: 'route.system_role',
+          i18nTitle: true,
+          icon: 'material-symbols:shield-person-outline',
+          requiresAuth: true
+        }
+      }
     ]
   },
   {

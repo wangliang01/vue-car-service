@@ -47,6 +47,43 @@ const local: App.I18n.Schema = {
       nameSearch: '请输入权限名称',
       codeSearch: '请输入权限编码',
       typeSearch: '请选择权限类型'
+    },
+    user: {
+      title: '用户管理',
+      username: '用户名',
+      password: '密码',
+      name: '姓名',
+      phone: '手机号',
+      email: '邮箱',
+      type: '用户类型',
+      typeAdmin: '管理员',
+      typeUser: '普通用户',
+      usernamePlaceholder: '请输入用户名',
+      passwordPlaceholder: '请输入密码',
+      namePlaceholder: '请输入姓名',
+      phonePlaceholder: '请输入手机号',
+      emailPlaceholder: '请输入邮箱',
+      typePlaceholder: '请选择用户类型',
+      usernameRequired: '请输入用户名',
+      passwordRequired: '请输入密码',
+      nameRequired: '请输入姓名',
+      phoneRequired: '请输入手机号',
+      emailRequired: '请输入邮箱',
+      typeRequired: '请选择用户类型'
+    },
+    role: {
+      title: '角色管理',
+      name: '角色名称',
+      code: '角色编码',
+      description: '角色描述',
+      status: '状态',
+      namePlaceholder: '请输入角色名称',
+      codePlaceholder: '请输入角色编码',
+      descriptionPlaceholder: '请输入角色描述',
+      statusPlaceholder: '请选择状态',
+      nameRequired: '请输入角色名称',
+      codeRequired: '请输入角色编码',
+      statusRequired: '请选择状态'
     }
   },
   common: {
@@ -79,6 +116,8 @@ const local: App.I18n.Schema = {
     modifySuccess: '修改成功',
     noData: '无数据',
     operate: '操作',
+    operation: '操作',
+    createTime: '创建时间',
     pleaseCheckValue: '请选择要操作的数据',
     refresh: '刷新',
     reset: '重置',
@@ -233,8 +272,10 @@ const local: App.I18n.Schema = {
     'repair-order': '维修工单',
     'repair-order_list': '工单列表',
     system: '系统管理',
-    'system_store': '门店管理',
-    'system_permission': '权限管理'
+    system_store: '门店管理',
+    system_permission: '权限管理',
+    system_user: '用户管理',
+    system_role: '角色管理'
   },
   page: {
     login: {
@@ -427,7 +468,11 @@ const local: App.I18n.Schema = {
       statusPlaceholder: '请选择工单状态'
     },
     system: {
-      store: '门店管理'
+      _value: '系统管理',
+      store: '门店管理',
+      permission: '权限管理',
+      user: '用户管理',
+      role: '角色管理'
     }
   },
   repairOrder: {
