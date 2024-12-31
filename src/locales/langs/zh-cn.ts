@@ -62,6 +62,7 @@ const local: App.I18n.Schema = {
       phone: '手机号',
       email: '邮箱',
       type: '用户类型',
+      roles: '关联角色',  
       typeAdmin: '管理员',
       typeUser: '普通用户',
       usernamePlaceholder: '请输入用户名',
@@ -75,7 +76,11 @@ const local: App.I18n.Schema = {
       nameRequired: '请输入姓名',
       phoneRequired: '请输入手机号',
       emailRequired: '请输入邮箱',
-      typeRequired: '请选择用户类型'
+      typeRequired: '请选择用户类型',
+      linkRole: {
+        title: '关联角色',
+        action: '关联角色'
+      }
     },
     role: {
       title: '角色管理',

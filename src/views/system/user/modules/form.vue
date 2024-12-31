@@ -87,10 +87,11 @@ const rules = {
 async function handleSubmit() {
   try {
     await formRef.value?.validate();
-    const submitData = { ...model.value };
-    // 编辑时不提交密码字段
+    const submitData = { ...model.value, isAdmin: model.value.type === 'admin' };
+    // 编辑时不提交密码字段, 删除type字段
     if (props.isEdit) {
       delete submitData.password;
+      delete submitData.type;
     }
     emit('submit', submitData);
   } catch (err) {

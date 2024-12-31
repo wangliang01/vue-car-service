@@ -74,3 +74,20 @@ export function assignRoles(userId: string, roleIds: string[]) {
     data: { roleIds }
   });
 }
+
+// 获取用户角色
+export function getUserRoles(userId: string) {
+  return request<BaseResponse<{ list: Array<{ _id: string; name: string }> }>>({
+    url: `/user/${userId}/roles`,
+    method: 'get'
+  });
+}
+
+// 更新用户角色
+export function updateUserRoles(userId: string, roleIds: string[]) {
+  return request<BaseResponse<null>>({
+    url: `/user/${userId}/roles`,
+    method: 'put',
+    data: { roleIds }
+  });
+}

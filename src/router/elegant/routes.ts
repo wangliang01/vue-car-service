@@ -167,7 +167,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/system/store',
         component: 'view.system_store',
         meta: {
-
           order: 1,
           title: 'menu.system.store',
           i18nKey: 'route.system_store',

@@ -3,10 +3,11 @@ import { h, ref, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NCard, NDataTable, NSpace, NButton, NPopconfirm, useMessage, NTag } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
-import { getUserList, createUser, updateUser, deleteUser } from '@/service/api/user';
+import { getUserList, createUser, updateUser, deleteUser, getUserRoles, updateUserRoles } from '@/service/api/user';
 import type { UserInfo, UserForm } from '@/service/api/user';
 import Search from './modules/search.vue';
 import Form from './modules/form.vue';
+import LinkRole from './modules/link-role.vue';
 
 defineOptions({ name: 'UserManagement' });
 
@@ -23,6 +24,13 @@ const pagination = reactive({
   showSizePicker: true,
   pageSizes: [10, 20, 30, 40]
 });
+
+// 关联角色控制
+const showLinkRole = ref(false);
+const linkRoleLoading = ref(false);
+const currentUserId = ref<string>();
+const currentUsername = ref('');
+const linkedRoleIds = ref<string[]>([]);
 
 // 搜索条件
 const searchModel = ref({
@@ -61,8 +69,34 @@ const columns: DataTableColumns<UserInfo> = [
     title: t('system.user.type'),
     key: 'type',
     render(row) {
-      const tag = row.type === 'admin' ? t('system.user.typeAdmin') : t('system.user.typeUser');
-      return h(NTag, { type: row.type === 'admin' ? 'success' : 'info' }, tag);
+      const tag = row.isAdmin === true ? t('system.user.typeAdmin') : t('system.user.typeUser');
+      return h(NTag, { type: row.isAdmin === true  ? 'success' : 'info' }, tag);
+    }
+  },
+  {
+    title: t('system.user.roles'),
+    key: 'roles',
+    render(row) {
+      if (row.isAdmin === true) {
+        return '-';
+      }
+      if (!row.roles?.length) {
+        return '暂无角色';
+      }
+      return h(
+        NSpace,
+        { size: 4 },
+        {
+          default: () =>
+            row.roles.map((role) =>
+              h(
+                NTag,
+                { type: 'warning', size: 'small' },
+                { default: () => role.name }
+              )
+            )
+        }
+      );
     }
   },
   {
@@ -86,6 +120,17 @@ const columns: DataTableColumns<UserInfo> = [
               },
               { default: () => t('common.edit') }
             ),
+            ...(!row.isAdmin ? [
+              h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => handleLinkRole(row)
+                },
+                { default: () => t('system.user.linkRole.action') }
+              )
+            ] : []),
             h(
               NPopconfirm,
               {
@@ -120,10 +165,11 @@ async function loadTableData() {
       limit: pagination.pageSize,
       ...searchModel.value
     });
+    
     tableData.value = data.list;
     pagination.itemCount = data.total;
   } catch (err) {
-    // message.error(t('common.loadError'));
+    message.error(t('common.loadError'));
   } finally {
     loading.value = false;
   }
@@ -209,6 +255,38 @@ async function handleFormSubmit(data: UserForm) {
   }
 }
 
+// 处理关联角色
+async function handleLinkRole(row: UserInfo) {
+  currentUserId.value = row._id;
+  currentUsername.value = row.username;
+  showLinkRole.value = true;
+  
+  try {
+    const { data: roleData } = await getUserRoles(row._id);
+    console.log('获取到的角色数据:', roleData);
+    linkedRoleIds.value = roleData.map(item => item._id);
+  } catch (err) {
+    console.error('获取角色失败:', err);
+    message.error(t('common.loadError'));
+  }
+}
+
+// 处理关联角色提交
+async function handleLinkRoleSubmit(roleIds: string[]) {
+  if (!currentUserId.value) return;
+  
+  linkRoleLoading.value = true;
+  try {
+    await updateUserRoles(currentUserId.value, roleIds);
+    message.success(t('common.updateSuccess'));
+    showLinkRole.value = false;
+  } catch (err) {
+    message.error(t('common.updateError'));
+  } finally {
+    linkRoleLoading.value = false;
+  }
+}
+
 // 初始加载
 loadTableData();
 </script>
@@ -251,6 +329,15 @@ loadTableData();
       :is-edit="!!currentId"
       :edit-data="editData"
       @submit="handleFormSubmit"
+    />
+
+    <LinkRole
+      v-model:show="showLinkRole"
+      :loading="linkRoleLoading"
+      :user-id="currentUserId"
+      :username="currentUsername"
+      :linked-role-ids="linkedRoleIds"
+      @submit="handleLinkRoleSubmit"
     />
   </div>
 </template> 
