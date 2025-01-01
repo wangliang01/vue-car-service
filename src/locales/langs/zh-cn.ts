@@ -94,7 +94,8 @@ const local: App.I18n.Schema = {
       statusPlaceholder: '请选择状态',
       nameRequired: '请输入角色名称',
       codeRequired: '请输入角色编码',
-      statusRequired: '请选择状态'
+      statusRequired: '请选择状态',
+      linkPermission: '关联权限'
     }
   },
   common: {

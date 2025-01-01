@@ -7,6 +7,7 @@ import { getRoleList, createRole, updateRole, deleteRole } from '@/service/api/r
 import type { RoleInfo, RoleForm } from '@/service/api/role';
 import Search from './modules/search.vue';
 import Form from './modules/form.vue';
+import LinkPermission from './modules/link-permission.vue';
 
 defineOptions({ name: 'RoleManagement' });
 
@@ -37,6 +38,10 @@ const formRef = ref();
 const currentId = ref<string>();
 const formLoading = ref(false);
 const editData = ref<RoleForm | null>(null);
+
+// 权限设置控制
+const showPermission = ref(false);
+const currentRoleId = ref('');
 
 // 表格列定义
 const columns: DataTableColumns<RoleInfo> = [
@@ -99,6 +104,15 @@ const columns: DataTableColumns<RoleInfo> = [
                     { default: () => t('common.delete') }
                   )
               }
+            ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                type: 'info',
+                onClick: () => handlePermission(row)
+              },
+              { default: () => t('system.role.linkPermission') }
             )
           ]
         }
@@ -203,6 +217,12 @@ async function handleFormSubmit(data: RoleForm) {
   }
 }
 
+// 处理权限设置
+function handlePermission(row: RoleInfo) {
+  currentRoleId.value = row.id;
+  showPermission.value = true;
+}
+
 // 初始加载
 loadTableData();
 </script>
@@ -245,6 +265,11 @@ loadTableData();
       :is-edit="!!currentId"
       :edit-data="editData"
       @submit="handleFormSubmit"
+    />
+
+    <LinkPermission
+      v-model:show="showPermission"
+      :role-id="currentRoleId"
     />
   </div>
 </template> 

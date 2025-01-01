@@ -76,4 +76,8 @@ export function assignPermissions(roleId: string, permissionIds: string[]) {
     method: 'post',
     data: { permissionIds }
   });
+}
+
+export function updateRolePermissions(roleId: string, permissions: string[]) {
+  return request.put(`/role/${roleId}/permissions`, { permissions });
 } 
