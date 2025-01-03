@@ -219,7 +219,7 @@ async function handleFormSubmit(data: RoleForm) {
 
 // 处理权限设置
 function handlePermission(row: RoleInfo) {
-  currentRoleId.value = row.id;
+  currentRoleId.value = row._id;
   showPermission.value = true;
 }
 

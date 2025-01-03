@@ -75,6 +75,18 @@ async function handleSubmit() {
     } else {
       await fetchCreatePermission(formModel.value);
     }
+    // 清空表单
+    Object.assign(formModel.value, {
+      name: '',
+      code: '',
+      type: 'menu', 
+      parentId: null,
+      path: '',
+      component: '',
+      sort: 1,
+      icon: ''
+    });
+    formRef.value?.restoreValidation();
     emit('update:show', false);
     emit('submit');
   } finally {

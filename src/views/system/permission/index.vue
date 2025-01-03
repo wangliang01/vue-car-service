@@ -12,24 +12,36 @@ const { t } = useI18n();
 const loading = ref(false);
 const showForm = ref(false);
 const editingRecord = ref<Api.Permission.PermissionInfo | null>(null);
-const permissionTree = ref<Api.Permission.PermissionInfo[]>([]);
+const permissionTree = ref([])
 
 // 转换权限数据为树形结构
 function transformPermissionToTree(permissions: Api.Permission.PermissionInfo[]): TreeOption[] {
-  return permissions.map(item => ({
-    key: item._id,
-    label: item.name,
-    children: [], // 如果有子节点,后端会返回嵌套结构
-    rawData: item
-  }));
+  return permissions.map(item => {
+    const node: TreeOption = {
+      key: item._id,
+      label: item.name,
+      code: item.code,
+      type: item.type,
+      icon: item.icon,
+      rawData: item
+    };
+
+    if (item.children && item.children.length > 0) {
+      node.children = transformPermissionToTree(item.children);
+    }
+
+    return node;
+  });
 }
 
 // 获取权限树
 async function getPermissionTree() {
   try {
     loading.value = true;
-    const data = await fetchPermissionTree();
-    permissionTree.value = transformPermissionToTree(data);
+    const {data} = await fetchPermissionTree();
+    permissionTree.value = transformPermissionToTree(data)
+
+    console.log("permissionTree", permissionTree.value);
   } finally {
     loading.value = false;
   }
@@ -105,16 +117,19 @@ getPermissionTree();
         :loading="loading"
         block-line
         selectable
-        :render-label="(nodeProps) => {
-          const node = nodeProps as unknown as TreeOption & { rawData: Api.Permission.PermissionInfo };
+        expand-on-click
+        :show-irrelevant-nodes="false"
+        :render-label="({ option: node }) => {
           return h(
             'div',
             {
-              class: 'flex-y-center justify-between w-full'
+              class: 'h-10 flex-y-center justify-between w-full'
             },
             {
               default: () => [
-                h('span', node.label),
+                h('span', {
+                  class: 'flex-1'
+                }, node.label),
                 h(
                   NSpace,
                   { align: 'center' },
@@ -173,3 +188,13 @@ getPermissionTree();
     </NCard>
   </div>
 </template> 
+
+<style scoped>
+:deep(.n-tree-node) {
+  align-items: center;
+  .n-tree-node-switcher {
+    position: relative;
+    top: -2px;
+  }
+}
+</style>
