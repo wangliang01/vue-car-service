@@ -304,4 +304,46 @@ declare namespace Api {
 
     interface UpdatePermissionParams extends Partial<CreatePermissionParams> {}
   }
+
+  namespace Technician {
+    interface TechnicianInfo {
+      _id: string;
+      userId: string;
+      name: string;
+      avatar: string;
+      phone: string;
+      email: string;
+      level: string;
+      specialties: string[];
+      workYears: number;
+      status: 'active' | 'onLeave' | 'deleted';
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface SearchParams extends Common.PaginationParams {
+      name?: string;
+      phone?: string;
+      email?: string;
+      level?: string;
+      status?: string;
+    }
+
+    interface CreateParams {
+      userId: string;
+      name: string;
+      avatar: string;
+      phone: string;
+      email: string;
+      level: string;
+      specialties: string[];
+      workYears: number;
+    }
+
+    interface UpdateParams extends Partial<Omit<CreateParams, 'userId'>> {}
+
+    interface UpdateStatusParams {
+      status: 'active' | 'onLeave';
+    }
+  }
 }

@@ -97,6 +97,32 @@ const local: App.I18n.Schema = {
       codeRequired: '请输入角色编码',
       statusRequired: '请选择状态',
       linkPermission: '关联权限'
+    },
+    technician: {
+      title: '技师管理',
+      name: '姓名',
+      avatar: '头像',
+      phone: '手机号',
+      email: '邮箱',
+      level: '技师等级',
+      specialties: '专长领域',
+      workYears: '工作年限',
+      status: '状态',
+      namePlaceholder: '请输入姓名',
+      phonePlaceholder: '请输入手机号',
+      emailPlaceholder: '请输入邮箱',
+      levelPlaceholder: '请选择技师等级',
+      specialtiesPlaceholder: '请选择专长领域',
+      workYearsPlaceholder: '请输入工作年限',
+      nameRequired: '请输入姓名',
+      phoneRequired: '请输入手机号',
+      emailRequired: '请输入邮箱',
+      levelRequired: '请选择技师等级',
+      specialtiesRequired: '请选择专长领域',
+      workYearsRequired: '请输入工作年限',
+      statusActive: '在岗',
+      statusOnLeave: '请假',
+      statusDeleted: '已删除'
     }
   },
   common: {
@@ -290,7 +316,8 @@ const local: App.I18n.Schema = {
     system_store: '门店管理',
     system_permission: '权限管理',
     system_user: '用户管理',
-    system_role: '角色管理'
+    system_role: '角色管理',
+    system_technician: '技师管理'
   },
   page: {
     login: {

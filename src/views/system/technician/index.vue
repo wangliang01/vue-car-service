@@ -1,0 +1,279 @@
+<template>
+  <div>
+    <Search
+      v-model:model="searchModel"
+      @search="handleSearch"
+      @reset="handleReset"
+    />
+
+    <NCard>
+      <template #header>
+        <NSpace justify="space-between">
+          <span>{{ t('system.technician.title') }}</span>
+          <NButton type="primary" @click="handleAdd">
+            <template #icon>
+              <div class="i-material-symbols:add" />
+            </template>
+            {{ t('common.add') }}
+          </NButton>
+        </NSpace>
+      </template>
+
+      <NDataTable
+        :loading="loading"
+        :columns="columns"
+        :data="tableData"
+        :pagination="pagination"
+        @update:page="handlePageChange"
+        @update:page-size="handlePageSizeChange"
+      />
+    </NCard>
+
+    <Form
+      ref="formRef"
+      v-model:show="showForm"
+      :loading="formLoading"
+      :is-edit="!!currentId"
+      :edit-data="editData"
+      @submit="handleFormSubmit"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, h } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { NCard, NSpace, NButton, NDataTable, NPopconfirm, NTag, NAvatar, useMessage } from 'naive-ui';
+import type { DataTableColumns } from 'naive-ui';
+import { getTechnicianList, deleteTechnician, updateTechnicianStatus } from '@/service/api/technician';
+import Search from './modules/search.vue';
+import Form from './modules/form.vue';
+
+defineOptions({ name: 'TechnicianManagement' });
+
+const { t } = useI18n();
+const message = useMessage();
+
+// 搜索相关
+const searchModel = ref({
+  name: '',
+  phone: '',
+  email: '',
+  level: '',
+  status: ''
+});
+
+// 表格相关
+const loading = ref(false);
+const tableData = ref<Api.Technician.TechnicianInfo[]>([]);
+const pagination = ref({
+  page: 1,
+  pageSize: 10,
+  itemCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 30, 40]
+});
+
+// 表单相关
+const formRef = ref();
+const showForm = ref(false);
+const formLoading = ref(false);
+const currentId = ref('');
+const editData = ref<Api.Technician.TechnicianInfo | null>(null);
+
+// 表格列定义
+const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
+  {
+    title: t('system.technician.avatar'),
+    key: 'avatar',
+    width: 80,
+    render(row) {
+      return h(NAvatar, {
+        size: 'small',
+        src: row.avatar,
+        round: true
+      });
+    }
+  },
+  {
+    title: t('system.technician.name'),
+    key: 'name',
+    width: 120
+  },
+  {
+    title: t('system.technician.phone'),
+    key: 'phone',
+    width: 120
+  },
+  {
+    title: t('system.technician.email'),
+    key: 'email',
+    width: 180
+  },
+  {
+    title: t('system.technician.level'),
+    key: 'level',
+    width: 120
+  },
+  {
+    title: t('system.technician.specialties'),
+    key: 'specialties',
+    width: 200,
+    render(row) {
+      return row.specialties.map(item => h(NTag, { style: { marginRight: '6px' } }, { default: () => item }));
+    }
+  },
+  {
+    title: t('system.technician.workYears'),
+    key: 'workYears',
+    width: 100
+  },
+  {
+    title: t('system.technician.status'),
+    key: 'status',
+    width: 100,
+    render(row) {
+      const statusMap = {
+        active: { type: 'success', text: t('system.technician.statusActive') },
+        onLeave: { type: 'warning', text: t('system.technician.statusOnLeave') },
+        deleted: { type: 'error', text: t('system.technician.statusDeleted') }
+      };
+      const status = statusMap[row.status];
+      return h(NTag, { type: status.type }, { default: () => status.text });
+    }
+  },
+  {
+    title: t('common.action'),
+    key: 'actions',
+    width: 200,
+    fixed: 'right',
+    render(row) {
+      return h(NSpace, {}, {
+        default: () => [
+          h(NButton, {
+            size: 'small',
+            onClick: () => handleEdit(row)
+          }, { default: () => t('common.edit') }),
+          h(NPopconfirm, {
+            onPositiveClick: () => handleDelete(row._id)
+          }, {
+            default: () => t('common.confirmDelete'),
+            trigger: () => h(NButton, {
+              size: 'small',
+              type: 'error'
+            }, { default: () => t('common.delete') })
+          }),
+          h(NPopconfirm, {
+            onPositiveClick: () => handleUpdateStatus(row._id, row.status === 'active' ? 'onLeave' : 'active')
+          }, {
+            default: () => t('common.confirmUpdate'),
+            trigger: () => h(NButton, {
+              size: 'small',
+              type: row.status === 'active' ? 'warning' : 'success'
+            }, { default: () => row.status === 'active' ? t('system.technician.statusOnLeave') : t('system.technician.statusActive') })
+          })
+        ]
+      });
+    }
+  }
+];
+
+// 获取列表数据
+async function fetchData() {
+  loading.value = true;
+  try {
+    const params = {
+      ...searchModel.value,
+      page: pagination.value.page,
+      limit: pagination.value.pageSize
+    };
+    const { data } = await getTechnicianList(params);
+    tableData.value = data.list;
+    pagination.value.itemCount = data.total;
+  } catch (err) {
+    console.error(err);
+    message.error(t('common.error'));
+  } finally {
+    loading.value = false;
+  }
+}
+
+// 搜索
+async function handleSearch() {
+  pagination.value.page = 1;
+  await fetchData();
+}
+
+// 重置搜索
+async function handleReset() {
+  pagination.value.page = 1;
+  await fetchData();
+}
+
+// 分页改变
+async function handlePageChange(page: number) {
+  pagination.value.page = page;
+  await fetchData();
+}
+
+// 每页条数改变
+async function handlePageSizeChange(pageSize: number) {
+  pagination.value.pageSize = pageSize;
+  pagination.value.page = 1;
+  await fetchData();
+}
+
+// 新增
+function handleAdd() {
+  currentId.value = '';
+  editData.value = null;
+  showForm.value = true;
+}
+
+// 编辑
+function handleEdit(row: Api.Technician.TechnicianInfo) {
+  currentId.value = row._id;
+  editData.value = row;
+  showForm.value = true;
+}
+
+// 删除
+async function handleDelete(id: string) {
+  try {
+    await deleteTechnician(id);
+    message.success(t('common.deleteSuccess'));
+    await fetchData();
+  } catch (err) {
+    console.error(err);
+    message.error(t('common.error'));
+  }
+}
+
+// 更新状态
+async function handleUpdateStatus(id: string, status: Api.Technician.TechnicianInfo['status']) {
+  try {
+    await updateTechnicianStatus(id, { status });
+    message.success(t('common.updateSuccess'));
+    await fetchData();
+  } catch (err) {
+    console.error(err);
+    message.error(t('common.error'));
+  }
+}
+
+// 表单提交
+async function handleFormSubmit() {
+  await fetchData();
+  showForm.value = false;
+}
+
+// 初始化
+fetchData();
+</script>
+
+<style scoped>
+.action-column {
+  display: flex;
+  gap: 8px;
+}
+</style> 

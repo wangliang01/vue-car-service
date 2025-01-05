@@ -176,6 +176,18 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'system_technician',
+        path: '/system/technician',
+        component: 'view.system_technician',
+        meta: {
+          order: 5,
+          title: 'system_technician',
+          i18nKey: 'route.system_technician',
+          i18nTitle: true,
+          icon: 'material-symbols:engineering-outline'
+        }
+      },
+      {
         name: 'system_user',
         path: '/system/user',
         component: 'view.system_user',

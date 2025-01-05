@@ -177,6 +177,7 @@ const routeMap: RouteMap = {
   "system_permission": "/system/permission",
   "system_role": "/system/role",
   "system_store": "/system/store",
+  "system_technician": "/system/technician",
   "system_user": "/system/user",
   "vehicle": "/vehicle",
   "vehicle_list": "/vehicle/list"
