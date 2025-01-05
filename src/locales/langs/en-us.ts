@@ -59,7 +59,9 @@ const local: App.I18n.Schema = {
     },
     unit: {
       kilometer: 'km'
-    }
+    },
+    confirmDeleteTitle: 'Confirm Delete',
+    confirmDeleteContent: 'Data will be lost after deletion, are you sure to delete?'
   },
   request: {
     logout: 'Logout user after request failed',

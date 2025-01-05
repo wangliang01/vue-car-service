@@ -48,6 +48,7 @@ import type { DataTableColumns } from 'naive-ui';
 import { getTechnicianList, deleteTechnician, updateTechnicianStatus } from '@/service/api/technician';
 import Search from './modules/search.vue';
 import Form from './modules/form.vue';
+import ExpertiseTag from '@/components/ExpertiseTag/index.vue'
 
 defineOptions({ name: 'TechnicianManagement' });
 
@@ -84,16 +85,9 @@ const editData = ref<Api.Technician.TechnicianInfo | null>(null);
 // 表格列定义
 const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
   {
-    title: t('system.technician.avatar'),
-    key: 'avatar',
-    width: 80,
-    render(row) {
-      return h(NAvatar, {
-        size: 'small',
-        src: row.avatar,
-        round: true
-      });
-    }
+    title: t('system.technician.employeeId'),
+    key: 'employeeId',
+    width: 120
   },
   {
     title: t('system.technician.name'),
@@ -120,7 +114,7 @@ const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
     key: 'specialties',
     width: 200,
     render(row) {
-      return row.specialties.map(item => h(NTag, { style: { marginRight: '6px' } }, { default: () => item }));
+      return row.specialties.map(item => h(NTag, { class: { 'mr-2': true, 'mb-2': true } }, { default: () => item }));
     }
   },
   {
@@ -155,22 +149,21 @@ const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
             onClick: () => handleEdit(row)
           }, { default: () => t('common.edit') }),
           h(NPopconfirm, {
-            onPositiveClick: () => handleDelete(row._id)
+            onPositiveClick: () => handleDelete(row._id),
+            positiveText: t('common.confirm'),
+            negativeText: t('common.cancel'),
+            width: '240px',
+            showIcon: true,
+            type: 'warning',
           }, {
-            default: () => t('common.confirmDelete'),
+            default: () => h('div', { class: 'delete-confirm' }, [
+              h('div', { class: 'confirm-title' }, t('common.confirmDeleteTitle')),
+              h('div', { class: 'confirm-content' }, t('common.confirmDeleteContent'))
+            ]),
             trigger: () => h(NButton, {
               size: 'small',
               type: 'error'
             }, { default: () => t('common.delete') })
-          }),
-          h(NPopconfirm, {
-            onPositiveClick: () => handleUpdateStatus(row._id, row.status === 'active' ? 'onLeave' : 'active')
-          }, {
-            default: () => t('common.confirmUpdate'),
-            trigger: () => h(NButton, {
-              size: 'small',
-              type: row.status === 'active' ? 'warning' : 'success'
-            }, { default: () => row.status === 'active' ? t('system.technician.statusOnLeave') : t('system.technician.statusActive') })
           })
         ]
       });
@@ -187,9 +180,9 @@ async function fetchData() {
       page: pagination.value.page,
       limit: pagination.value.pageSize
     };
-    const { data } = await getTechnicianList(params);
-    tableData.value = data.list;
-    pagination.value.itemCount = data.total;
+    const res = await getTechnicianList(params);
+    tableData.value = res.data.records;
+    pagination.value.itemCount = res.data.total;
   } catch (err) {
     console.error(err);
     message.error(t('common.error'));
@@ -269,11 +262,32 @@ async function handleFormSubmit() {
 
 // 初始化
 fetchData();
+
+// 如果专长领域是字符串，需要先转换为数组
+const formatExpertise = (expertise: string) => {
+  return expertise ? expertise.split(',') : []
+}
 </script>
 
 <style scoped>
 .action-column {
   display: flex;
   gap: 8px;
+}
+
+.delete-confirm {
+  padding: 8px 0;
+}
+
+.confirm-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--n-title-text-color);
+}
+
+.confirm-content {
+  font-size: 14px;
+  color: var(--n-text-color);
 }
 </style> 

@@ -1,3 +1,5 @@
+import { CommonType } from './common';
+
 /**
  * Namespace Env
  *

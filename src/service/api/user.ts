@@ -40,6 +40,15 @@ export function getUserList(params: UserSearchParams) {
   });
 }
 
+// 搜索用户
+export function searchUsers(params: { keyword: string }) {
+  return request<BaseResponse<PageResult<UserInfo>>>({
+    url: '/user/search',
+    method: 'get',
+    params
+  });
+}
+
 // 创建用户
 export function createUser(data: UserForm) {
   return request<BaseResponse<UserInfo>>({

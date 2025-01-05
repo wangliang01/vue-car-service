@@ -308,7 +308,7 @@ declare namespace Api {
   namespace Technician {
     interface TechnicianInfo {
       _id: string;
-      userId: string;
+      employeeId: string;
       name: string;
       avatar: string;
       phone: string;
@@ -343,7 +343,7 @@ declare namespace Api {
     interface UpdateParams extends Partial<Omit<CreateParams, 'userId'>> {}
 
     interface UpdateStatusParams {
-      status: 'active' | 'onLeave';
+      status: 'active' | 'onLeave' | 'deleted';
     }
   }
 }

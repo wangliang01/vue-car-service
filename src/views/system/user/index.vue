@@ -70,7 +70,7 @@ const columns: DataTableColumns<UserInfo> = [
     key: 'type',
     render(row) {
       // 管理员，普通用户
-      const tag = t('system.user.typeAdmin');
+      const tag = row.isAdmin === true ? t('system.user.typeAdmin') : t('system.user.typeUser');
       return h(NTag, {
         type: row.isAdmin === true ? 'success' : 'info',
         size: 'small'

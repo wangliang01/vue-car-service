@@ -100,6 +100,7 @@ const local: App.I18n.Schema = {
     },
     technician: {
       title: '技师管理',
+      employeeId: '工号',
       name: '姓名',
       avatar: '头像',
       phone: '手机号',
@@ -108,6 +109,7 @@ const local: App.I18n.Schema = {
       specialties: '专长领域',
       workYears: '工作年限',
       status: '状态',
+      selectUser: '请选择用户',
       namePlaceholder: '请输入姓名',
       phonePlaceholder: '请输入手机号',
       emailPlaceholder: '请输入邮箱',
@@ -198,7 +200,9 @@ const local: App.I18n.Schema = {
     uploadFailed: '上传失败',
     invalidForm: '表单验证失败',
     loadError: '加载失败',
-    loadSuccess: '加载成功'
+    loadSuccess: '加载成功',
+    confirmDeleteTitle: '确认删除',
+    confirmDeleteContent: '删除后数据将无法恢复，是否确认删除？',
   },
   request: {
     logout: '请求失败后登出用户',

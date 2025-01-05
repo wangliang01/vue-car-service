@@ -12,45 +12,41 @@
         :label-width="100"
         require-mark-placement="right-hanging"
       >
-        <NFormItem :label="t('system.technician.avatar')" path="avatar">
-          <NUpload
-            accept="image/*"
-            :max="1"
-            :custom-request="handleAvatarUpload"
-          >
-            <NButton>{{ t('common.upload') }}</NButton>
-          </NUpload>
-          <template v-if="model.avatar">
-            <img :src="model.avatar" class="avatar-preview" />
-          </template>
-        </NFormItem>
-
-        <NFormItem :label="t('system.technician.name')" path="name">
-          <NInput 
-            v-model:value="model.name" 
-            :placeholder="t('system.technician.namePlaceholder')"
+        <NFormItem v-if="!isEdit" :label="t('system.technician.selectUser')" path="userId">
+          <NSelect
+            v-model:value="selectedUserId"
+            :options="userOptions"
+            :loading="loading"
+            filterable
+            remote
+            :placeholder="t('system.technician.selectUser')"
+            @search="handleSearch"
+            style="width: 100%"
           />
         </NFormItem>
 
-        <NFormItem :label="t('system.technician.phone')" path="phone">
-          <NInput 
-            v-model:value="model.phone" 
-            :placeholder="t('system.technician.phonePlaceholder')"
-          />
-        </NFormItem>
+        <template v-if="selectedUserId">
+          <div class="bg-gray-100 dark:bg-gray-800 rounded p-4 mb-4">
+            <NFormItem :label="t('system.technician.name')" path="name">
+              <span>{{ model.name }}</span>
+            </NFormItem>
 
-        <NFormItem :label="t('system.technician.email')" path="email">
-          <NInput 
-            v-model:value="model.email" 
-            :placeholder="t('system.technician.emailPlaceholder')"
-          />
-        </NFormItem>
+            <NFormItem :label="t('system.technician.phone')" path="phone">
+              <span>{{ model.phone }}</span>
+            </NFormItem>
+
+            <NFormItem :label="t('system.technician.email')" path="email">
+              <span>{{ model.email }}</span>
+            </NFormItem>
+          </div>
+        </template>
 
         <NFormItem :label="t('system.technician.level')" path="level">
           <NSelect
             v-model:value="model.level"
             :options="levelOptions"
             :placeholder="t('system.technician.levelPlaceholder')"
+            style="width: 100%"
           />
         </NFormItem>
 
@@ -60,6 +56,7 @@
             :options="specialtiesOptions"
             multiple
             :placeholder="t('system.technician.specialtiesPlaceholder')"
+            style="width: 100%"
           />
         </NFormItem>
 
@@ -69,6 +66,7 @@
             :min="0"
             :precision="0"
             :placeholder="t('system.technician.workYearsPlaceholder')"
+            style="width: 100%"
           />
         </NFormItem>
       </NForm>
@@ -94,11 +92,11 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSpace, NButton, NSelect, NInputNumber, NUpload, useMessage } from 'naive-ui'
-import type { FormInst, UploadFileInfo } from 'naive-ui'
+import { NDrawer, NDrawerContent, NForm, NFormItem, NSpace, NButton, NSelect, NInputNumber, useMessage } from 'naive-ui'
+import type { FormInst, FormRules } from 'naive-ui'
 import { createTechnician, updateTechnician } from '@/service/api/technician'
-import { uploadFile } from '@/service/api/upload'
-import { useAuthStore } from '@/store/modules/auth'
+import { searchUsers } from '@/service/api/user'
+import type { UserInfo } from '@/service/api/user'
 
 defineOptions({ name: 'TechnicianForm' })
 
@@ -122,13 +120,16 @@ interface Emits {
 const emit = defineEmits<Emits>()
 const { t } = useI18n()
 const message = useMessage()
-const authStore = useAuthStore()
 const formRef = ref<FormInst | null>(null)
 
 const show = defineModel<boolean>('show', {
   type: Boolean,
   default: false
 })
+
+const selectedUserId = ref('')
+const loading = ref(false)
+const userOptions = ref<{ label: string; value: string; user: UserInfo }[]>([])
 
 const model = ref<Omit<Api.Technician.CreateParams, 'userId'>>({
   name: '',
@@ -158,57 +159,57 @@ const specialtiesOptions = [
   { label: '钣金喷漆', value: '钣金喷漆' }
 ]
 
-const rules = {
-  name: {
-    required: true,
-    message: t('system.technician.nameRequired'),
-    trigger: ['blur', 'input']
-  },
-  phone: {
-    required: true,
-    message: t('system.technician.phoneRequired'),
-    trigger: ['blur', 'input'],
-    pattern: /^1[3-9]\d{9}$/
-  },
-  email: {
-    required: true,
-    message: t('system.technician.emailRequired'),
-    trigger: ['blur', 'input'],
-    pattern: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
-  },
-  level: {
+const rules: FormRules = {
+  level: [{
     required: true,
     message: t('system.technician.levelRequired'),
     trigger: ['blur', 'change']
-  },
-  specialties: {
+  }],
+  specialties: [{
     required: true,
     type: 'array',
     message: t('system.technician.specialtiesRequired'),
     trigger: ['blur', 'change']
-  },
-  workYears: {
+  }],
+  workYears: [{
     required: true,
     type: 'number',
     message: t('system.technician.workYearsRequired'),
     trigger: ['blur', 'change']
+  }]
+}
+
+// 搜索用户
+async function handleSearch(query: string) {
+  if (!query) return
+  
+  loading.value = true
+  try {
+    const { data } = await searchUsers({ keyword: query })
+    userOptions.value = data.map(user => ({
+      label: `${user.name}(${user.phone})`,
+      value: user._id,
+      user
+    }))
+  } catch (err) {
+    console.error('搜索用户失败:', err)
+  } finally {
+    loading.value = false
   }
 }
 
-// 头像上传
-async function handleAvatarUpload(options: any) {
-  try {
-    const { file } = options
-    const formData = new FormData()
-    formData.append('file', file.file)
-    const { data } = await uploadFile(formData)
-    model.value.avatar = data.url
-    message.success(t('common.uploadSuccess'))
-  } catch (err) {
-    console.error(err)
-    message.error(t('common.uploadFailed'))
+// 监听用户选择变化
+watch(selectedUserId, (newId) => {
+  if (!newId) return
+  const selectedOption = userOptions.value.find(opt => opt.value === newId)
+  if (selectedOption) {
+    const { user } = selectedOption
+    model.value.name = user.name
+    model.value.avatar = user.avatar || ''
+    model.value.phone = user.phone
+    model.value.email = user.email
   }
-}
+})
 
 // 提交表单
 async function handleSubmit() {
@@ -216,7 +217,7 @@ async function handleSubmit() {
     await formRef.value?.validate()
     const submitData = {
       ...model.value,
-      userId: authStore.userInfo.userId
+      userId: selectedUserId.value
     }
     if (props.isEdit && props.editData) {
       await updateTechnician(props.editData._id, model.value)
@@ -240,6 +241,7 @@ function handleClose() {
 
 // 重置表单
 function resetForm() {
+  selectedUserId.value = ''
   model.value = {
     name: '',
     avatar: '',

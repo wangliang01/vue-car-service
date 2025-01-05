@@ -1,5 +1,5 @@
 /** The common type namespace */
-declare namespace CommonType {
+export declare namespace CommonType {
   /** The strategic pattern */
   interface StrategicPattern {
     /** The condition */
@@ -22,4 +22,35 @@ declare namespace CommonType {
   type RecordNullable<T> = {
     [K in keyof T]?: T[K] | null;
   };
+}
+
+export interface ApiResponse<T = any> {
+  code: number;
+  data: T;
+  message: string;
+}
+
+export interface PageResult<T = any> {
+  list: T[];
+  total: number;
+}
+
+export interface CommonResult {
+  code: number;
+  message: string;
+}
+
+declare namespace Api {
+  interface PageResult<T> {
+    records: T[];
+    total: number;
+    size: number;
+    current: number;
+  }
+
+  interface ApiResponse<T> {
+    code: number;
+    message: string;
+    data: T;
+  }
 }

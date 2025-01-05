@@ -1,9 +1,13 @@
 import { request } from '../request'
-import type { ApiResponse, PageResult } from '@/typings/api'
+import type { ApiResponse, PageResult } from '@/typings/common'
 
 /** 获取技师列表 */
 export function getTechnicianList(params: Api.Technician.SearchParams) {
-  return request<ApiResponse<PageResult<Api.Technician.TechnicianInfo>>>('/technician', { params })
+  return request<ApiResponse<PageResult<Api.Technician.TechnicianInfo>>>({
+    url: '/technician',
+    method: 'get',
+    params
+  })
 }
 
 /** 创建技师 */
@@ -43,10 +47,16 @@ export function deleteTechnician(id: string) {
 
 /** 根据用户ID获取技师信息 */
 export function getTechnicianByUserId(userId: string) {
-  return request<ApiResponse<Api.Technician.TechnicianInfo>>(`/technician/user/${userId}`)
+  return request<ApiResponse<Api.Technician.TechnicianInfo>>({
+    url: `/technician/user/${userId}`,
+    method: 'get'
+  })
 }
 
 /** 获取技师详情 */
 export function getTechnicianById(id: string) {
-  return request<ApiResponse<Api.Technician.TechnicianInfo>>(`/technician/${id}`)
+  return request<ApiResponse<Api.Technician.TechnicianInfo>>({
+    url: `/technician/${id}`,
+    method: 'get'
+  })
 }
