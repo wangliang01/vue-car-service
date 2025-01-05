@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NGrid, NGridItem, NCard, NDatePicker } from 'naive-ui'
+import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NGrid, NGridItem, NCard, NDatePicker, NSelect, useMessage } from 'naive-ui'
 import type { RepairItem, RepairPart } from '@/types/repair-order'
+import { getTechnicianList } from '@/service/api/technician'
 
 const { t } = useI18n()
+const message = useMessage()
 
 const props = withDefaults(defineProps<{
   show: boolean
@@ -156,13 +158,41 @@ async function handleSubmit() {
     window.$message?.error(t('common.invalidForm'))
   }
 }
+
+const loading = ref(false)
+const technicianOptions = ref<{ label: string; value: string }[]>([])
+
+// 获取技师列表
+const fetchTechnicians = async () => {
+  loading.value = true
+  try {
+    const res = await getTechnicianList({ 
+      status: 'active', // 只获取在岗的技师
+      page: 1,
+      limit: 999 // 获取所有技师
+    })
+    technicianOptions.value = res.data.records.map(item => ({
+      label: `${item.name} (${item.level})`, // 显示技师姓名和级别
+      value: item._id
+    }))
+  } catch (err) {
+    console.error(err)
+    message.error(t('common.error'))
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchTechnicians()
+})
 </script>
 
 <template>
   <NDrawer
     :show="show"
     @update:show="emit('update:show', $event)"
-    :width="800"
+    :width="900"
     placement="right"
   >
     <NDrawerContent :title="drawerTitle">
@@ -170,6 +200,10 @@ async function handleSubmit() {
         ref="formRef"
         :model="repairData"
         :rules="rules"
+        label-placement="left"
+        label-width="auto"
+        require-mark-placement="right-hanging"
+        size="medium"
       >
         <div class="section">
           <div class="section-header">
@@ -220,8 +254,6 @@ async function handleSubmit() {
                     <NInputNumber 
                       v-model:value="item.price" 
                       :min="0" 
-                      readonly 
-                      disabled
                     />
                   </NFormItem>
                 </NGridItem>
@@ -258,7 +290,7 @@ async function handleSubmit() {
                         </template>
                       </NButton>
                     </div>
-                    <NGrid :cols="24" :x-gap="12">
+                    <NGrid :cols="24" :x-gap="12" class="pr-8">
                       <NGridItem :span="8">
                         <NFormItem 
                           :label="t('repairOrder.repair.partName')"
@@ -319,7 +351,13 @@ async function handleSubmit() {
               :label="t('repairOrder.repair.mechanic')"
               required
             >
-              <NInput v-model:value="repairData.mechanic" />
+              <NSelect
+                v-model:value="repairData.mechanic"
+                :loading="loading"
+                :options="technicianOptions"
+                clearable
+                filterable
+              />
             </NFormItem>
           </NGridItem>
         </NGrid>

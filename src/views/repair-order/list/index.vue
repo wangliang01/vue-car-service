@@ -269,6 +269,10 @@ async function handleRepairSubmit(orderId: string, data: Api.RepairOrder.RepairD
     window.$message?.error(t('repairOrder.repairFailed'));
   }
 }
+
+const formatStatus = (status: string) => {
+  return t(`repairOrder.status.${status}`)
+}
 </script>
 
 <template>

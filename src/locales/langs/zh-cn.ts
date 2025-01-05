@@ -527,7 +527,9 @@ const local: App.I18n.Schema = {
       checked: '已检查',
       repairing: '维修中', 
       completed: '已完工',
-      delivered: '已交车'
+      delivered: '已交车',
+      repaired: '已修复',
+      inspecting: '检查中'
     },
     check: '检查',
     repair: {
