@@ -42,7 +42,7 @@ const model = ref<UserForm>({
   type: 'user'
 });
 
-// 用户类型选项
+// 用户类型选项, 管理员， 维修技师， 普通用户
 const typeOptions = [
   { label: t('system.user.typeAdmin'), value: 'admin' },
   { label: t('system.user.typeUser'), value: 'user' }

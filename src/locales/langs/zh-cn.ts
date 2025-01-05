@@ -64,6 +64,7 @@ const local: App.I18n.Schema = {
       type: '用户类型',
       roles: '关联角色',  
       typeAdmin: '管理员',
+      typeTechnician: '维修技师',
       typeUser: '普通用户',
       usernamePlaceholder: '请输入用户名',
       passwordPlaceholder: '请输入密码',
