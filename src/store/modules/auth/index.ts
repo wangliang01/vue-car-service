@@ -22,9 +22,9 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
   const userInfo: Api.Auth.UserInfo = reactive({
     userId: '',
-    userName: '',
+    name: '',
     roles: [],
-    buttons: []
+    permissions: []
   });
 
   /** is super role in static route */
@@ -75,7 +75,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
         if (routeStore.isInitAuthRoute) {
           window.$notification?.success({
             title: $t('page.login.common.loginSuccess'),
-            content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
+            content: $t('page.login.common.welcomeBack', { userName: userInfo.name }),
             duration: 4500
           });
         }

@@ -152,6 +152,16 @@ const columns = computed(() => [
             },
             { default: () => t('repairOrder.repair.action') }
           ),
+          row.status === 'repaired' && h(
+            NButton,
+            {
+              type: 'success',
+              size: 'small',
+              ghost: true,
+              onClick: () => handleComplete(row)
+            },
+            { default: () => t('repairOrder.complete') }
+          ),
           h(
             NButton,
             {
@@ -267,6 +277,16 @@ async function handleRepairSubmit(orderId: string, data: Api.RepairOrder.RepairD
   } catch (error) {
     console.error(error)
     window.$message?.error(t('repairOrder.repairFailed'));
+  }
+}
+
+async function handleComplete(row: Api.RepairOrder.RepairOrderInfo) {
+  try {
+    await fetchUpdateRepairOrderStatus(row._id, { status: 'completed' });
+    window.$message?.success(t('repairOrder.completeSuccess'));
+    await getData();
+  } catch (error) {
+    window.$message?.error(t('repairOrder.completeFailed'));
   }
 }
 

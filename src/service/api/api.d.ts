@@ -1,6 +1,6 @@
 interface RepairOrder {
   id: string
-  status: 'pending' | 'checked' | 'repairing' | 'completed' | 'delivered'
+  status: 'pending' | 'checked' | 'repairing' | 'completed' | 'delivered' | 'repaired' | 'inspecting'
   // ... 其他字段
 } 
 

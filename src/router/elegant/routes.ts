@@ -146,7 +146,9 @@ export const generatedRoutes: GeneratedRoute[] = [
           order: 4,
           title: 'system_permission',
           icon: 'material-symbols:admin-panel-settings',
-          i18nKey: 'route.system_permission'
+          i18nKey: 'route.system_permission',
+          i18nTitle: true,
+          requiresAuth: true
         }
       },
       {

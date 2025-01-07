@@ -525,12 +525,15 @@ const local: App.I18n.Schema = {
     status: {
       pending: '待处理',
       checked: '已检查',
-      repairing: '维修中', 
+      repairing: '维修中',
       completed: '已完工',
       delivered: '已交车',
       repaired: '已修复',
       inspecting: '检查中'
     },
+    complete: '完工',
+    completeSuccess: '工单完工成功',
+    completeFailed: '工单完工失败',
     check: '检查',
     repair: {
       action: '维修',

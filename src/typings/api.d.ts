@@ -71,18 +71,11 @@ declare namespace Api {
 
     interface UserInfo {
       userId: string;
-      userName: string;
+      name: string;
       roles: string[];
-      buttons: string[];
+      permissions: string[];
     }
 
-    /** register params */
-    interface RegisterParams {
-      username: string;
-      email: string;
-      password: string;
-      role?: string;
-    }
   }
 
   namespace Vehicle {
