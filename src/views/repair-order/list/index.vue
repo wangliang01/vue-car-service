@@ -4,7 +4,7 @@ import { NButton, NSpace, NCard, NDataTable, NSelect, NTag, useDialog, useMessag
 import dayjs from 'dayjs';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
-import { fetchRepairOrderList, fetchUpdateRepairOrderStatus, checkRepairOrder, repairRepairOrder, updateInspection } from '@/service/api/repair-order';
+import { fetchRepairOrderList, fetchUpdateRepairOrderStatus, checkRepairOrder, repairRepairOrder, fetchCompleteRepairOrder } from '@/service/api/repair-order';
 import RepairOrderSearch from './modules/search.vue';
 import RepairOrderForm from './modules/form.vue';
 import RepairOrderInspection from './modules/inspection.vue';
@@ -282,7 +282,7 @@ async function handleRepairSubmit(orderId: string, data: Api.RepairOrder.RepairD
 
 async function handleComplete(row: Api.RepairOrder.RepairOrderInfo) {
   try {
-    await fetchUpdateRepairOrderStatus(row._id, { status: 'completed' });
+    await fetchCompleteRepairOrder(row._id);
     window.$message?.success(t('repairOrder.completeSuccess'));
     await getData();
   } catch (error) {

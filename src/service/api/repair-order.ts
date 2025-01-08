@@ -27,6 +27,14 @@ export function fetchUpdateRepairOrderStatus(id: string, data: Api.RepairOrder.S
   });
 }
 
+/** 完工结算 */
+export function fetchCompleteRepairOrder(id: string) {
+  return request({
+    url: `/repair-order/${id}/complete`,
+    method: 'post'
+  });
+}
+
 /** 获取工单详情 */
 export function fetchRepairOrderDetail(id: string) {
   return request<Api.RepairOrder.RepairOrderInfo>({

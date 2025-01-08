@@ -16,3 +16,13 @@ export interface RepairData {
   estimatedCompletionTime: string | null
   mechanic: string
 } 
+
+declare namespace Api.RepairOrder {
+  /** 完工结算参数 */
+  interface CompleteParams {
+    /** 结算金额 */
+    amount: number;
+    /** 备注 */
+    remark?: string;
+  }
+} 
