@@ -23,6 +23,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   customer_list: () => import("@/views/customer/list/index.vue"),
   home: () => import("@/views/home/index.vue"),
   "repair-order_list": () => import("@/views/repair-order/list/index.vue"),
+  settlement_list: () => import("@/views/settlement/list/index.vue"),
   system_permission: () => import("@/views/system/permission/index.vue"),
   system_role: () => import("@/views/system/role/index.vue"),
   system_store: () => import("@/views/system/store/index.vue"),

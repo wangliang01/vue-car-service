@@ -11,8 +11,6 @@ export default defineConfig(configEnv => {
 
   const enableProxy = configEnv.command === 'serve' && !configEnv.isPreview;
 
-  console.log("proxy", createViteProxy(viteEnv, enableProxy));
-
   return {
     base: viteEnv.VITE_BASE_URL,
     resolve: {

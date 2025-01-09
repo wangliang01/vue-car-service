@@ -120,7 +120,30 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'repair-order_list',
           i18nKey: 'route.repair-order_list',
-          icon: 'material-symbols:build'
+          icon: 'material-symbols:construction'
+        }
+      }
+    ]
+  },
+  {
+    name: 'settlement',
+    path: '/settlement',
+    component: 'layout.base',
+    meta: {
+      order: 5,
+      title: 'settlement',
+      i18nKey: 'route.settlement',
+      icon: 'material-symbols:receipt-long-outline'
+    },
+    children: [
+      {
+        name: 'settlement_list',
+        path: '/settlement/list',
+        component: 'view.settlement_list',
+        meta: {
+          title: 'settlement_list',
+          i18nKey: 'route.settlement_list',
+          icon: 'material-symbols:receipt'
         }
       }
     ]

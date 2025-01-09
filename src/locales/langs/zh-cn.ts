@@ -159,6 +159,7 @@ const local: App.I18n.Schema = {
     operate: '操作',
     operation: '操作',
     createTime: '创建时间',
+    pay: '支付',
     pleaseCheckValue: '请选择要操作的数据',
     refresh: '刷新',
     reset: '重置',
@@ -321,7 +322,9 @@ const local: App.I18n.Schema = {
     system_permission: '权限管理',
     system_user: '用户管理',
     system_role: '角色管理',
-    system_technician: '技师管理'
+    system_technician: '技师管理',
+    settlement: '结算管理',
+    settlement_list: '结算列表'
   },
   page: {
     login: {
@@ -588,6 +591,35 @@ const local: App.I18n.Schema = {
         quantityInvalid: '数量必须大于等于0',
         quantityRequired: '请输入数量'
       }
+    }
+  },
+  settlement: {
+    title: '结算管理',
+    settlementNo: '结算单号',
+    repairOrder: '维修工单',
+    customer: '客户',
+    vehicle: '车辆',
+    partsAmount: '配件金额',
+    laborAmount: '工时费',
+    totalAmount: '总金额',
+    paymentMethod: '支付方式',
+    statusLabel: '结算状态',
+    remark: '备注',
+    createdAt: '创建时间',
+    paymentMethods: {
+      cash: '现金',
+      wechat: '微信',
+      alipay: '支付宝',
+      card: '银行卡'
+    },
+    status: {
+      unpaid: '未支付',
+      paid: '已支付',
+      refunded: '已退款'
+    },
+    search: {
+      minAmount: '最小金额',
+      maxAmount: '最大金额'
     }
   }
 };
