@@ -1,374 +1,286 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NGrid, NGridItem, NCard, NDatePicker, NSelect, useMessage } from 'naive-ui'
-import type { RepairItem, RepairPart } from '@/types/repair-order'
-import { getTechnicianList } from '@/service/api/technician'
+import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NDatePicker, NSelect, NDivider } from 'naive-ui';
+import type { FormInst } from 'naive-ui';
 
-const { t } = useI18n()
-const message = useMessage()
+const { t } = useI18n();
+const formRef = ref<FormInst | null>(null);
 
-const props = withDefaults(defineProps<{
-  show: boolean
-  orderId: string | null
-}>(), {
-  show: false,
-  orderId: null
-})
+const show = defineModel<boolean>('show');
+const loading = defineModel<boolean>('loading', { default: false });
 
-const emit = defineEmits<{
-  'update:show': [value: boolean]
-  'submit': [orderId: string, data: RepairData]
-}>()
-
-interface RepairData {
-  repairItems: RepairItem[]
-  estimatedCompletionTime: number | null
-  mechanic: string
+interface RepairPart {
+  name: string;
+  quantity: number;
+  purchasePrice: number;
+  managementFee: number;
+  managementDiscount: number;
 }
 
-const repairData = ref<RepairData>({
-  repairItems: [],
+interface RepairItem {
+  name: string;
+  laborHours: number;
+  laborPrice: number;
+  complexityFactor: number;
+  laborDiscount: number;
+  parts: RepairPart[];
+}
+
+const model = ref<{
+  repairItems: RepairItem[];
+  estimatedCompletionTime: string | null;
+  mechanic: string;
+}>({
+  repairItems: [{
+    name: '',
+    laborHours: 0,
+    laborPrice: 0,
+    complexityFactor: 1,
+    laborDiscount: 0,
+    parts: [{
+      name: '',
+      quantity: 1,
+      purchasePrice: 0,
+      managementFee: 0.1,
+      managementDiscount: 0
+    }]
+  }],
   estimatedCompletionTime: null,
   mechanic: ''
-})
+});
 
-const drawerTitle = computed(() => t('repairOrder.repair.title'))
-
-// 添加表单引用和校验方法
-const formRef = ref<typeof NForm | null>(null)
-
-// 定义校验规则
 const rules = {
   repairItems: {
-    type: 'array' as const,
-    message: t('common.required'),
-    trigger: 'submit',
-    validator: (rule: any, value: RepairItem[]) => {
-      if (!value || value.length === 0) {
-        return new Error(t('repairOrder.repair.atLeastOneItem'))
-      }
-      return true
-    }
-  },
-  'repairItems.*': {
-    type: 'object',
-    trigger: 'submit',
-    rule: {
-      name: {
-        required: true,
-        trigger: 'blur',
-        validator: (rule: any, value: string) => {
-          if (!value?.trim()) {
-            return new Error(t('repairOrder.repair.nameRequired'))
+    type: 'array',
+    required: true,
+    message: t('repairOrder.repair.atLeastOneItem'),
+    trigger: ['blur', 'change'],
+    fields: {
+      0: {
+        type: 'object',
+        fields: {
+          name: {
+            required: true,
+            message: t('repairOrder.repair.nameRequired')
+          },
+          laborHours: {
+            type: 'number',
+            required: true,
+            min: 0,
+            message: t('repairOrder.repair.laborHoursInvalid')
+          },
+          laborPrice: {
+            type: 'number',
+            required: true,
+            min: 0,
+            message: t('repairOrder.repair.laborPriceInvalid')
           }
-          return true
-        }
-      },
-      price: {
-        required: true,
-        trigger: ['input', 'change'],
-        validator: (rule: any, value: number) => {
-          if (typeof value !== 'number' || value < 0) {
-            return new Error(t('repairOrder.repair.priceInvalid'))
-          }
-          return true
         }
       }
     }
   },
   estimatedCompletionTime: {
     required: true,
-    trigger: ['blur', 'change'],
     message: t('repairOrder.repair.estimatedTimeRequired')
   },
   mechanic: {
     required: true,
-    trigger: 'blur',
     message: t('repairOrder.repair.mechanicRequired')
   }
-}
+};
 
-// 计算维修项目总价
-function calculateItemTotal(item: RepairItem) {
-  // 配件总价
-  const partsTotal = item.parts.reduce((sum, part) => {
-    return sum + (part.price * part.quantity)
-  }, 0)
-  return partsTotal
-}
+const emit = defineEmits(['submit']);
 
-// 监听配件变化，自动更新维修费用
-function updateItemPrice(item: RepairItem) {
-  item.price = calculateItemTotal(item)
-}
-
+// 添加维修项目
 function addRepairItem() {
-  repairData.value.repairItems.push({
+  model.value.repairItems.push({
     name: '',
-    price: 0, // 初始价格为0
+    laborHours: 0,
+    laborPrice: 0,
+    complexityFactor: 1,
+    laborDiscount: 0,
     parts: []
-  })
+  });
 }
 
+// 删除维修项目
 function removeRepairItem(index: number) {
-  repairData.value.repairItems.splice(index, 1)
+  model.value.repairItems.splice(index, 1);
 }
 
-function addPart(item: RepairItem) {
-  item.parts.push({
+// 添加配件
+function addPart(repairItemIndex: number) {
+  model.value.repairItems[repairItemIndex].parts.push({
     name: '',
     quantity: 1,
-    price: 0
-  })
+    purchasePrice: 0,
+    managementFee: 0.1,
+    managementDiscount: 0
+  });
 }
 
-function removePart(item: RepairItem, index: number) {
-  item.parts.splice(index, 1)
+// 删除配件
+function removePart(repairItemIndex: number, partIndex: number) {
+  model.value.repairItems[repairItemIndex].parts.splice(partIndex, 1);
 }
 
-// 当配件数量或价格变化时更新维修费用
-function handlePartChange(item: RepairItem) {
-  updateItemPrice(item)
-}
+// 计算工时费
+const laborAmount = computed(() => {
+  return model.value.repairItems.reduce((total, item) => {
+    const amount = item.laborHours * item.laborPrice * item.complexityFactor;
+    return total + amount * (1 - item.laborDiscount);
+  }, 0);
+});
 
-function handleClose() {
-  emit('update:show', false)
-}
+// 计算配件费
+const partsAmount = computed(() => {
+  return model.value.repairItems.reduce((total, item) => {
+    return total + item.parts.reduce((partTotal, part) => {
+      const managementAmount = part.purchasePrice * part.managementFee;
+      const finalManagementAmount = managementAmount * (1 - part.managementDiscount);
+      return partTotal + (part.purchasePrice + finalManagementAmount) * part.quantity;
+    }, 0);
+  }, 0);
+});
+
+// 总金额
+const totalAmount = computed(() => {
+  return laborAmount.value + partsAmount.value;
+});
 
 async function handleSubmit() {
   try {
-    await formRef.value?.validate()
-    
-    const { repairItems } = repairData.value
-    if (!repairItems.length) {
-      window.$message?.warning(t('repairOrder.repair.atLeastOneItem'))
-      return
-    }
-
-    if (props.orderId) {
-      const submitData = {
-        ...repairData.value
-      }
-      emit('submit', props.orderId, submitData)
-      handleClose()
-    }
-  } catch (errors) {
-    console.error('Validation error:', errors)
-    window.$message?.error(t('common.invalidForm'))
-  }
-}
-
-const loading = ref(false)
-const technicianOptions = ref<{ label: string; value: string }[]>([])
-
-// 获取技师列表
-const fetchTechnicians = async () => {
-  loading.value = true
-  try {
-    const res = await getTechnicianList({ 
-      status: 'active', // 只获取在岗的技师
-      page: 1,
-      limit: 999 // 获取所有技师
-    })
-    technicianOptions.value = res.data.records.map(item => ({
-      label: `${item.name} (${item.level})`, // 显示技师姓名和级别
-      value: item._id
-    }))
+    await formRef.value?.validate();
+    emit('submit', model.value);
   } catch (err) {
-    console.error(err)
-    message.error(t('common.error'))
-  } finally {
-    loading.value = false
+    // 表单验证失败
   }
 }
-
-onMounted(() => {
-  fetchTechnicians()
-})
 </script>
 
 <template>
-  <NDrawer
-    :show="show"
-    @update:show="emit('update:show', $event)"
-    :width="900"
-    placement="right"
-  >
-    <NDrawerContent :title="drawerTitle">
-      <NForm
-        ref="formRef"
-        :model="repairData"
-        :rules="rules"
-        label-placement="left"
-        label-width="auto"
-        require-mark-placement="right-hanging"
-        size="medium"
-      >
-        <div class="section">
-          <div class="section-header">
-            <div class="flex justify-between items-center">
-              <span>{{ t('repairOrder.repair.items') }}</span>
-              <NButton size="small" type="primary" ghost @click="addRepairItem">
+  <NDrawer v-model:show="show" :width="720">
+    <NDrawerContent :title="t('repairOrder.repair.title')" :native-scrollbar="false">
+      <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="100">
+        <div v-for="(repairItem, repairIndex) in model.repairItems" :key="repairIndex">
+          <NDivider>{{ t('repairOrder.repair.items') }} #{{ repairIndex + 1 }}</NDivider>
+          
+          <!-- 维修项目基本信息 -->
+          <NFormItem :label="t('repairOrder.repair.itemName')" :path="`repairItems[${repairIndex}].name`">
+            <NInput v-model:value="repairItem.name" />
+          </NFormItem>
+          
+          <NSpace :wrap="false" :size="24">
+            <NFormItem :label="t('repairOrder.repair.laborHours')" :path="`repairItems[${repairIndex}].laborHours`">
+              <NInputNumber v-model:value="repairItem.laborHours" :min="0" :precision="1" />
+            </NFormItem>
+            
+            <NFormItem :label="t('repairOrder.repair.laborPrice')" :path="`repairItems[${repairIndex}].laborPrice`">
+              <NInputNumber v-model:value="repairItem.laborPrice" :min="0" />
+            </NFormItem>
+            
+            <NFormItem :label="t('repairOrder.repair.complexityFactor')">
+              <NInputNumber v-model:value="repairItem.complexityFactor" :min="0" :precision="1" :step="0.1" />
+            </NFormItem>
+            
+            <NFormItem :label="t('repairOrder.repair.laborDiscount')">
+              <NInputNumber v-model:value="repairItem.laborDiscount" :min="0" :max="1" :precision="2" :step="0.1" />
+            </NFormItem>
+          </NSpace>
+
+          <!-- 配件列表 -->
+          <div class="parts-list">
+            <div class="parts-header">
+              <span>{{ t('repairOrder.repair.parts') }}</span>
+              <NButton text type="primary" @click="addPart(repairIndex)">
                 <template #icon>
                   <div class="i-material-symbols:add" />
                 </template>
                 {{ t('common.add') }}
               </NButton>
             </div>
-          </div>
-          <NSpace vertical>
-            <NCard 
-              v-for="(item, index) in repairData.repairItems" 
-              :key="index" 
-              size="small"
-              class="relative"
-            >
-              <div class="absolute right-2 top-2">
-                <NButton 
-                  circle
-                  size="tiny"
-                  type="error"
-                  ghost
-                  @click="removeRepairItem(index)"
-                >
+
+            <div v-for="(part, partIndex) in repairItem.parts" :key="partIndex" class="part-item">
+              <NSpace :wrap="false" :size="24">
+                <NFormItem :label="t('repairOrder.repair.partName')" :path="`repairItems[${repairIndex}].parts[${partIndex}].name`">
+                  <NInput v-model:value="part.name" />
+                </NFormItem>
+                
+                <NFormItem :label="t('repairOrder.repair.quantity')" :path="`repairItems[${repairIndex}].parts[${partIndex}].quantity`">
+                  <NInputNumber v-model:value="part.quantity" :min="1" />
+                </NFormItem>
+                
+                <NFormItem :label="t('repairOrder.repair.purchasePrice')" :path="`repairItems[${repairIndex}].parts[${partIndex}].purchasePrice`">
+                  <NInputNumber v-model:value="part.purchasePrice" :min="0" />
+                </NFormItem>
+              </NSpace>
+
+              <NSpace :wrap="false" :size="24">
+                <NFormItem :label="t('repairOrder.repair.managementFee')" :path="`repairItems[${repairIndex}].parts[${partIndex}].managementFee`">
+                  <NInputNumber v-model:value="part.managementFee" :min="0" :max="1" :precision="2" :step="0.1" />
+                </NFormItem>
+                
+                <NFormItem :label="t('repairOrder.repair.managementDiscount')" :path="`repairItems[${repairIndex}].parts[${partIndex}].managementDiscount`">
+                  <NInputNumber v-model:value="part.managementDiscount" :min="0" :max="1" :precision="2" :step="0.1" />
+                </NFormItem>
+
+                <NButton text type="error" @click="removePart(repairIndex, partIndex)">
                   <template #icon>
-                    <div class="i-material-symbols:close" />
+                    <div class="i-material-symbols:delete" />
                   </template>
                 </NButton>
-              </div>
-              <NGrid :cols="24" :x-gap="12">
-                <NGridItem :span="12">
-                  <NFormItem 
-                    :label="t('repairOrder.repair.itemName')"
-                    required
-                  >
-                    <NInput v-model:value="item.name" />
-                  </NFormItem>
-                </NGridItem>
-                <NGridItem :span="12">
-                  <NFormItem 
-                    :label="t('repairOrder.repair.price')"
-                    required
-                  >
-                    <NInputNumber 
-                      v-model:value="item.price" 
-                      :min="0" 
-                    />
-                  </NFormItem>
-                </NGridItem>
-              </NGrid>
+              </NSpace>
+            </div>
+          </div>
 
-              <!-- 配件列表 -->
-              <div class="mt-4">
-                <div class="flex justify-between items-center mb-2">
-                  <span>{{ t('repairOrder.repair.parts') }}</span>
-                  <NButton size="tiny" type="primary" ghost @click="addPart(item)">
-                    <template #icon>
-                      <div class="i-material-symbols:add" />
-                    </template>
-                    {{ t('common.add') }}
-                  </NButton>
-                </div>
-                <NSpace vertical>
-                  <NCard 
-                    v-for="(part, partIndex) in item.parts" 
-                    :key="partIndex"
-                    size="small"
-                    class="relative"
-                  >
-                    <div class="absolute right-2 top-2">
-                      <NButton 
-                        circle
-                        size="tiny"
-                        type="error"
-                        ghost
-                        @click="removePart(item, partIndex)"
-                      >
-                        <template #icon>
-                          <div class="i-material-symbols:close" />
-                        </template>
-                      </NButton>
-                    </div>
-                    <NGrid :cols="24" :x-gap="12" class="pr-8">
-                      <NGridItem :span="8">
-                        <NFormItem 
-                          :label="t('repairOrder.repair.partName')"
-                          required
-                        >
-                          <NInput v-model:value="part.name" />
-                        </NFormItem>
-                      </NGridItem>
-                      <NGridItem :span="8">
-                        <NFormItem 
-                          :label="t('repairOrder.repair.quantity')"
-                          required
-                        >
-                          <NInputNumber 
-                            v-model:value="part.quantity" 
-                            :min="1" 
-                            @update:value="() => handlePartChange(item)"
-                          />
-                        </NFormItem>
-                      </NGridItem>
-                      <NGridItem :span="8">
-                        <NFormItem 
-                          :label="t('repairOrder.repair.partPrice')"
-                          required
-                        >
-                          <NInputNumber 
-                            v-model:value="part.price" 
-                            :min="0"
-                            @update:value="() => handlePartChange(item)"
-                          />
-                        </NFormItem>
-                      </NGridItem>
-                    </NGrid>
-                  </NCard>
-                </NSpace>
-              </div>
-            </NCard>
-          </NSpace>
+          <NButton text type="error" @click="removeRepairItem(repairIndex)">
+            {{ t('common.delete') }}
+          </NButton>
         </div>
 
-        <NGrid :cols="24" :x-gap="12">
-          <NGridItem :span="12">
-            <NFormItem 
-              :label="t('repairOrder.repair.estimatedTime')"
-              required
-            >
-              <NDatePicker
-                v-model:value="repairData.estimatedCompletionTime"
-                type="datetime"
-                clearable
-                value-format="yyyy.MM.dd HH:mm:ss"
-                :is-date-disabled="(timestamp: number) => timestamp < Date.now()"
-              />
-            </NFormItem>
-          </NGridItem>
-          <NGridItem :span="12">
-            <NFormItem 
-              :label="t('repairOrder.repair.mechanic')"
-              required
-            >
-              <NSelect
-                v-model:value="repairData.mechanic"
-                :loading="loading"
-                :options="technicianOptions"
-                clearable
-                filterable
-              />
-            </NFormItem>
-          </NGridItem>
-        </NGrid>
+        <NButton class="mt-4" @click="addRepairItem">
+          <template #icon>
+            <div class="i-material-symbols:add" />
+          </template>
+          {{ t('repairOrder.repair.addItem') }}
+        </NButton>
+
+        <NDivider />
+
+        <!-- 预计完工时间和维修技师 -->
+        <NFormItem :label="t('repairOrder.repair.estimatedTime')" path="estimatedCompletionTime">
+          <NDatePicker v-model:value="model.estimatedCompletionTime" type="datetime" clearable />
+        </NFormItem>
+
+        <NFormItem :label="t('repairOrder.repair.mechanic')" path="mechanic">
+          <NInput v-model:value="model.mechanic" />
+        </NFormItem>
+
+        <!-- 金额汇总 -->
+        <NDivider />
+        <div class="amount-summary">
+          <div class="amount-item">
+            <span>{{ t('repairOrder.repair.laborAmount') }}:</span>
+            <span class="amount">¥{{ laborAmount.toFixed(2) }}</span>
+          </div>
+          <div class="amount-item">
+            <span>{{ t('repairOrder.repair.partsAmount') }}:</span>
+            <span class="amount">¥{{ partsAmount.toFixed(2) }}</span>
+          </div>
+          <div class="amount-item total">
+            <span>{{ t('repairOrder.repair.totalAmount') }}:</span>
+            <span class="amount">¥{{ totalAmount.toFixed(2) }}</span>
+          </div>
+        </div>
       </NForm>
 
       <template #footer>
         <NSpace justify="end">
-          <NButton @click="handleClose">
+          <NButton @click="show = false">
             {{ t('common.cancel') }}
           </NButton>
-          <NButton type="primary" @click="handleSubmit">
+          <NButton type="primary" :loading="loading" @click="handleSubmit">
             {{ t('common.confirm') }}
           </NButton>
         </NSpace>
@@ -378,49 +290,47 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.section {
-  margin-bottom: 24px;
+.parts-list {
+  margin: 16px 0;
+  padding: 16px;
+  background-color: var(--n-card-color);
+  border-radius: 3px;
 }
 
-.section-header {
-  font-size: 16px;
-  font-weight: 500;
+.parts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
 }
 
-.relative {
-  position: relative;
+.part-item {
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px dashed var(--n-border-color);
+  border-radius: 3px;
 }
 
-.absolute {
-  position: absolute;
+.amount-summary {
+  padding: 16px;
+  background-color: var(--n-card-color);
+  border-radius: 3px;
 }
 
-.right-2 {
-  right: 8px;
-}
-
-.top-2 {
-  top: 8px;
-}
-
-.flex {
+.amount-item {
   display: flex;
-}
-
-.justify-between {
   justify-content: space-between;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.mt-4 {
-  margin-top: 16px;
-}
-
-.mb-2 {
   margin-bottom: 8px;
+}
+
+.amount-item.total {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--n-border-color);
+  font-weight: bold;
+}
+
+.amount {
+  color: var(--n-text-color-success);
 }
 </style> 
