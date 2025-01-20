@@ -73,7 +73,40 @@ const columns = computed(() => [
       return row.vehicle?.licensePlate || '-';
     }
   },
+  {
+    title: `${t('menu.vehicle.brand')}/${t('menu.vehicle.model')}`,
+    key: 'vehicleBrandModel',
+    width: 150,
+    render: (row: Api.RepairOrder.RepairOrderInfo) => {
+      return row.vehicle ? `${row.vehicle.brand || '-'}/${row.vehicle.model || '-'}` : '-';
+    }
+  },
+  {
+    title: t('menu.vehicle.color'),
+    key: 'vehicleColor',
+    width: 80,
+    render: (row: Api.RepairOrder.RepairOrderInfo) => {
+      return row.vehicle?.color || '-';
+    }
+  },
+  {
+    title: t('menu.vehicle.mileage'),
+    key: 'vehicleMileage',
+    width: 100,
+    render: (row: Api.RepairOrder.RepairOrderInfo) => {
+      return row.vehicle?.mileage ? `${row.vehicle.mileage}${t('common.unit.kilometer')}` : '-';
+    }
+  },
+  {
+    title: t('menu.customer.contact'),
+    key: 'customerContact',
+    width: 100,
+    render: (row: Api.RepairOrder.RepairOrderInfo) => {
+      return row.customer?.contact || '-';
+    }
+  },
   { title: t('menu.repairOrder.faultDesc'), key: 'faultDesc', width: 150 },
+  { title: t('common.remark'), key: 'remark', width: 150 },
   { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100 },
   { 
     title: t('menu.repairOrder.createTime'), 

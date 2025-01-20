@@ -85,6 +85,9 @@ declare namespace Api {
       customer?: {
         _id: string;
         name: string;
+        phone?: string;
+        email?: string;
+        address?: string;
       };
       brand: string;
       model: string;
@@ -92,6 +95,8 @@ declare namespace Api {
       licensePlate: string;
       vin: string;
       mileage: number;
+      engineNo?: string;
+      color?: string;
       createdAt?: string;
       updatedAt?: string;
     }
@@ -131,6 +136,9 @@ declare namespace Api {
       phone: string;
       email: string;
       address: string;
+      contact?: string;
+      bankAccount?: string;
+      bankName?: string;
       createdAt: string;
       updatedAt: string;
     }
@@ -140,6 +148,9 @@ declare namespace Api {
       phone: string;
       email: string;
       address: string;
+      contact?: string;
+      bankAccount?: string;
+      bankName?: string;
     }
 
     interface UpdateCustomerParams extends Partial<CreateCustomerParams> {}

@@ -1,12 +1,12 @@
 <template>
-  <NDrawer v-model:show="props.show" :width="500" :mask-closable="true">
+  <NDrawer v-model:show="show" :width="500" :mask-closable="true">
     <NDrawerContent :title="props.type === 'add' ? t('common.add') : t('common.edit')">
       <NForm 
         ref="formRef" 
         :model="formModel" 
         :rules="rules" 
         label-placement="left" 
-        :label-width="80"
+        :label-width="100"
       >
         <NFormItem :label="t('menu.customer.name')" path="customerId">
           <NSelect
@@ -14,6 +14,18 @@
             :options="customerOptions"
             :placeholder="t('menu.customer.nameSearch')"
             filterable
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.licensePlate')" path="licensePlate">
+          <NInput
+            v-model:value="formModel.licensePlate"
+            :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
+          />
+        </NFormItem>
+        <NFormItem :label="t('menu.vehicle.color')" path="color">
+          <NInput
+            v-model:value="formModel.color"
+            :placeholder="t('menu.vehicle.colorPlaceholder')"
           />
         </NFormItem>
         <NFormItem :label="t('menu.vehicle.brand')" path="brand">
@@ -39,18 +51,20 @@
             style="width: 100%"
           />
         </NFormItem>
-        <NFormItem :label="t('menu.vehicle.licensePlate')" path="licensePlate">
-          <NInput
-            v-model:value="formModel.licensePlate"
-            :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
-          />
-        </NFormItem>
+   
         <NFormItem :label="t('menu.vehicle.vin')" path="vin">
           <NInput
             v-model:value="formModel.vin"
             :placeholder="t('menu.vehicle.vinPlaceholder')"
           />
         </NFormItem>
+        <NFormItem :label="t('menu.vehicle.engineNo')" path="engineNo">
+          <NInput
+            v-model:value="formModel.engineNo"
+            :placeholder="t('menu.vehicle.engineNoPlaceholder')"
+          />
+        </NFormItem>
+   
         <NFormItem :label="t('menu.vehicle.mileage')" path="mileage">
           <NInputNumber
             v-model:value="formModel.mileage"
@@ -74,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
 import {
@@ -95,17 +109,15 @@ import { BRAND_OPTIONS, DEFAULT_BRAND_LOGO, getBrandLogo, getBrandLabel } from '
 defineOptions({ name: 'VehicleForm' });
 
 const props = defineProps<{
-  show: boolean;
   type: 'add' | 'edit';
   editData?: Api.Vehicle.VehicleInfo;
   brands: string[];
   models: string[];
 }>();
 
-// const show = defineModel<boolean>('show', { required: true });
+const show = defineModel<boolean>('show', { required: true, default: false });
 
 const emit = defineEmits<{
-  (e: 'update:show', value: boolean): void;
   (e: 'submit-success'): void;
   (e: 'brand-change', brand: string): void;
 }>();
@@ -120,6 +132,8 @@ const formModel = reactive({
   licensePlate: '',
   year: new Date().getFullYear(),
   vin: '',
+  engineNo: '',
+  color: '',
   mileage: 0
 });
 
@@ -141,11 +155,13 @@ async function loadCustomers() {
 const rules = {
   customerId: { required: true, message: t('common.required') },
   brand: { required: true, message: t('common.required') },
-  model: { required: true, message: t('common.required') },
+  model: { required: false },
   licensePlate: { required: true, message: t('common.required') },
-  year: { required: true, message: t('common.required') },
-  vin: { required: true, message: t('common.required') },
-  mileage: { required: true, message: t('common.required') }
+  year: { required: false },
+  vin: { required: false },
+  engineNo: { required: false },
+  color: { required: true, message: t('common.required') },
+  mileage: { required: false }
 };
 
 const loading = ref(false);
@@ -158,12 +174,14 @@ function resetForm() {
     licensePlate: '',
     year: new Date().getFullYear(),
     vin: '',
+    engineNo: '',
+    color: '',
     mileage: 0
   });
 }
 
 function handleClose() {
-  emit('update:show', false);
+  show.value = false;
   resetForm();
 }
 
@@ -174,6 +192,7 @@ async function handleSubmit() {
     if (props.type === 'add') {
       await fetchCreateVehicle(formModel);
     } else {
+      console.log("formModel", formModel);
       await fetchUpdateVehicle(props.editData!._id, formModel);
     }
     emit('submit-success');
@@ -193,22 +212,19 @@ watch(
   async newVal => {
     if (newVal && props.type === 'edit') {
       await loadCustomers();
-      console.log("newVal", newVal);
-      // 设置表单数据
       Object.assign(formModel, {
         ...newVal,
-        customerId: newVal.customer._id // 确保客户ID被正确设置
+        customerId: newVal.customer._id
       });
     }
-  },
-  { immediate: true }
+  }
 );
 
 // 监听抽屉显示状态，当关闭时重置表单
 watch(
-  () => props.show,
+  () => show.value,
   (newVal) => {
-    if (!newVal) {
+    if (!newVal && props.type === 'add') {  // 只在添加模式下重置表单
       resetForm();
     }
   }
