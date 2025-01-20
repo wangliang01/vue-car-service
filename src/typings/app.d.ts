@@ -483,6 +483,7 @@ declare namespace App {
         confirmPwd: FormMsg;
         code: FormMsg;
         email: FormMsg;
+        contact: FormMsg;
       };
       dropdown: Record<Global.DropdownKey, string>;
       icon: {

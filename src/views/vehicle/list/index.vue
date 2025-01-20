@@ -33,7 +33,7 @@ const columns = computed(() => [
   { title: t('common.index'), key: 'index', width: 80 },
   
   { 
-    title: t('menu.vehicle.brand'), 
+    title: t('menu.vehicle.brand') + ' / ' + t('menu.vehicle.model'), 
     key: 'brand', 
     width: 120,
     render: (row: Api.Vehicle.VehicleInfo) => {
@@ -47,11 +47,16 @@ const columns = computed(() => [
             objectFit: 'contain'
           }
         }),
-        h('span', null, row.brand)
+        h('span', null, row.brand),
+        h('span', null, row.model)
       ]);
     }
   },
-  { title: t('menu.vehicle.model'), key: 'model', width: 120 },
+  { 
+    title: t('menu.vehicle.color'),
+    key: 'color',
+    width: 80
+  },
   { 
     title: t('menu.customer.name'), 
     key: 'customer', 
@@ -63,11 +68,19 @@ const columns = computed(() => [
   { title: t('menu.vehicle.year'), key: 'year', width: 100 },
   { title: t('menu.vehicle.licensePlate'), key: 'licensePlate', width: 120 },
   { title: t('menu.vehicle.vin'), key: 'vin', width: 180 },
+
+  {
+    title: t('menu.vehicle.engineNo'),
+    key: 'engineNo',
+    width: 120
+  },
   { 
     title: t('menu.vehicle.mileage'), 
     key: 'mileage', 
-    width: 120, 
-    render: (row: Api.Vehicle.VehicleInfo) => `${row.mileage}${t('common.unit.kilometer')}` 
+    width: 100, 
+    render: (row: Api.Vehicle.VehicleInfo) => {
+      return row.mileage ? `${row.mileage}${t('common.unit.kilometer')}` : '-';
+    }
   },
   {
     title: t('common.action'),
@@ -305,7 +318,7 @@ getBrands();
       @reset="handleReset"
       @brand-change="getModels"
     />
-    <NCard :bordered="false" class="flex-1">
+    <NCard :bordered="false" class="flex-1 vehicle-list-card">
       <template #header>
         <div class="flex-y-center justify-between">
           <div class="flex-y-center">
@@ -345,7 +358,7 @@ getBrands();
         :columns="tableColumns"
         :data="dataList"
         :pagination="pagination"
-        :scroll-x="1200"
+        :scroll-x="1600"
         :row-key="(row: Api.Vehicle.VehicleInfo) => row._id"
         @update:checked-row-keys="checkedRowKeys = $event"
         @update:page="getData"
@@ -363,10 +376,3 @@ getBrands();
   </div>
 </template>
 
-<style scoped>
-.h-full {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-</style>

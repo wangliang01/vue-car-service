@@ -35,10 +35,13 @@ const searchModel = reactive<Api.Customer.CustomerSearchParams>({
 const columns: DataTableColumns<Api.Customer.CustomerInfo> = [
   { type: 'selection' },
   { title: t('common.index'), key: 'index', width: 80 },
-  { title: t('menu.customer.name'), key: 'name', width: 150 },
-  { title: t('menu.customer.email'), key: 'email', width: 200 },
-  { title: t('menu.customer.phone'), key: 'phone', width: 150 },
+  { title: t('menu.customer.name'), key: 'name', width: 120 },
+  { title: t('menu.customer.contact'), key: 'contact', width: 120 },
+  { title: t('menu.customer.phone'), key: 'phone', width: 120 },
   { title: t('menu.customer.address'), key: 'address', width: 200 },
+  { title: t('menu.customer.email'), key: 'email', width: 180 },
+  { title: t('menu.customer.bankAccount'), key: 'bankAccount', width: 150 },
+  { title: t('menu.customer.bankName'), key: 'bankName', width: 150 },
   {
     title: t('common.action'),
     key: 'actions',

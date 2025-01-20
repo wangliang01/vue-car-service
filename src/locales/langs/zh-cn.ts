@@ -431,6 +431,9 @@ const local: App.I18n.Schema = {
     email: {
       required: '请输入邮箱',
       invalid: '邮箱格式不正确'
+    },
+    contact: {
+      required: '请输入联系人'
     }
   },
   dropdown: {

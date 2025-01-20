@@ -22,13 +22,16 @@ const emit = defineEmits<Emits>();
 const { t } = useI18n();
 const { formRef, validate } = useNaiveForm();
 
-const show = defineModel()
+const show = defineModel<boolean>('show')
 
 const formModel = reactive({
   name: '',
   phone: '',
   email: '',
-  address: ''
+  address: '',
+  contact: '',
+  bankAccount: '',
+  bankName: ''
 });
 
 const rules = {
@@ -38,10 +41,9 @@ const rules = {
     message: t('form.phone.required'),
     validator: (_rule: unknown, value: string) => /^1[3-9]\d{9}$/.test(value) || new Error(t('form.phone.invalid'))
   },
-  email: {
+  contact: {
     required: true,
-    message: t('form.email.required'),
-    validator: (_rule: unknown, value: string) => /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(value) || new Error(t('form.email.invalid'))
+    message: t('form.contact.required')
   }
 };
 
@@ -52,7 +54,10 @@ function resetForm() {
     name: '',
     phone: '',
     email: '',
-    address: ''
+    address: '',
+    contact: '',
+    bankAccount: '',
+    bankName: ''
   });
 }
 
@@ -72,8 +77,8 @@ async function handleSubmit() {
       await fetchUpdateCustomer(props.editData!._id, formModel);
       window.$message?.success(t('common.updateSuccess'));
     }
-    emit('submit-success');
     handleClose();
+    emit('submit-success');
   } finally {
     loading.value = false;
   }
@@ -88,7 +93,10 @@ watch(
         name: newData.name,
         phone: newData.phone,
         email: newData.email,
-        address: newData.address
+        address: newData.address,
+        contact: newData.contact,
+        bankAccount: newData.bankAccount,
+        bankName: newData.bankName
       });
     }
   },
@@ -99,9 +107,19 @@ watch(
 <template>
   <NDrawer v-model:show="show" :width="500" :mask-closable="true">
     <NDrawerContent :title="props.type === 'add' ? t('common.add') : t('common.edit')">
-      <NForm ref="formRef" :model="formModel" :rules="rules" label-placement="left" :label-width="80">
+      <NForm 
+        ref="formRef" 
+        :model="formModel" 
+        :rules="rules" 
+        label-placement="left" 
+        :label-width="80"
+        @keyup.enter="handleSubmit"
+      >
         <NFormItem :label="t('menu.customer.name')" path="name">
           <NInput v-model:value="formModel.name" :placeholder="t('menu.customer.nameSearch')" />
+        </NFormItem>
+        <NFormItem :label="t('menu.customer.contact')" path="contact">
+          <NInput v-model:value="formModel.contact" :placeholder="t('menu.customer.contactSearch')" />
         </NFormItem>
         <NFormItem :label="t('menu.customer.phone')" path="phone">
           <NInput v-model:value="formModel.phone" :placeholder="t('menu.customer.phoneSearch')" />
@@ -111,6 +129,12 @@ watch(
         </NFormItem>
         <NFormItem :label="t('menu.customer.address')" path="address">
           <NInput v-model:value="formModel.address" :placeholder="t('menu.customer.addressSearch')" />
+        </NFormItem>
+        <NFormItem :label="t('menu.customer.bankAccount')" path="bankAccount">
+          <NInput v-model:value="formModel.bankAccount" :placeholder="t('menu.customer.bankAccountSearch')" />
+        </NFormItem>
+        <NFormItem :label="t('menu.customer.bankName')" path="bankName">
+          <NInput v-model:value="formModel.bankName" :placeholder="t('menu.customer.bankNameSearch')" />
         </NFormItem>
       </NForm>
 

@@ -281,6 +281,9 @@ const local: App.I18n.Schema = {
     email: {
       required: 'Please enter email',
       invalid: 'Email format is incorrect'
+    },
+    contact: {
+      required: 'Please enter contact'
     }
   },
   dropdown: {
