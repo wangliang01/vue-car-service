@@ -38,9 +38,9 @@ const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' 
 };
 
 const columns = computed(() => [
-  { type: 'selection' as const, width: 50 },
+  // { type: 'selection' as const, width: 50 },
   { title: t('common.index'), key: 'index', width: 60 },
-  { title: t('menu.repairOrder.orderNo'), key: 'orderNo', width: 100 },
+  { title: t('menu.repairOrder.orderNo'), key: 'orderNo', width: 150 },
   { 
     title: t('menu.repairOrder.status'), 
     key: 'status',
@@ -74,6 +74,15 @@ const columns = computed(() => [
     }
   },
   {
+    title: `${t('menu.customer.contact')}/${t('menu.customer.phone')}`,
+    key: 'customerContact',
+    width: 200,
+    render: (row: Api.RepairOrder.RepairOrderInfo) => {
+      return row.customer ? `${row.customer.contact || '-'} / ${row.customer.phone || '-'}` : '-';
+    }
+  },
+
+  {
     title: `${t('menu.vehicle.brand')}/${t('menu.vehicle.model')}`,
     key: 'vehicleBrandModel',
     width: 150,
@@ -82,11 +91,11 @@ const columns = computed(() => [
     }
   },
   {
-    title: t('menu.vehicle.color'),
+    title: `${t('menu.vehicle.color')}/${t('menu.vehicle.engineNo')}`,
     key: 'vehicleColor',
-    width: 80,
+    width: 160,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.vehicle?.color || '-';
+      return row.vehicle ? `${row.vehicle.color || '-'}/${row.vehicle.engineNo || '-'}` : '-';
     }
   },
   {
@@ -97,23 +106,16 @@ const columns = computed(() => [
       return row.vehicle?.mileage ? `${row.vehicle.mileage}${t('common.unit.kilometer')}` : '-';
     }
   },
-  {
-    title: t('menu.customer.contact'),
-    key: 'customerContact',
-    width: 100,
-    render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.customer?.contact || '-';
-    }
-  },
+
   { title: t('menu.repairOrder.faultDesc'), key: 'faultDesc', width: 150 },
   { title: t('common.remark'), key: 'remark', width: 150 },
   { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100 },
   { 
-    title: t('menu.repairOrder.createTime'), 
-    key: 'createdAt', 
-    width: 150,
-    render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return dayjs(row.createdAt).format('YYYY-MM-DD HH:mm:ss');
+    title: t('menu.repairOrder.inDate'),
+    key: 'inDate',
+    width: 120,
+    render: (row) => {
+      return dayjs(row.inDate).format('YYYY-MM-DD');
     }
   },
   { 
@@ -122,7 +124,7 @@ const columns = computed(() => [
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
       return row.estimatedCompletionTime 
-        ? dayjs(row.estimatedCompletionTime).format('YYYY-MM-DD HH:mm:ss')
+        ? dayjs(row.estimatedCompletionTime).format('YYYY-MM-DD')
         : '-';
     }
   },
@@ -233,6 +235,7 @@ const editData = ref<Api.RepairOrder.RepairOrderInfo | null>(null);
 const currentOrderId = ref<string | null>(null);
 
 function handleAdd() {
+  drawerType.value = 'add';
   showDrawer.value = true;
 }
 
@@ -259,7 +262,6 @@ function handleRefresh() {
 function handleSubmitSuccess() {
   showDrawer.value = false;
   getData();
-  window.$message?.success(t('common.addSuccess'));
 }
 
 function handleEdit(row: Api.RepairOrder.RepairOrderInfo) {
@@ -323,6 +325,10 @@ async function handleComplete(row: Api.RepairOrder.RepairOrderInfo) {
   }
 }
 
+const scrollX = computed(() => {
+  return tableColumns.value.reduce((acc, col) => acc + Number(col.width || 0), 0);
+});
+
 const formatStatus = (status: string) => {
   return t(`repairOrder.status.${status}`)
 }
@@ -363,7 +369,8 @@ const formatStatus = (status: string) => {
         :columns="tableColumns"
         :data="dataList"
         :pagination="pagination"
-        :scroll-x="1600"
+        :scroll-x="scrollX"
+        :style="{ maxWidth: '100%' }"
         :row-key="(row: Api.RepairOrder.RepairOrderInfo) => row._id"
         @update:page="getData"
       />

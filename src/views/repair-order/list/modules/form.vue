@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, computed } from 'vue';
 import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSelect, NSpace, NButton, NDivider, NInputNumber, NSwitch, NGrid, NGi, NDescriptions, NDescriptionsItem, useThemeVars, NTag, NDatePicker } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
@@ -30,31 +30,32 @@ const show = defineModel('show', { required: true, default: false });
 
 interface FormModel extends Omit<Api.RepairOrder.CreateParams, 'customer' | 'vehicle'> {
   customer: {
-    _id?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    address?: string;
-    contact?: string;
+    _id: string;
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    contact: string;
     bankAccount?: string;
     bankName?: string;
   };
   vehicle: {
-    _id?: string;
-    brand?: string;
-    model?: string;
-    year?: number | null;
+    _id: string;
+    customerId: string;
+    brand: string;
+    model: string;
+    year: number | null;
     licensePlate: string;
-    vin?: string;
-    mileage?: number;
+    vin: string;
+    mileage: number;
     engineNo?: string;
     color?: string;
   };
+  isNewCustomer: boolean;
   faultDesc: string;
   remark?: string;
-  isNewCustomer?: boolean;
-  inDate?: number | null;  // 进厂日期
-  estimatedCompletionTime?: number | null;  // 预计完工日期
+  inDate?: number | null;
+  estimatedCompletionTime?: number | null;
 }
 
 const formModel = reactive<FormModel>({
@@ -70,6 +71,7 @@ const formModel = reactive<FormModel>({
   },
   vehicle: {
     _id: '',
+    customerId: '',
     brand: '',
     model: '',
     year: null,
@@ -81,8 +83,8 @@ const formModel = reactive<FormModel>({
   },
   faultDesc: '',
   remark: '',
-  isNewCustomer: false,
-  inDate: Date.now(),
+  isNewCustomer: true,
+  inDate: dayjs().valueOf(),
   estimatedCompletionTime: null
 });
 
@@ -90,27 +92,15 @@ const customerOptions = ref<{ label: string; value: string }[]>([]);
 const loading = ref(false);
 
 const rules = {
-  'customer._id': { required: true, message: t('common.required') },
-  'customer.name': { required: true, message: t('common.required') },
-  'customer.phone': { required: true, message: t('common.required') },
-  'customer.contact': { required: true, message: t('common.required') },
-  'vehicle._id': { required: true, message: t('common.required') },
-  'vehicle.licensePlate': { required: true, message: t('common.required') },
-  faultDesc: { required: true, message: t('common.required') }
+  'customer._id': { required: true, message: t('menu.customer.nameRequired'), trigger: 'blur' },
+  'customer.name': { required: true, message: t('menu.customer.nameRequired'), trigger: 'blur' },
+  'customer.phone': { required: true, message: t('menu.customer.phoneRequired'), trigger: 'blur' },
+  'customer.contact': { required: true, message: t('menu.customer.contactRequired'), trigger: 'blur' },
+  'vehicle._id': { required: true, message: t('menu.vehicle.required'), trigger: 'blur' },
+  'vehicle.licensePlate': { required: true, message: t('menu.vehicle.licensePlateRequired'), trigger: 'blur' },
+  faultDesc: { required: true, message: t('menu.repairOrder.faultDescRequired'), trigger: 'blur' }
 };
 
-const customerInfo = ref({
-  phone: '',
-  email: '',
-  address: ''
-});
-
-const vehicleInfo = ref({
-  brand: '',
-  model: '',
-  year: '',
-  vin: ''
-});
 
 async function loadCustomers() {
   try {
@@ -130,6 +120,8 @@ async function handleSubmit() {
     loading.value = true;
     const submitData = {
       ...formModel,
+      inspectionItems: [],
+      customerItems: [],
       isNewCustomer: !formModel.customer._id
     };
     
@@ -158,12 +150,7 @@ function handleClose() {
 
 async function handleCustomerChange(customerId: string) {
   if (!customerId) {
-    customerInfo.value = { 
-      phone: '', 
-      email: '', 
-      address: '' 
-    };
-    Object.assign(formModel.customer, {
+    formModel.customer = {
       _id: '',
       name: '',
       phone: '',
@@ -172,26 +159,22 @@ async function handleCustomerChange(customerId: string) {
       contact: '',
       bankAccount: '',
       bankName: ''
-    });
+    };
     return;
   }
   try {
     const { data } = await fetchCustomerById(customerId);
-    customerInfo.value = {
-      phone: data.phone,
-      email: data.email,
-      address: data.address
-    };
-    Object.assign(formModel.customer, {
+
+    formModel.customer = {
       _id: data._id,
       name: data.name,
       phone: data.phone,
       email: data.email,
       address: data.address,
-      contact: data.contact,
-      bankAccount: data.bankAccount,
-      bankName: data.bankName
-    });
+      contact: data.contact || '',
+      bankAccount: data.bankAccount || '',
+      bankName: data.bankName || ''
+    };
   } catch (error) {
     console.error('Failed to fetch customer details:', error);
   }
@@ -209,34 +192,32 @@ async function handleLicensePlateSearch() {
     const { data } = await fetchVehicleByPlate(formModel.vehicle.licensePlate);
     
     if (data) {
-      // 回填车辆信息
-      Object.assign(formModel.vehicle, {
+      formModel.vehicle = {
         _id: data._id,
+        customerId: data.customer?._id || '',
         brand: data.brand,
         model: data.model,
-        year: data.year,
+        year: data.year ? dayjs(data.year).valueOf() : null,
+        licensePlate: data.licensePlate,
         vin: data.vin,
         mileage: data.mileage,
-        engineNo: data.engineNo,
-        color: data.color
-      });
+        engineNo: data.engineNo || '',
+        color: data.color || ''
+      };
       
-      // 如果有关联的客户信息，同时回填
       if (data.customer) {
-        Object.assign(formModel.customer, {
+        formModel.customer = {
           _id: data.customer._id,
           name: data.customer.name,
           phone: data.customer.phone,
           email: data.customer.email,
           address: data.customer.address,
-          contact: data.customer.contact,
-          bankAccount: data.customer.bankAccount,
-          bankName: data.customer.bankName
-        });
+          contact: data.customer.contact || '',
+          bankAccount: data.customer.bankAccount || '',
+          bankName: data.customer.bankName || ''
+        };
       }
-    } else {
-      resetVehicleInfo();
-    }
+    } 
   } catch (error) {
     console.error('获取车辆信息失败:', error);
     resetVehicleInfo();
@@ -247,8 +228,9 @@ async function handleLicensePlateSearch() {
 
 // 重置车辆信息
 function resetVehicleInfo() {
-  Object.assign(formModel.vehicle, {
+  formModel.vehicle = {
     _id: '',
+    customerId: '',
     brand: '',
     model: '',
     year: null,
@@ -257,43 +239,38 @@ function resetVehicleInfo() {
     mileage: 0,
     engineNo: '',
     color: ''
-  });
+  };
 }
 
 function resetForm() {
-  Object.assign(formModel, {
-    customer: {
-      _id: '',
-      name: '',
-      phone: '',
-      email: '',
-      address: '',
-      contact: '',
-      bankAccount: '',
-      bankName: ''
-    },
-    vehicle: {
-      _id: '',
-      brand: '',
-      model: '',
-      year: null,
-      licensePlate: '',
-      vin: '',
-      mileage: 0,
-      engineNo: '',
-      color: ''
-    },
-    faultDesc: '',
-    remark: '',
-    isNewCustomer: false,
-    inDate: Date.now(),
-    estimatedCompletionTime: null
-  });
-  customerInfo.value = { 
-    phone: '', 
-    email: '', 
-    address: '' 
+  formModel.customer = {
+    _id: '',
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    contact: '',
+    bankAccount: '',
+    bankName: ''
   };
+  formModel.vehicle = {
+    _id: '',
+    customerId: '',
+    brand: '',
+    model: '',
+    year: null,
+    licensePlate: '',
+    vin: '',
+    mileage: 0,
+    engineNo: '',
+    color: ''
+  };
+  formModel.faultDesc = '';
+  formModel.remark = '';
+  formModel.isNewCustomer = false;
+  formModel.inDate = Date.now();
+  formModel.estimatedCompletionTime = null;
+
 }
 
 loadCustomers();
@@ -308,40 +285,38 @@ async function getOrderDetail() {
     loading.value = true;
     const { data } = await fetchRepairOrderDetail(props.editData._id);
     
-    // 回显数据
-    Object.assign(formModel, {
-      faultDesc: data.faultDesc,
-      remark: data.remark,
-      isNewCustomer: false
-    });
+    formModel.faultDesc = data.faultDesc;
+    formModel.remark = data.remark;
+    formModel.isNewCustomer = false;
+    formModel.inDate = dayjs(data.createdAt).valueOf();
+    formModel.estimatedCompletionTime = dayjs(data.estimatedCompletionTime).valueOf();
 
-    // 回显车辆信息
     if (data.vehicle) {
-      Object.assign(formModel.vehicle, {
+      formModel.vehicle = {
         _id: data.vehicle._id,
+        customerId: data.vehicle.customer?._id || '',
         brand: data.vehicle.brand,
         model: data.vehicle.model,
-        year: data.vehicle.year,
+        year: data.vehicle.year ? dayjs(data.vehicle.year).valueOf() : null,
         licensePlate: data.vehicle.licensePlate,
         vin: data.vehicle.vin,
         mileage: data.vehicle.mileage,
-        engineNo: data.vehicle.engineNo,
-        color: data.vehicle.color
-      });
+        engineNo: data.vehicle.engineNo || '',
+        color: data.vehicle.color || ''
+      };
     }
 
-    // 回显客户信息
     if (data.customer) {
-      Object.assign(formModel.customer, {
+      formModel.customer = {
         _id: data.customer._id,
         name: data.customer.name,
         phone: data.customer.phone,
         email: data.customer.email,
         address: data.customer.address,
-        contact: data.customer.contact,
-        bankAccount: data.customer.bankAccount,
-        bankName: data.customer.bankName
-      });
+        contact: data.customer.contact || '',
+        bankAccount: data.customer.bankAccount || '',
+        bankName: data.customer.bankName || ''
+      };
     }
   } catch (error) {
     window.$message?.error(t('common.error'));
@@ -350,12 +325,18 @@ async function getOrderDetail() {
   }
 }
 
+const title = computed(() => {
+  return props.type === 'add' ? t('common.add') : props.type === 'edit' ? t('common.edit') : t('common.view');
+});
+
 // 监听抽屉显示状态和类型变化
 watch(
   () => [show.value, props.type],
   async ([show, type]) => {
     if (show && (type === 'edit' || type === 'view')) {
       await getOrderDetail();
+    } else {
+      resetForm();
     }
   },
   { immediate: true }
@@ -371,15 +352,15 @@ const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' 
 };
 
 // 添加时间格式化函数
-function formatTime(time?: string) {
+function formatTime(time: string | number | null | undefined): string {
   if (!time) return '-';
-  return dayjs(time).format('YYYY-MM-DD');
+  return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
 }
 </script>
 
 <template>
   <NDrawer v-model:show="show" :width="800" :mask-closable="true">
-    <NDrawerContent :title="props.type === 'add' ? t('common.add') : props.type === 'edit' ? t('common.edit') : t('common.view')">
+    <NDrawerContent :title="title">
       <!-- 查看模式 -->
       <template v-if="props.type === 'view'">
         <div class="detail-container">
@@ -520,26 +501,6 @@ function formatTime(time?: string) {
               </div>
             </div>
           </div>
-
-          <!-- 进度追踪卡片 -->
-          <div class="detail-section" v-if="editData?.statusLogs?.length">
-            <div class="section-header">
-              <span>进度追踪</span>
-            </div>
-            <div class="section-content">
-              <div class="timeline">
-                <div class="timeline-item" v-for="(log, index) in editData.statusLogs" :key="index">
-                  <div class="time">{{ formatTime(log.createdAt) }}</div>
-                  <div class="status">
-                    <NTag :type="statusTagTypes[log.status]" size="small">
-                      {{ t(`repairOrder.status.${log.status}`) }}
-                    </NTag>
-                  </div>
-                  <div class="operator">{{ log.operator }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </template>
 
@@ -597,8 +558,9 @@ function formatTime(time?: string) {
                       v-model:value="formModel.vehicle.year"
                       type="year"
                       :placeholder="t('menu.vehicle.yearPlaceholder')"
-                      :is-date-disabled="(timestamp) => timestamp > Date.now()"
-                      style="width: 100%"
+                      :actions="['clear']"
+                      clearable
+                      :default-value="null"
                     />
                   </NFormItem>
                 </NGi>
@@ -1276,7 +1238,7 @@ function formatTime(time?: string) {
     gap: 16px;
   }
   
-  .timeline-item {
+ .timeline-item {
     grid-template-columns: 1fr;
     gap: 8px;
   }

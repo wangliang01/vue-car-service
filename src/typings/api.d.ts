@@ -88,6 +88,9 @@ declare namespace Api {
         phone?: string;
         email?: string;
         address?: string;
+        contact?: string;
+        bankAccount?: string;
+        bankName?: string;
       };
       brand: string;
       model: string;
@@ -187,7 +190,9 @@ declare namespace Api {
       customer: Customer.CustomerInfo;
       vehicle: Vehicle.VehicleInfo;
       faultDesc: string;
+      remark?: string;
       mechanic?: string;
+      inDate: string;
       estimatedCompletionTime?: string;
       actualCompletionTime?: string;
       deliveryTime?: string;
@@ -204,7 +209,18 @@ declare namespace Api {
 
     interface CreateParams {
       isNewCustomer: boolean;
-      customer: Customer.CustomerInfo | { _id: string };
+      customer: {
+        _id: string;
+        name: string;
+        phone: string;
+        email: string;
+        address: string;
+        contact?: string;
+        bankAccount?: string;
+        bankName?: string;
+        createdAt?: string;
+        updatedAt?: string;
+      } | { _id: string };
       vehicle: Vehicle.VehicleInfo | { _id: string };
       faultDesc: string;
       remark?: string;

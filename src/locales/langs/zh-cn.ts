@@ -479,7 +479,10 @@ const local: App.I18n.Schema = {
       bankNameSearch: '请输入开户行',
       userStatus: '用户状态',
       statusSearch: '请选择状态',
-      export: '导出'
+      export: '导出',
+      nameRequired: '请输入客户姓名',
+      phoneRequired: '请输入联系方式',
+      contactRequired: '请输入联系人'
     },
     vehicle: {
       _value: '车辆管理',
@@ -503,6 +506,8 @@ const local: App.I18n.Schema = {
       export: '导出',
       brandSearch: '请选择品牌',
       modelSearch: '请选择型号',
+      required: '请选择车辆',
+      licensePlateRequired: '请输入车牌号'
     },
     repairOrder: {
       _value: '维修管理',
@@ -527,7 +532,8 @@ const local: App.I18n.Schema = {
       orderNoPlaceholder: '请输入工单编号',
       customerNamePlaceholder: '请输入客户名称',
       licensePlatePlaceholder: '请输入车牌号',
-      statusPlaceholder: '请选择工单状态'
+      statusPlaceholder: '请选择工单状态',
+      faultDescRequired: '请输入故障描述'
     },
     system: {
       _value: '系统管理',
@@ -617,7 +623,13 @@ const local: App.I18n.Schema = {
         quantityInvalid: '数量必须大于等于0',
         quantityRequired: '请输入数量'
       }
-    }
+    },
+    list: '维修工单',
+    add: '新增工单',
+    edit: '编辑工单',
+    view: '查看工单',
+    createTime: '创建时间',
+    inDate: '进厂日期'
   },
   settlement: {
     title: '结算管理',

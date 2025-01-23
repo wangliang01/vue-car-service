@@ -44,7 +44,11 @@ const rules = {
   contact: {
     required: true,
     message: t('form.contact.required')
-  }
+  },
+  email: { required: false },
+  address: { required: false },
+  bankAccount: { required: false },
+  bankName: { required: false }
 };
 
 const loading = ref(false);
