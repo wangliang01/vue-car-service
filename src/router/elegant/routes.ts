@@ -119,31 +119,28 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.repair-order_list',
         meta: {
           title: 'repair-order_list',
-          i18nKey: 'route.repair-order_list',
-          icon: 'material-symbols:construction'
+          i18nKey: 'route.repair-order',
+          icon: 'material-symbols:receipt-long-outline'
         }
-      }
-    ]
-  },
-  {
-    name: 'settlement',
-    path: '/settlement',
-    component: 'layout.base',
-    meta: {
-      order: 5,
-      title: 'settlement',
-      i18nKey: 'route.settlement',
-      icon: 'material-symbols:receipt-long-outline'
-    },
-    children: [
+      },
       {
-        name: 'settlement_list',
-        path: '/settlement/list',
-        component: 'view.settlement_list',
+        name: 'repair-order_record',
+        path: '/repair-order/record',
+        component: 'view.repair-order_record',
         meta: {
-          title: 'settlement_list',
-          i18nKey: 'route.settlement_list',
-          icon: 'material-symbols:receipt'
+          title: 'repair-order_record',
+          i18nKey: 'route.repair-order_record',
+          icon: 'material-symbols:history'
+        }
+      },
+      {
+        name: 'repair-order_settlement',
+        path: '/repair-order/settlement',
+        component: 'view.repair-order_settlement',
+        meta: {
+          title: 'repair-order_settlement',
+          i18nKey: 'route.repair-order_settlement',
+          icon: 'material-symbols:payments-outline'
         }
       }
     ]

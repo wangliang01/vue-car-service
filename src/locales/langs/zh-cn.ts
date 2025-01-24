@@ -62,7 +62,7 @@ const local: App.I18n.Schema = {
       phone: '手机号',
       email: '邮箱',
       type: '用户类型',
-      roles: '关联角色',  
+      roles: '关联角色',
       typeAdmin: '管理员',
       typeTechnician: '维修技师',
       typeUser: '普通用户',
@@ -317,14 +317,14 @@ const local: App.I18n.Schema = {
     vehicle_list: '车辆列表',
     'repair-order': '维修管理',
     'repair-order_list': '维修登记',
+    'repair-order_record': '维修记录',
+    'repair-order_settlement': '维修结算',
     system: '系统管理',
     system_store: '门店管理',
     system_permission: '权限管理',
     system_user: '用户管理',
     system_role: '角色管理',
-    system_technician: '技师管理',
-    settlement: '结算管理',
-    settlement_list: '结算列表'
+    system_technician: '技师管理'
   },
   page: {
     login: {

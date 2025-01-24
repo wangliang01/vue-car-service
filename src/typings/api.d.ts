@@ -200,8 +200,8 @@ declare namespace Api {
       updatedAt: string;
     }
 
-    interface SearchParams extends Common.PaginationParams {
-      status?: string;
+    interface SearchParams {
+      status?: string[] | string;
       orderNo?: string;
       customerName?: string;
       licensePlate?: string;
