@@ -41,7 +41,7 @@ function handleStatusChange(value: string | undefined) {
               <NInput v-model:value="searchModel.name" :placeholder="t('common.keywordSearch')" clearable />
             </NFormItemGi>
 
-            <NFormItemGi :span="6" :label="t('repairItem.status')" path="isActive">
+            <NFormItemGi :span="6" :label="t('repairItem.isActive')" path="isActive">
               <NSelect
                 :value="searchModel.isActive?.toString()"
                 :options="statusOptions"

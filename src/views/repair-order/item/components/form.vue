@@ -7,16 +7,13 @@ import {
   NFormItem,
   NInput,
   NInputNumber,
-  NSelect,
   NSpace,
   NButton,
   NGrid,
   NFormItemGi,
-  NDynamicInput
 } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { createRepairItem, updateRepairItem } from '@/service/api/repair-item';
-import { fetchMaterialList } from '@/service/api/material';
 
 const { t } = useI18n();
 
@@ -34,7 +31,6 @@ const show = defineModel('show', {
 
 const formRef = ref();
 const loading = ref(false);
-const materials = ref<Api.Material.MaterialInfo[]>([]);
 
 const formModel = ref<Api.RepairItem.CreateParams>({
   name: '',
@@ -42,21 +38,8 @@ const formModel = ref<Api.RepairItem.CreateParams>({
   laborPrice: 0,
   complexityFactor: 1,
   laborDiscountRate: 1,
-  materials: [],
   description: ''
 });
-
-// 获取材料列表
-async function getMaterials() {
-  try {
-    const res = await fetchMaterialList({ current: 1, size: 999 });
-    materials.value = res.records;
-  } catch (error) {
-    window.$message?.error(t('common.error'));
-  }
-}
-
-getMaterials();
 
 watch(
   () => props.editData,
@@ -99,7 +82,6 @@ function handleClose() {
     laborPrice: 0,
     complexityFactor: 1,
     laborDiscountRate: 1,
-    materials: [],
     description: ''
   });
   emits('close');
@@ -139,34 +121,6 @@ function handleClose() {
           <NFormItemGi :span="1">
             <NFormItem :label="t('repairItem.laborDiscountRate')" path="laborDiscountRate" class="w-full">
               <NInputNumber v-model:value="formModel.laborDiscountRate" :min="0" :max="1" :precision="2" class="w-full" />
-            </NFormItem>
-          </NFormItemGi>
-
-          <!-- 材料信息 -->
-          <NFormItemGi :span="2">
-            <NFormItem :label="t('repairItem.materials')" path="materials">
-              <NDynamicInput v-model:value="formModel.materials" :on-create="() => ({ materialId: '', quantity: 1, managementFeeRate: 0, materialDiscountRate: 1 })">
-                <template #default="{ value }">
-                  <NGrid :cols="4" :x-gap="12">
-                    <NFormItem :rule="{ required: true, message: t('common.required') }">
-                      <NSelect
-                        v-model:value="value.materialId"
-                        :options="materials.map(item => ({ label: item.name, value: item._id }))"
-                        :placeholder="t('common.select')"
-                      />
-                    </NFormItem>
-                    <NFormItem :rule="{ required: true, message: t('common.required') }">
-                      <NInputNumber v-model:value="value.quantity" :min="1" :precision="0" />
-                    </NFormItem>
-                    <NFormItem>
-                      <NInputNumber v-model:value="value.managementFeeRate" :min="0" :precision="2" />
-                    </NFormItem>
-                    <NFormItem>
-                      <NInputNumber v-model:value="value.materialDiscountRate" :min="0" :max="1" :precision="2" />
-                    </NFormItem>
-                  </NGrid>
-                </template>
-              </NDynamicInput>
             </NFormItem>
           </NFormItemGi>
 

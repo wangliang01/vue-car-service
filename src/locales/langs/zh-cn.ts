@@ -637,7 +637,6 @@ const local: App.I18n.Schema = {
         managementFeeRate: '管理费率',
         materialDiscountRate: '材料优惠率',
         description: '描述',
-        totalCost: '总成本',
         status: '状态',
         createTime: '创建时间',
         updateTime: '更新时间',
@@ -693,21 +692,79 @@ const local: App.I18n.Schema = {
     name: '项目名称',
     laborHours: '工时定额',
     laborPrice: '工时单价',
-    laborCost: '工时成本',
-    materialCost: '材料成本',
     complexityFactor: '复杂系数',
     laborDiscountRate: '工时费优惠率',
-    materials: '材料清单',
-    materialId: '材料名称',
-    quantity: '数量',
-    managementFeeRate: '管理费率',
-    materialDiscountRate: '材料优惠率',
-    description: '描述',
-    totalCost: '总成本',
-    status: '状态',
+    category: '项目类别',
+    description: '项目描述',
+    isActive: '是否启用',
     createTime: '创建时间',
     updateTime: '更新时间',
-    operation: '操作'
+    operation: '操作',
+    categoryTypes: {
+      engine: '发动机维修',
+      transmission: '变速箱维修',
+      brake: '制动系统',
+      electrical: '电器系统',
+      suspension: '悬挂系统',
+      maintenance: '日常保养',
+      other: '其他'
+    },
+    form: {
+      title: {
+        add: '新增维修项目',
+        edit: '编辑维修项目'
+      },
+      namePlaceholder: '请输入项目名称',
+      laborHoursPlaceholder: '请输入工时定额',
+      laborPricePlaceholder: '请输入工时单价',
+      complexityFactorPlaceholder: '请输入复杂系数',
+      laborDiscountRatePlaceholder: '请输入工时费优惠率',
+      categoryPlaceholder: '请选择项目类别',
+      descriptionPlaceholder: '请输入项目描述',
+      isActivePlaceholder: '请选择是否启用'
+    },
+    table: {
+      columns: {
+        name: '项目名称',
+        category: '项目类别',
+        laborHours: '工时定额',
+        laborPrice: '工时单价',
+        complexityFactor: '复杂系数',
+        laborDiscountRate: '工时费优惠率',
+        isActive: '是否启用',
+        description: '描述',
+        createTime: '创建时间',
+        updateTime: '更新时间'
+      },
+      search: {
+        name: '项目名称',
+        category: '项目类别',
+        isActive: '是否启用',
+        namePlaceholder: '请输入项目名称搜索',
+        categoryPlaceholder: '请选择项目类别',
+        isActivePlaceholder: '请选择状态'
+      },
+      operations: {
+        add: '新增项目',
+        edit: '编辑',
+        delete: '删除',
+        view: '查看详情',
+        confirmDelete: '确认删除该维修项目？'
+      }
+    },
+    item: {
+      title: '维修项目管理',
+      name: '项目名称',
+      laborHours: '工时定额',
+      laborPrice: '工时单价',
+      complexityFactor: '复杂系数',
+      laborDiscountRate: '工时费优惠率',
+      description: '描述',
+      status: '状态',
+      createTime: '创建时间',
+      updateTime: '更新时间',
+      operation: '操作'
+    }
   },
   settlement: {
     title: '结算管理',

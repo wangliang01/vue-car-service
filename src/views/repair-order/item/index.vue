@@ -11,9 +11,12 @@ defineOptions({ name: 'RepairItemList' });
 
 const { t } = useI18n();
 
+
 const searchModel = reactive<Api.RepairItem.SearchParams>({
   name: '',
-  isActive: true
+  isActive: true,
+  current: 1,
+  size: 10
 });
 
 const columns = ref([
@@ -22,21 +25,10 @@ const columns = ref([
   { title: t('repairItem.laborHours'), key: 'laborHours', width: 100 },
   { title: t('repairItem.laborPrice'), key: 'laborPrice', width: 100 },
   { title: t('repairItem.complexityFactor'), key: 'complexityFactor', width: 100 },
+  { title: t('common.remark'), key: 'description', width: 150 },
   {
-    title: t('repairItem.totalCost'),
-    key: 'totalCost',
-    width: 150,
-    render: (row: Api.RepairItem.RepairItemInfo) => {
-      return h('div', [
-        h('div', `${t('repairItem.laborCost')}: ¥${row.totalLaborCost}`),
-        h('div', `${t('repairItem.materialCost')}: ¥${row.totalMaterialCost}`),
-        h('div', `${t('repairItem.totalCost')}: ¥${row.totalCost}`)
-      ]);
-    }
-  },
-  {
-    title: t('repairItem.status'),
-    key: 'status',
+    title: t('repairItem.isActive'),
+    key: 'isActive',
     width: 80,
     render: (row: Api.RepairItem.RepairItemInfo) => {
       return h(
@@ -54,9 +46,9 @@ const columns = ref([
     title: t('common.action'),
     key: 'actions',
     fixed: 'right',
-    width: 200,
+    width: 120,
     render: (row: Api.RepairItem.RepairItemInfo) => {
-      return h(NSpace, { justify: 'center' }, {
+      return h(NSpace, { }, {
         default: () => [
           h(
             NButton,
@@ -112,14 +104,18 @@ function handleEdit(row: Api.RepairItem.RepairItemInfo) {
   showModal.value = true;
 }
 
-function handleSearch() {
+function handleSearch(searchParams: Api.RepairItem.SearchParams) {
+  Object.assign(searchModel, searchParams);
+  pagination.current = 1;
   getData();
 }
 
 function handleReset() {
   Object.assign(searchModel, {
     name: '',
-    isActive: true
+    isActive: true,
+    current: 1,
+    size: 10
   });
   getData();
 }

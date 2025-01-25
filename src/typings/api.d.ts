@@ -452,14 +452,8 @@ declare namespace Api {
       name: string;
       laborHours: number;
       laborPrice: number;
-      complexityFactor?: number;
-      laborDiscountRate?: number;
-      materials: {
-        materialId: string;
-        quantity: number;
-        managementFeeRate?: number;
-        materialDiscountRate?: number;
-      }[];
+      complexityFactor: number;
+      laborDiscountRate: number;
       description?: string;
     }
 
