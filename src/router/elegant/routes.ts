@@ -118,6 +118,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/repair-order/list',
         component: 'view.repair-order_list',
         meta: {
+          order: 1,
           title: 'menu.repair-order.list',
           i18nKey: 'route.repair-order_list',
           i18nTitle: true,
@@ -126,10 +127,24 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'repair-order_item',
+        path: '/repair-order/item',
+        component: 'view.repair-order_item',
+        meta: {
+          order: 4,
+          title: 'menu.repair-order.item',
+          i18nKey: 'route.repair-order_item',
+          i18nTitle: true,
+          icon: 'material-symbols:handyman-outline',
+          requiresAuth: true
+        }
+      },
+      {
         name: 'repair-order_material',
         path: '/repair-order/material',
         component: 'view.repair-order_material',
         meta: {
+          order: 5,
           title: 'menu.repair-order.material',
           i18nKey: 'route.repair-order_material',
           i18nTitle: true,
@@ -142,6 +157,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/repair-order/record',
         component: 'view.repair-order_record',
         meta: {
+          order: 3,
           title: 'menu.repair-order.record',
           i18nKey: 'route.repair-order_record',
           i18nTitle: true,
@@ -154,6 +170,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/repair-order/settlement',
         component: 'view.repair-order_settlement',
         meta: {
+          order: 2,
           title: 'repair-order_settlement',
           i18nKey: 'route.repair-order_settlement',
           i18nTitle: true,

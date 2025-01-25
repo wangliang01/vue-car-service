@@ -419,4 +419,50 @@ declare namespace Api {
 
     interface UpdateParams extends Partial<CreateParams> {}
   }
+
+  namespace RepairItem {
+    interface RepairItemInfo {
+      _id: string;
+      name: string;
+      laborHours: number;
+      laborPrice: number;
+      complexityFactor: number;
+      laborDiscountRate: number;
+      materials: {
+        materialId: string;
+        quantity: number;
+        managementFeeRate: number;
+        materialDiscountRate: number;
+      }[];
+      description?: string;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+      totalLaborCost: number;
+      totalMaterialCost: number;
+      totalCost: number;
+    }
+
+    interface SearchParams extends Common.PaginationParams {
+      name?: string;
+      isActive?: boolean;
+    }
+
+    interface CreateParams {
+      name: string;
+      laborHours: number;
+      laborPrice: number;
+      complexityFactor?: number;
+      laborDiscountRate?: number;
+      materials: {
+        materialId: string;
+        quantity: number;
+        managementFeeRate?: number;
+        materialDiscountRate?: number;
+      }[];
+      description?: string;
+    }
+
+    interface UpdateParams extends Partial<CreateParams> {}
+  }
 }
