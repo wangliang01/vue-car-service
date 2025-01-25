@@ -25,12 +25,12 @@ declare module "@elegant-router/types" {
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
-    "repair-order": "/repair-order";
-    "repair-order_item": "/repair-order/item";
-    "repair-order_list": "/repair-order/list";
-    "repair-order_material": "/repair-order/material";
-    "repair-order_record": "/repair-order/record";
-    "repair-order_settlement": "/repair-order/settlement";
+    "repair": "/repair";
+    "repair_item": "/repair/item";
+    "repair_list": "/repair/list";
+    "repair_material": "/repair/material";
+    "repair_record": "/repair/record";
+    "repair_settlement": "/repair/settlement";
     "system": "/system";
     "system_permission": "/system/permission";
     "system_role": "/system/role";
@@ -77,7 +77,7 @@ declare module "@elegant-router/types" {
     | "home"
     | "iframe-page"
     | "login"
-    | "repair-order"
+    | "repair"
     | "system"
     | "vehicle"
   >;
@@ -103,11 +103,11 @@ declare module "@elegant-router/types" {
     | "login"
     | "customer_list"
     | "home"
-    | "repair-order_item"
-    | "repair-order_list"
-    | "repair-order_material"
-    | "repair-order_record"
-    | "repair-order_settlement"
+    | "repair_item"
+    | "repair_list"
+    | "repair_material"
+    | "repair_record"
+    | "repair_settlement"
     | "system_permission"
     | "system_role"
     | "system_store"

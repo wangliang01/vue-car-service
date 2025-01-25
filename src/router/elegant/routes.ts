@@ -103,78 +103,58 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
-    name: 'repair-order',
-    path: '/repair-order',
+    name: 'repair',
+    path: '/repair',
     component: 'layout.base',
     meta: {
-      title: 'repair-order',
-      i18nKey: 'route.repair-order',
-      order: 4,
+      title: 'repair',
+      i18nKey: 'route.repair',
       icon: 'material-symbols:build-outline'
     },
     children: [
       {
-        name: 'repair-order_list',
-        path: '/repair-order/list',
-        component: 'view.repair-order_list',
+        name: 'repair_item',
+        path: '/repair/item',
+        component: 'view.repair_item',
         meta: {
-          order: 1,
-          title: 'menu.repair-order.list',
-          i18nKey: 'route.repair-order_list',
-          i18nTitle: true,
-          icon: 'material-symbols:receipt-long-outline',
-          requiresAuth: true
+          title: 'repair_item',
+          i18nKey: 'route.repair_item'
         }
       },
       {
-        name: 'repair-order_item',
-        path: '/repair-order/item',
-        component: 'view.repair-order_item',
+        name: 'repair_list',
+        path: '/repair/list',
+        component: 'view.repair_list',
         meta: {
-          order: 4,
-          title: 'menu.repair-order.item',
-          i18nKey: 'route.repair-order_item',
-          i18nTitle: true,
-          icon: 'material-symbols:handyman-outline',
-          requiresAuth: true
+          title: 'repair_list',
+          i18nKey: 'route.repair_list'
         }
       },
       {
-        name: 'repair-order_material',
-        path: '/repair-order/material',
-        component: 'view.repair-order_material',
+        name: 'repair_material',
+        path: '/repair/material',
+        component: 'view.repair_material',
         meta: {
-          order: 5,
-          title: 'menu.repair-order.material',
-          i18nKey: 'route.repair-order_material',
-          i18nTitle: true,
-          icon: 'material-symbols:inventory-2-outline',
-          requiresAuth: true
+          title: 'repair_material',
+          i18nKey: 'route.repair_material'
         }
       },
       {
-        name: 'repair-order_record',
-        path: '/repair-order/record',
-        component: 'view.repair-order_record',
+        name: 'repair_record',
+        path: '/repair/record',
+        component: 'view.repair_record',
         meta: {
-          order: 3,
-          title: 'menu.repair-order.record',
-          i18nKey: 'route.repair-order_record',
-          i18nTitle: true,
-          icon: 'material-symbols:history',
-          requiresAuth: true
+          title: 'repair_record',
+          i18nKey: 'route.repair_record'
         }
       },
       {
-        name: 'repair-order_settlement',
-        path: '/repair-order/settlement',
-        component: 'view.repair-order_settlement',
+        name: 'repair_settlement',
+        path: '/repair/settlement',
+        component: 'view.repair_settlement',
         meta: {
-          order: 2,
-          title: 'repair-order_settlement',
-          i18nKey: 'route.repair-order_settlement',
-          i18nTitle: true,
-          icon: 'material-symbols:payments-outline'
+          title: 'repair_settlement',
+          i18nKey: 'route.repair_settlement'
         }
       }
     ]

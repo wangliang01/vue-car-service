@@ -1,10 +1,11 @@
 import { request } from '../request';
 
 /** 获取权限树 */
-export function fetchPermissionTree() {
+export function fetchPermissionTree(params: any) {
   return request<Api.Permission.PermissionInfo[]>({
     url: '/permission/tree',
-    method: 'get'
+    method: 'get',
+    params
   });
 }
 
@@ -32,4 +33,4 @@ export function fetchDeletePermission(id: string) {
     url: `/permission/${id}`,
     method: 'delete'
   });
-} 
+}

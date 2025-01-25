@@ -11,22 +11,20 @@ interface Emits {
   (e: 'search'): void;
 }
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits(['reset', 'search']);
 const { t } = useI18n();
 const loading = ref(false);
 
-const { formRef, validate, restoreValidation } = useNaiveForm();
+const { formRef } = useNaiveForm();
 
-const model = defineModel<{
+const model = ref<{
   name?: string;
   code?: string;
   type?: 'menu' | 'operation';
-}>('model', { 
-  default: () => ({
-    name: '',
-    code: '',
-    type: undefined
-  })
+}>({
+  name: '',
+  code: '',
+  type: undefined
 });
 
 // 权限类型选项
@@ -39,8 +37,7 @@ const typeOptions = [
 async function handleSearch() {
   loading.value = true;
   try {
-    await validate();
-    emit('search');
+    emit('search', model.value);
   } finally {
     loading.value = false;
   }
@@ -53,7 +50,7 @@ function handleReset() {
     code: '',
     type: undefined
   };
-  restoreValidation();
+
   emit('reset');
 }
 </script>
@@ -67,23 +64,24 @@ function handleReset() {
             <span>{{ t('common.search') }}</span>
           </NSpace>
         </template>
-        
+
         <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi :span="6" :label="t('system.permission.name')">
-              <NInput v-model:value="model.name" :placeholder="t('system.permission.nameSearch')" />
+              <NInput v-model:value="model.name" :placeholder="t('system.permission.nameSearch')" clearable @keyup.enter="handleSearch"/>
             </NFormItemGi>
-            
+
             <NFormItemGi :span="6" :label="t('system.permission.code')">
-              <NInput v-model:value="model.code" :placeholder="t('system.permission.codeSearch')" />
+              <NInput v-model:value="model.code" :placeholder="t('system.permission.codeSearch')" clearable @keyup.enter="handleSearch"/>
             </NFormItemGi>
-            
+
             <NFormItemGi :span="6" :label="t('system.permission.type')">
               <NSelect
                 v-model:value="model.type"
                 :options="typeOptions"
                 :placeholder="t('system.permission.typeSearch')"
                 clearable
+                @update:value="handleSearch"
               />
             </NFormItemGi>
 
@@ -95,9 +93,9 @@ function handleReset() {
                   </template>
                   {{ t('common.reset') }}
                 </NButton>
-                <NButton 
-                  type="primary" 
-                  :loading="loading" 
+                <NButton
+                  type="primary"
+                  :loading="loading"
                   @click="handleSearch"
                 >
                   <template #icon>
@@ -136,4 +134,4 @@ function handleReset() {
     --search-wrapper-shadow: rgba(0, 0, 0, 0.12);
   }
 }
-</style> 
+</style>

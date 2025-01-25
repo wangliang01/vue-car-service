@@ -38,7 +38,7 @@ function transformPermissionToTree(permissions: Api.Permission.PermissionInfo[])
 async function getPermissionTree() {
   try {
     loading.value = true;
-    const {data} = await fetchPermissionTree();
+    const {data} = await fetchPermissionTree(searchModel.value);
     permissionTree.value = transformPermissionToTree(data)
 
     console.log("permissionTree", permissionTree.value);
@@ -86,12 +86,26 @@ const searchModel = ref({
 });
 
 // 处理搜索
-async function handleSearch() {
+async function handleSearch(model: {
+  name?: string;
+  code?: string;
+  type?: 'menu' | 'operation';
+}) {
+  searchModel.value = {
+    name: model.name || '',
+    code: model.code || '',
+    type: model.type || undefined
+  };
   await getPermissionTree();
 }
 
 // 处理重置
 async function handleReset() {
+  searchModel.value = {
+    name: '',
+    code: '',
+    type: undefined
+  };
   await getPermissionTree();
 }
 
@@ -102,14 +116,13 @@ getPermissionTree();
 <template>
   <div class="h-full">
     <PermissionSearch
-      v-model="searchModel"
       @search="handleSearch"
       @reset="handleReset"
     />
 
     <NCard :title="t('system.permission.title')">
       <template #header-extra>
-        <NButton type="primary" @click="() => handleAdd()">{{ t('common.add') }}</NButton>
+        <NButton type="primary" ghost @click="() => handleAdd()">{{ t('common.add') }}</NButton>
       </template>
 
       <NTree
@@ -140,6 +153,7 @@ getPermissionTree();
                         {
                           text: true,
                           type: 'primary',
+                          ghost: true,
                           onClick: (e: Event) => {
                             e.stopPropagation();
                             handleAdd(node.key as string);
@@ -152,6 +166,7 @@ getPermissionTree();
                         {
                           text: true,
                           type: 'primary',
+                          ghost: true,
                           onClick: (e: Event) => {
                             e.stopPropagation();
                             handleEdit(node.rawData as Api.Permission.PermissionInfo);
@@ -164,6 +179,7 @@ getPermissionTree();
                         {
                           text: true,
                           type: 'error',
+                          ghost: true,
                           onClick: (e: Event) => {
                             e.stopPropagation();
                             handleDelete(node.key as string);
