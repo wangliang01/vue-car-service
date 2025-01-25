@@ -27,6 +27,7 @@ declare module "@elegant-router/types" {
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "repair-order": "/repair-order";
     "repair-order_list": "/repair-order/list";
+    "repair-order_material": "/repair-order/material";
     "repair-order_record": "/repair-order/record";
     "repair-order_settlement": "/repair-order/settlement";
     "system": "/system";
@@ -102,6 +103,7 @@ declare module "@elegant-router/types" {
     | "customer_list"
     | "home"
     | "repair-order_list"
+    | "repair-order_material"
     | "repair-order_record"
     | "repair-order_settlement"
     | "system_permission"

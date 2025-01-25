@@ -118,9 +118,23 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/repair-order/list',
         component: 'view.repair-order_list',
         meta: {
-          title: 'repair-order_list',
-          i18nKey: 'route.repair-order',
-          icon: 'material-symbols:receipt-long-outline'
+          title: 'menu.repair-order.list',
+          i18nKey: 'route.repair-order_list',
+          i18nTitle: true,
+          icon: 'material-symbols:receipt-long-outline',
+          requiresAuth: true
+        }
+      },
+      {
+        name: 'repair-order_material',
+        path: '/repair-order/material',
+        component: 'view.repair-order_material',
+        meta: {
+          title: 'menu.repair-order.material',
+          i18nKey: 'route.repair-order_material',
+          i18nTitle: true,
+          icon: 'material-symbols:inventory-2-outline',
+          requiresAuth: true
         }
       },
       {
@@ -128,9 +142,11 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/repair-order/record',
         component: 'view.repair-order_record',
         meta: {
-          title: 'repair-order_record',
+          title: 'menu.repair-order.record',
           i18nKey: 'route.repair-order_record',
-          icon: 'material-symbols:history'
+          i18nTitle: true,
+          icon: 'material-symbols:history',
+          requiresAuth: true
         }
       },
       {
@@ -140,6 +156,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'repair-order_settlement',
           i18nKey: 'route.repair-order_settlement',
+          i18nTitle: true,
           icon: 'material-symbols:payments-outline'
         }
       }

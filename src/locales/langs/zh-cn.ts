@@ -150,6 +150,7 @@ const local: App.I18n.Schema = {
     error: '错误',
     index: '序号',
     keywordSearch: '请输入关键词搜索',
+    select: '请选择',
     logout: '退出登录',
     logoutConfirm: '确认退出登录吗？',
     lookForward: '敬请期待',
@@ -319,6 +320,7 @@ const local: App.I18n.Schema = {
     'repair-order_list': '维修登记',
     'repair-order_record': '维修记录',
     'repair-order_settlement': '维修结算',
+    'repair-order_material': '维修材料',
     system: '系统管理',
     system_store: '门店管理',
     system_permission: '权限管理',
@@ -541,6 +543,40 @@ const local: App.I18n.Schema = {
       permission: '权限管理',
       user: '用户管理',
       role: '角色管理'
+    },
+
+  },
+  material: {
+    list: '材料列表',
+    name: '材料名称',
+    code: '材料编码',
+    categoryLabel: '材料类别',
+    specification: '规格型号',
+    unitLabel: '单位',
+    price: '价格信息',
+    purchasePrice: '采购价格',
+    sellingPrice: '销售价格',
+    managementFeeRate: '管理费率',
+    stock: '库存',
+    stockQuantity: '库存数量',
+    stockThreshold: '库存预警值',
+    category: '材料类别',
+    unit: '单位',
+    status: '状态',
+    supplier: {
+      name: '供应商名称',
+      contact: '联系人',
+      phone: '联系电话'
+    },
+    categoryTypes: {
+      parts: '配件',
+      oil: '油品',
+      consumables: '耗材'
+    },
+    unitTypes: {
+      piece: '个',
+      set: '套',
+      liter: '升'
     }
   },
   repairOrder: {

@@ -201,7 +201,7 @@ declare namespace Api {
     }
 
     interface SearchParams {
-      status?: string[] | string;
+      status?: string;
       orderNo?: string;
       customerName?: string;
       licensePlate?: string;
@@ -365,5 +365,58 @@ declare namespace Api {
     interface UpdateStatusParams {
       status: 'active' | 'onLeave' | 'deleted';
     }
+  }
+
+  namespace Material {
+    interface MaterialInfo {
+      _id: string;
+      name: string;
+      code?: string;
+      category: string;
+      specification?: string;
+      unit: string;
+      purchasePrice: number;
+      managementFeeRate: number;
+      sellingPrice: number;
+      stockQuantity: number;
+      stockThreshold: number;
+      supplier?: {
+        name?: string;
+        contact?: string;
+        phone?: string;
+      };
+      isActive: boolean;
+      remarks?: string;
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface SearchParams extends Common.PaginationParams {
+      name?: string;
+      code?: string;
+      category?: string;
+      isActive?: boolean;
+    }
+
+    interface CreateParams {
+      name: string;
+      code?: string;
+      category: string;
+      specification?: string;
+      unit: string;
+      purchasePrice: number;
+      managementFeeRate?: number;
+      sellingPrice: number;
+      stockQuantity?: number;
+      stockThreshold?: number;
+      supplier?: {
+        name?: string;
+        contact?: string;
+        phone?: string;
+      };
+      remarks?: string;
+    }
+
+    interface UpdateParams extends Partial<CreateParams> {}
   }
 }
