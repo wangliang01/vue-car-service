@@ -40,8 +40,8 @@ const selectedRoleIds = ref<string[]>([]);
 // 加载角色列表
 async function loadRoleList() {
   try {
-    const { data } = await getRoleList({ page: 1, limit: 999 });
-    roleOptions.value = data.list.map(item => ({
+    const { data } = await getRoleList({ page: 1, size: 999 });
+    roleOptions.value = data.records.map(item => ({
       label: item.name,
       value: item._id
     }));
@@ -86,7 +86,7 @@ watch(
 
 <template>
   <NDrawer v-model:show="show" :width="500">
-    <NDrawerContent 
+    <NDrawerContent
       :title="t('system.user.linkRole.title')"
       :native-scrollbar="false"
     >
@@ -101,8 +101,8 @@ watch(
           <NButton @click="handleClose">
             {{ t('common.cancel') }}
           </NButton>
-          <NButton 
-            type="primary" 
+          <NButton
+            type="primary"
             :loading="loading"
             @click="handleSubmit"
           >
@@ -112,4 +112,4 @@ watch(
       </template>
     </NDrawerContent>
   </NDrawer>
-</template> 
+</template>

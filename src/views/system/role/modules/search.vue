@@ -18,7 +18,7 @@ const model = defineModel<{
   name?: string;
   code?: string;
   status?: string;
-}>('model', { 
+}>('model', {
   default: () => ({
     name: '',
     code: '',
@@ -28,8 +28,8 @@ const model = defineModel<{
 
 // 状态选项
 const statusOptions = [
-  { label: t('common.status.enable'), value: 'enable' },
-  { label: t('common.status.disable'), value: 'disable' }
+  { label: t('common.status.active'), value: 'active' },
+  { label: t('common.status.inactive'), value: 'inactive' }
 ];
 
 // 搜索
@@ -62,33 +62,38 @@ function handleReset() {
             <span>{{ t('common.search') }}</span>
           </NSpace>
         </template>
-        
+
         <NForm :model="model" label-placement="left" :label-width="80">
           <NGrid :cols="24" :x-gap="24">
             <NFormItemGi :span="6" :label="t('system.role.name')">
-              <NInput 
-                v-model:value="model.name" 
+              <NInput
+                v-model:value="model.name"
                 :placeholder="t('system.role.namePlaceholder')"
+                @keyup.enter="handleSearch"
+                clearable
               />
             </NFormItemGi>
-            
+
             <NFormItemGi :span="6" :label="t('system.role.code')">
-              <NInput 
-                v-model:value="model.code" 
+              <NInput
+                v-model:value="model.code"
                 :placeholder="t('system.role.codePlaceholder')"
+                @keyup.enter="handleSearch"
+                clearable
               />
             </NFormItemGi>
-            
+
             <NFormItemGi :span="6" :label="t('system.role.status')">
               <NSelect
                 v-model:value="model.status"
                 :options="statusOptions"
                 :placeholder="t('system.role.statusPlaceholder')"
                 clearable
+                @keyup.enter="handleSearch"
               />
             </NFormItemGi>
 
-            <NFormItemGi :span="24">
+            <NFormItemGi :span="6">
               <NSpace class="w-full" justify="end">
                 <NButton :loading="loading" @click="handleReset">
                   <template #icon>
@@ -96,9 +101,9 @@ function handleReset() {
                   </template>
                   {{ t('common.reset') }}
                 </NButton>
-                <NButton 
-                  type="primary" 
-                  :loading="loading" 
+                <NButton
+                  type="primary"
+                  :loading="loading"
                   @click="handleSearch"
                 >
                   <template #icon>
@@ -136,4 +141,4 @@ function handleReset() {
     --search-wrapper-shadow: rgba(0, 0, 0, 0.12);
   }
 }
-</style> 
+</style>

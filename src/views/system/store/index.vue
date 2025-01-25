@@ -15,7 +15,7 @@ import {
 import StoreForm from './modules/form.vue';
 import StoreSearch from './modules/search.vue';
 import LinkUser from './modules/link-user.vue';
-
+import { formatDate } from '@/utils/common';
 const { t } = useI18n();
 const message = useMessage();
 
@@ -73,6 +73,13 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
   {
     title: t('system.store.address'),
     key: 'address',
+  },
+  {
+    title: t('common.createTime'),
+    key: 'createdAt',
+    render(row) {
+      return formatDate(row.createdAt);
+    }
   },
   {
     title: t('common.operation'),

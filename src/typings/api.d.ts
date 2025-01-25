@@ -298,6 +298,7 @@ declare namespace Api {
       icon?: string; // 图标
       createdAt: string;
       updatedAt: string;
+      children?: PermissionInfo[];
     }
 
     interface CreatePermissionParams {

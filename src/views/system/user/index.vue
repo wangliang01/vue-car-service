@@ -8,6 +8,7 @@ import type { UserInfo, UserForm } from '@/service/api/user';
 import Search from './modules/search.vue';
 import Form from './modules/form.vue';
 import LinkRole from './modules/link-role.vue';
+import { formatDate } from '@/utils/common';
 
 defineOptions({ name: 'UserManagement' });
 
@@ -105,7 +106,10 @@ const columns: DataTableColumns<UserInfo> = [
   },
   {
     title: t('common.createTime'),
-    key: 'createdAt'
+    key: 'createdAt',
+    render(row) {
+      return formatDate(row.createdAt);
+    }
   },
   {
     title: t('common.operation'),
@@ -286,6 +290,7 @@ async function handleLinkRoleSubmit(roleIds: string[]) {
     await updateUserRoles(currentUserId.value, roleIds);
     message.success(t('common.updateSuccess'));
     showLinkRole.value = false;
+    loadTableData();
   } catch (err) {
     message.error(t('common.updateError'));
   } finally {

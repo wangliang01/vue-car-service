@@ -106,7 +106,7 @@ getPermissionTree();
       @search="handleSearch"
       @reset="handleReset"
     />
-    
+
     <NCard :title="t('system.permission.title')">
       <template #header-extra>
         <NButton type="primary" @click="() => handleAdd()">{{ t('common.add') }}</NButton>
@@ -154,7 +154,7 @@ getPermissionTree();
                           type: 'primary',
                           onClick: (e: Event) => {
                             e.stopPropagation();
-                            handleEdit(node.rawData);
+                            handleEdit(node.rawData as Api.Permission.PermissionInfo);
                           }
                         },
                         { default: () => t('common.edit') }
@@ -187,7 +187,7 @@ getPermissionTree();
       />
     </NCard>
   </div>
-</template> 
+</template>
 
 <style scoped>
 :deep(.n-tree-node) {

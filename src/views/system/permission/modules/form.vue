@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n';
 import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSelect, NInputNumber, NButton, NSpace } from 'naive-ui';
 import type { FormInst } from 'naive-ui';
 import { fetchCreatePermission, fetchUpdatePermission } from '@/service/api/permission';
-import IconSelect from './icon-select.vue';
 
 interface Props {
   show: boolean;
@@ -69,7 +68,7 @@ async function handleSubmit() {
   try {
     await formRef.value?.validate();
     loading.value = true;
-    
+
     if (props.editingRecord?._id) {
       await fetchUpdatePermission(props.editingRecord._id, formModel.value);
     } else {
@@ -79,7 +78,7 @@ async function handleSubmit() {
     Object.assign(formModel.value, {
       name: '',
       code: '',
-      type: 'menu', 
+      type: 'menu',
       parentId: null,
       path: '',
       component: '',
@@ -96,9 +95,9 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer 
-    :show="show" 
-    @update:show="value => emit('update:show', value)" 
+  <NDrawer
+    :show="show"
+    @update:show="value => emit('update:show', value)"
     :width="500"
   >
     <NDrawerContent :title="editingRecord ? t('common.edit') : t('common.add')">
@@ -137,11 +136,7 @@ async function handleSubmit() {
         </NFormItem>
 
         <NFormItem :label="t('system.permission.sort')" path="sort">
-          <NInputNumber v-model:value="formModel.sort" />
-        </NFormItem>
-
-        <NFormItem :label="t('system.permission.icon')" path="icon">
-          <IconSelect v-model:value="formModel.icon" />
+          <NInputNumber v-model:value="formModel.sort" style="width: 100%;"/>
         </NFormItem>
       </NForm>
 
@@ -155,4 +150,4 @@ async function handleSubmit() {
       </template>
     </NDrawerContent>
   </NDrawer>
-</template> 
+</template>

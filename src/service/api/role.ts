@@ -2,7 +2,7 @@ import { request } from '../request';
 import type { PageResult, BaseResponse } from '@/typings/api';
 
 export interface RoleInfo {
-  id: string;
+  _id: string;
   name: string;
   code: string;
   description?: string;
@@ -13,7 +13,7 @@ export interface RoleInfo {
 
 export interface RoleSearchParams {
   page: number;
-  limit: number;
+  size: number;
   name?: string;
   code?: string;
   status?: string;
@@ -84,4 +84,4 @@ export function updateRolePermissions(roleId: string, permissions: string[]) {
     method: 'put',
     data: { permissions }
   });
-} 
+}

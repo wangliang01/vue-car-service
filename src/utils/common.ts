@@ -1,5 +1,5 @@
 import { $t } from '@/locales';
-
+import dayjs from 'dayjs';
 /**
  * Transform record to option
  *
@@ -55,4 +55,8 @@ export function toggleHtmlClass(className: string) {
     add,
     remove
   };
+}
+
+export function formatDate(date: string, format = 'YYYY-MM-DD HH:mm:ss') {
+  return dayjs(date).format(format);
 }

@@ -42,8 +42,8 @@ const model = ref<RoleForm>({
 
 // 状态选项
 const statusOptions = [
-  { label: t('common.status.enable'), value: 'enable' },
-  { label: t('common.status.disable'), value: 'disable' }
+  { label: t('common.status.active'), value: 'active' },
+  { label: t('common.status.inactive'), value: 'inactive' }
 ];
 
 const rules = {
@@ -128,7 +128,7 @@ defineExpose({
 
 <template>
   <NDrawer v-model:show="show" :width="500">
-    <NDrawerContent 
+    <NDrawerContent
       :title="getTitle()"
       :native-scrollbar="false"
     >
@@ -141,23 +141,23 @@ defineExpose({
         require-mark-placement="right-hanging"
       >
         <NFormItem :label="t('system.role.name')" path="name">
-          <NInput 
-            v-model:value="model.name" 
+          <NInput
+            v-model:value="model.name"
             :placeholder="t('system.role.namePlaceholder')"
           />
         </NFormItem>
 
         <NFormItem :label="t('system.role.code')" path="code">
-          <NInput 
-            v-model:value="model.code" 
+          <NInput
+            v-model:value="model.code"
             :placeholder="t('system.role.codePlaceholder')"
             :disabled="isEdit"
           />
         </NFormItem>
 
         <NFormItem :label="t('system.role.description')" path="description">
-          <NInput 
-            v-model:value="model.description" 
+          <NInput
+            v-model:value="model.description"
             type="textarea"
             :placeholder="t('system.role.descriptionPlaceholder')"
           />
@@ -177,8 +177,8 @@ defineExpose({
           <NButton @click="handleClose">
             {{ t('common.cancel') }}
           </NButton>
-          <NButton 
-            type="primary" 
+          <NButton
+            type="primary"
             :loading="loading"
             @click="handleSubmit"
           >
@@ -188,4 +188,4 @@ defineExpose({
       </template>
     </NDrawerContent>
   </NDrawer>
-</template> 
+</template>

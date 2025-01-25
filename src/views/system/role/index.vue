@@ -8,7 +8,7 @@ import type { RoleInfo, RoleForm } from '@/service/api/role';
 import Search from './modules/search.vue';
 import Form from './modules/form.vue';
 import LinkPermission from './modules/link-permission.vue';
-
+import { formatDate } from '@/utils/common';
 defineOptions({ name: 'RoleManagement' });
 
 const { t } = useI18n();
@@ -61,18 +61,23 @@ const columns: DataTableColumns<RoleInfo> = [
     title: t('system.role.status'),
     key: 'status',
     render(row) {
-      const type = row.status === 'disable' ? 'warning' : 'success';
-      const text = row.status === 'disable' ? t('common.status.disable') : t('common.status.enable');
+      const type = row.status === 'inactive' ? 'warning' : 'success';
+      const text = row.status === 'inactive' ? t('common.status.inactive') : t('common.status.active');
       return h(NTag, { type }, { default: () => text });
     }
   },
   {
     title: t('common.createTime'),
-    key: 'createdAt'
+    key: 'createdAt',
+    render(row) {
+      return formatDate(row.createdAt);
+    }
   },
   {
     title: t('common.operation'),
     key: 'actions',
+    fixed: 'right',
+    width: 240,
     render(row) {
       return h(
         NSpace,
@@ -88,28 +93,21 @@ const columns: DataTableColumns<RoleInfo> = [
               { default: () => t('common.edit') }
             ),
             h(
-              NPopconfirm,
+              NButton,
               {
-                onPositiveClick: () => handleDelete(row)
+                size: 'small',
+                type: 'error',
+                ghost: true,
+                onClick: () => handleDelete(row)
               },
-              {
-                default: () => t('common.confirmDelete'),
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      size: 'small',
-                      type: 'error'
-                    },
-                    { default: () => t('common.delete') }
-                  )
-              }
+              { default: () => t('common.delete') }
             ),
             h(
               NButton,
               {
                 size: 'small',
                 type: 'info',
+                ghost: true,
                 onClick: () => handlePermission(row)
               },
               { default: () => t('system.role.linkPermission') }
@@ -127,10 +125,10 @@ async function loadTableData() {
   try {
     const { data } = await getRoleList({
       page: pagination.page,
-      limit: pagination.pageSize,
+      size: pagination.pageSize,
       ...searchModel.value
     });
-    tableData.value = data.list;
+    tableData.value = data.records;
     pagination.itemCount = data.total;
   } catch (err) {
     message.error(t('common.loadError'));
@@ -173,7 +171,7 @@ function handleAdd() {
 
 // 编辑角色
 function handleEdit(row: RoleInfo) {
-  currentId.value = row.id;
+  currentId.value = row._id;
   editData.value = {
     name: row.name,
     code: row.code,
@@ -186,14 +184,22 @@ function handleEdit(row: RoleInfo) {
 // 删除角色
 async function handleDelete(row: RoleInfo) {
   try {
-    await deleteRole(row.id);
-    message.success(t('common.deleteSuccess'));
-    if (tableData.value.length === 1 && pagination.page > 1) {
-      pagination.page -= 1;
-    }
-    loadTableData();
-  } catch (err) {
-    message.error(t('common.deleteError'));
+    window.$dialog?.warning({
+      title: t('common.warning'),
+      content: t('common.confirmDelete', { name: row.name }),
+      positiveText: t('common.confirm'),
+      negativeText: t('common.cancel'),
+      onPositiveClick: async () => {
+        await deleteRole(row._id);
+        message.success(t('common.deleteSuccess'));
+        if (tableData.value.length === 1 && pagination.page > 1) {
+          pagination.page -= 1;
+        }
+        loadTableData();
+      }
+    });
+  } catch (error) {
+    window.$message?.error(t('common.error'));
   }
 }
 
@@ -229,17 +235,13 @@ loadTableData();
 
 <template>
   <div>
-    <Search
-      v-model:model="searchModel"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
+    <Search v-model:model="searchModel" @search="handleSearch" @reset="handleReset" />
 
     <NCard>
       <template #header>
         <NSpace justify="space-between">
           <span>{{ t('system.role.title') }}</span>
-          <NButton type="primary" @click="handleAdd">
+          <NButton type="primary" @click="handleAdd" ghost>
             <template #icon>
               <div class="i-material-symbols:add" />
             </template>
@@ -248,28 +250,13 @@ loadTableData();
         </NSpace>
       </template>
 
-      <NDataTable
-        :loading="loading"
-        :columns="columns"
-        :data="tableData"
-        :pagination="pagination"
-        @update:page="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
+      <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
+        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" />
     </NCard>
 
-    <Form
-      ref="formRef"
-      v-model:show="showForm"
-      :loading="formLoading"
-      :is-edit="!!currentId"
-      :edit-data="editData"
-      @submit="handleFormSubmit"
-    />
+    <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"
+      @submit="handleFormSubmit" />
 
-    <LinkPermission
-      v-model:show="showPermission"
-      :role-id="currentRoleId"
-    />
+    <LinkPermission v-model:show="showPermission" :role-id="currentRoleId" />
   </div>
-</template> 
+</template>
