@@ -39,7 +39,7 @@ const pagination = ref({
 });
 
 // 选中行
-const checkedRowKeys = ref<string[]>([]);
+const checkedRowKeys = ref<(string | number)[]>([]);
 
 // 表单抽屉
 const formVisible = ref(false);
@@ -203,7 +203,7 @@ async function handleBatchUpdateStatus(status: string) {
   }
 
   try {
-    await fetchBatchUpdateStoreStatus(checkedRowKeys.value, status);
+    await fetchBatchUpdateStoreStatus(checkedRowKeys.value.map(String), status);
     window.$message?.success(t('common.updateSuccess'));
     checkedRowKeys.value = [];
     getData();

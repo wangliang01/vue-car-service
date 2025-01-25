@@ -15,7 +15,7 @@ const emit = defineEmits<Emits>();
 const { t } = useI18n();
 const loading = ref(false);
 
-const { formRef, validate, restoreValidation } = useNaiveForm();
+const { formRef, validate } = useNaiveForm();
 
 const model = defineModel<Api.Store.SearchParams>('model', { required: true });
 
@@ -24,16 +24,6 @@ const statusOptions = [
   { label: t('system.store.statusOptions.active'), value: 'active' },
   { label: t('system.store.statusOptions.inactive'), value: 'inactive' }
 ];
-
-type RuleKey = Extract<keyof Api.Store.SearchParams, 'name' | 'code'>;
-
-const rules = computed<Record<RuleKey, App.Global.FormRule>>(() => {
-  const { patternRules } = useFormRules();
-  return {
-    name: patternRules.name,
-    code: patternRules.code
-  };
-});
 
 // 搜索
 async function handleSearch() {
@@ -50,9 +40,7 @@ async function handleSearch() {
 
 // 重置
 function handleReset() {
-  // 重置表单验证
-  restoreValidation();
-  // 触发重置事件
+  formRef.value?.restoreValidation();
   emit('reset');
 }
 </script>
@@ -61,7 +49,7 @@ function handleReset() {
   <NCard :bordered="false" size="small">
     <NCollapse>
       <NCollapseItem :title="t('common.search')" name="store-search">
-        <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="80">
+        <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi :span="6" :label="t('system.store.name')" path="name">
               <NInput
