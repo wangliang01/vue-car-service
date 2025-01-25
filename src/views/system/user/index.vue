@@ -130,6 +130,7 @@ const columns: DataTableColumns<UserInfo> = [
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => handleLinkRole(row)
                 },
                 { default: () => t('system.user.linkRole.action') }
@@ -147,7 +148,8 @@ const columns: DataTableColumns<UserInfo> = [
                     NButton,
                     {
                       size: 'small',
-                      type: 'error'
+                      type: 'error',
+                      ghost: true
                     },
                     { default: () => t('common.delete') }
                   )
@@ -169,7 +171,7 @@ async function loadTableData() {
       limit: pagination.pageSize,
       ...searchModel.value
     });
-    
+
     tableData.value = data.list;
     pagination.itemCount = data.total;
   } catch (err) {
@@ -264,7 +266,7 @@ async function handleLinkRole(row: UserInfo) {
   currentUserId.value = row._id;
   currentUsername.value = row.username;
   showLinkRole.value = true;
-  
+
   try {
     const { data: roleData } = await getUserRoles(row._id);
     console.log('获取到的角色数据:', roleData);
@@ -278,7 +280,7 @@ async function handleLinkRole(row: UserInfo) {
 // 处理关联角色提交
 async function handleLinkRoleSubmit(roleIds: string[]) {
   if (!currentUserId.value) return;
-  
+
   linkRoleLoading.value = true;
   try {
     await updateUserRoles(currentUserId.value, roleIds);
@@ -307,7 +309,7 @@ loadTableData();
       <template #header>
         <NSpace justify="space-between">
           <span>{{ t('system.user.title') }}</span>
-          <NButton type="primary" @click="handleAdd">
+          <NButton type="primary" @click="handleAdd" ghost>
             <template #icon>
               <div class="i-material-symbols:add" />
             </template>
@@ -344,4 +346,4 @@ loadTableData();
       @submit="handleLinkRoleSubmit"
     />
   </div>
-</template> 
+</template>

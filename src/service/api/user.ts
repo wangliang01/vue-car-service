@@ -2,15 +2,15 @@ import { request } from '../request';
 import type { PageResult, BaseResponse } from '@/typings/api';
 
 export interface UserInfo {
+  _id: string;
   id: string;
   username: string;
   name: string;
   phone: string;
   email: string;
-  type: 'admin' | 'user';
-  roles?: string[];
-  createTime?: string;
-  updateTime?: string;
+  isAdmin: boolean;
+  roles: { _id: string; name: string }[];
+  createdAt: string;
 }
 
 export interface UserSearchParams {
