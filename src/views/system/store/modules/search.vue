@@ -64,18 +64,20 @@ function handleReset() {
         <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi :span="6" :label="t('system.store.name')" path="name">
-              <NInput 
-                v-model:value="model.name" 
+              <NInput
+                v-model:value="model.name"
                 :placeholder="t('system.store.nameSearch')"
                 @keyup.enter="handleSearch"
+                clearable
               />
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('system.store.code')" path="code">
-              <NInput 
-                v-model:value="model.code" 
+              <NInput
+                v-model:value="model.code"
                 :placeholder="t('system.store.codeSearch')"
                 @keyup.enter="handleSearch"
+                clearable
               />
             </NFormItemGi>
 
@@ -96,9 +98,9 @@ function handleReset() {
                   </template>
                   {{ t('common.reset') }}
                 </NButton>
-                <NButton 
-                  type="primary" 
-                  :loading="loading" 
+                <NButton
+                  type="primary"
+                  :loading="loading"
                   @click="handleSearch"
                 >
                   <template #icon>
@@ -136,4 +138,4 @@ function handleReset() {
     --search-wrapper-shadow: rgba(0, 0, 0, 0.12);
   }
 }
-</style> 
+</style>

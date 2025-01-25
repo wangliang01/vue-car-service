@@ -25,7 +25,7 @@ const loading = ref(false);
 const formModel = ref<Api.Store.CreateStoreParams>({
   name: '',
   code: '',
-  address: ''
+  address: '',
 });
 
 
@@ -38,13 +38,13 @@ const rules = {
 
 // 监听编辑记录变化
 watch(
-  () => props.editingRecord,
-  (record) => {
-    if (record) {
+  () => show.value,
+  () => {
+    if (props.mode === 'edit') {
       Object.assign(formModel.value, {
-        name: record.name,
-        code: record.code,
-        address: record.address,
+        name: props.editingRecord!.name,
+        code: props.editingRecord!.code,
+        address: props.editingRecord!.address,
       });
     } else {
       Object.assign(formModel.value, {
@@ -63,9 +63,14 @@ async function handleSubmit() {
   try {
     await formRef.value?.validate();
     loading.value = true;
-    
+
     if (props.mode === 'create') {
       await fetchCreateStore(formModel.value);
+      Object.assign(formModel.value, {
+        name: '',
+        code: '',
+        address: '',
+      });
     } else {
       await fetchUpdateStore(props.editingRecord!._id, formModel.value);
     }
@@ -87,7 +92,7 @@ function handleClose() {
     v-model:show="show"
     :width="500"
     :mask-closable="true"
-   
+
   >
     <NDrawerContent  :title="props.mode === 'create' ? t('common.add') : t('common.edit')">
       <NForm
@@ -101,7 +106,7 @@ function handleClose() {
         <NFormItem :label="t('system.store.name')" path="name">
           <NInput v-model:value="formModel.name" />
         </NFormItem>
-        
+
         <NFormItem :label="t('system.store.code')" path="code">
           <NInput v-model:value="formModel.code" />
         </NFormItem>
@@ -139,4 +144,5 @@ function handleClose() {
 .mt-24px {
   margin-top: 24px;
 }
+
 </style>

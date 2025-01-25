@@ -2,8 +2,10 @@
 import { NCard, NCollapse, NCollapseItem, NForm, NFormItemGi, NInput, NSelect, NSpace, NButton, NGrid } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import type { SelectOption } from 'naive-ui';
+import { useNaiveForm } from '@/hooks/common/form';
 
 const { t } = useI18n();
+const { formRef, validate, restoreValidation } = useNaiveForm();
 
 const props = defineProps<{
   searchModel: Api.RepairItem.SearchParams;
@@ -22,6 +24,20 @@ function handleStatusChange(value: string | undefined) {
   } else {
     props.searchModel.isActive = value === 'true';
   }
+}
+
+async function handleSearch() {
+  try {
+    await validate();
+    emits('search');
+  } catch (error) {
+    window.$message?.error(t('common.invalidForm'));
+  }
+}
+
+function handleReset() {
+  restoreValidation();
+  emits('reset');
 }
 </script>
 
@@ -54,13 +70,13 @@ function handleStatusChange(value: string | undefined) {
         </NForm>
         <div class="flex justify-end mt-16px">
           <NSpace>
-            <NButton @click="emits('reset')">
+            <NButton @click="handleReset">
               <template #icon>
                 <div class="i-material-symbols:refresh text-16px" />
               </template>
               {{ t('common.reset') }}
             </NButton>
-            <NButton type="primary" @click="emits('search')">
+            <NButton type="primary" @click="handleSearch">
               <template #icon>
                 <div class="i-material-symbols:search text-16px" />
               </template>

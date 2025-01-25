@@ -274,15 +274,6 @@ declare namespace Api {
       name: string;
       code: string;
       address: string;
-      contact: {
-        phone: string;
-        email: string;
-      };
-      businessHours: {
-        openTime: string;
-        closeTime: string;
-        workDays: number[];
-      };
     }
 
     interface UpdateStoreParams extends Partial<CreateStoreParams> {}
@@ -291,8 +282,6 @@ declare namespace Api {
       name?: string;
       code?: string;
       status?: string;
-      province?: string;
-      city?: string;
     }
   }
 

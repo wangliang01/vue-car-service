@@ -3,8 +3,8 @@ import { ref, onMounted, h } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NCard, NSpace, NButton, NDataTable, NPagination, NTag, NPopconfirm, useMessage } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
-import { 
-  fetchStoreList, 
+import {
+  fetchStoreList,
   fetchDeleteStore,
   fetchBatchUpdateStoreStatus,
   fetchExportStores,
@@ -24,8 +24,6 @@ const searchModel = ref<Api.Store.SearchParams>({
   name: '',
   code: '',
   status: null,
-  province: '',
-  city: '',
   current: 1,
   size: 10
 });
@@ -60,7 +58,7 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
   { type: 'selection' },
   { title: t('system.store.name'), key: 'name' },
   { title: t('system.store.code'), key: 'code' },
-  { 
+  {
     title: t('system.store.status._value'),
     key: 'status',
     render(row) {
@@ -72,12 +70,9 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
       });
     }
   },
-  { 
+  {
     title: t('system.store.address'),
     key: 'address',
-    render(row) {
-      return row.address;
-    }
   },
   {
     title: t('common.operation'),
@@ -104,6 +99,7 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
               {
                 size: 'small',
                 type: 'info',
+                ghost: true,
                 onClick: () => handleLinkUser(row)
               },
               { default: () => t('system.store.linkUser.action') }
@@ -113,28 +109,17 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
               {
                 size: 'small',
                 type: row.status === 'active' ? 'warning' : 'success',
+                ghost: true,
                 onClick: () => handleUpdateStatus(row)
               },
               { default: () => row.status === 'active' ? t('system.store.status.deactivate') : t('system.store.status.activate') }
             ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => handleDelete(row)
-              },
-              {
-                default: () => t('common.confirmDelete'),
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      size: 'small',
-                      type: 'error'
-                    },
-                    { default: () => t('common.delete') }
-                  )
-              }
-            )
+            h(NButton, {
+              size: 'small',
+              type: 'error',
+              ghost: true,
+              onClick: () => handleDelete(row )
+            }, { default: () => t('common.delete') }),
           ]
         }
       );
@@ -147,9 +132,9 @@ async function getData(page = pagination.value.current) {
   loading.value = true;
   try {
     const { data } = await fetchStoreList({
+      ...searchModel.value,
       current: page,
       size: pagination.value.size,
-      ...searchModel.value
     });
     dataList.value = data.records;
     pagination.value.total = data.total;
@@ -160,6 +145,7 @@ async function getData(page = pagination.value.current) {
 
 // 搜索
 function handleSearch() {
+  console.log("搜索", searchModel.value);
   getData(1);
 }
 
@@ -170,6 +156,9 @@ function handleReset() {
     code: '',
     status: null,
   });
+  searchModel.value.name = ''
+  searchModel.value.code = ''
+  searchModel.value.status = null
   getData(1);
 }
 
@@ -188,15 +177,15 @@ function handleEdit(record: Api.Store.StoreInfo) {
 }
 
 // 删除
-async function handleDelete(id: string) {
+async function handleDelete(row: Api.Store.StoreInfo) {
   try {
     window.$dialog?.warning({
       title: t('common.warning'),
-      content: t('common.confirmDelete'),
+      content: t('common.confirmDelete', { name: row.name }),
       positiveText: t('common.confirm'),
       negativeText: t('common.cancel'),
       onPositiveClick: async () => {
-        await fetchDeleteStore(id);
+        await fetchDeleteStore(row._id);
         window.$message?.success(t('common.deleteSuccess'));
         getData();
       }
@@ -226,7 +215,8 @@ async function handleBatchUpdateStatus(status: string) {
 // 导出
 async function handleExport() {
   try {
-    const blob = await fetchExportStores();
+    const {data: blob} = await fetchExportStores();
+    console.log("blob", blob)
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -246,8 +236,8 @@ function handleFormSubmit() {
   formVisible.value = false;
   getData();
   window.$message?.success(
-    formMode.value === 'create' 
-      ? t('common.addSuccess') 
+    formMode.value === 'create'
+      ? t('common.addSuccess')
       : t('common.updateSuccess')
   );
 }
@@ -257,11 +247,11 @@ async function handleLinkUser(row: Api.Store.StoreInfo) {
   currentStoreId.value = row._id;
   currentStoreName.value = row.name;
   showLinkUser.value = true;
-  
+
   try {
     const { data } = await getStoreUsers(row._id);
 
-    console.log("data", data);  
+    console.log("data", data);
     linkedUserIds.value = data.list.map(item => item._id);
   } catch (err) {
     message.error(t('common.loadError'));
@@ -271,7 +261,7 @@ async function handleLinkUser(row: Api.Store.StoreInfo) {
 // 处理关联用户提交
 async function handleLinkUserSubmit(userIds: string[]) {
   if (!currentStoreId.value) return;
-  
+
   linkUserLoading.value = true;
   try {
     await updateStoreUsers(currentStoreId.value, userIds);
@@ -289,7 +279,7 @@ async function handleLinkUserSubmit(userIds: string[]) {
 async function handleUpdateStatus(row: Api.Store.StoreInfo) {
   const newStatus = row.status === 'active' ? 'inactive' : 'active';
   const actionText = newStatus === 'active' ? t('system.store.status.activate') : t('system.store.status.deactivate');
-  
+
   try {
     await fetchUpdateStoreStatus(row._id, newStatus);
     message.success(actionText + t('common.success'));
