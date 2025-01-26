@@ -15,7 +15,7 @@ const emit = defineEmits<Emits>();
 const { t } = useI18n();
 const loading = ref(false);
 
-const { formRef, validate } = useNaiveForm();
+const { formRef } = useNaiveForm();
 
 const model = defineModel<Api.Store.SearchParams>('model', { required: true });
 
@@ -29,10 +29,7 @@ const statusOptions = [
 async function handleSearch() {
   try {
     loading.value = true;
-    await validate();
     emit('search');
-  } catch (error) {
-    window.$message?.error(t('common.invalidForm'));
   } finally {
     loading.value = false;
   }
@@ -47,8 +44,8 @@ function handleReset() {
 
 <template>
   <NCard :bordered="false" size="small">
-    <NCollapse>
-      <NCollapseItem :title="t('common.search')" name="store-search">
+    <NCollapse :default-expanded-names="['1']">
+      <NCollapseItem :title="t('common.search')"  name="1">
         <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi :span="6" :label="t('system.store.name')" path="name">

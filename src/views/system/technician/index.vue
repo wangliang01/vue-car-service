@@ -1,68 +1,18 @@
-<template>
-  <div>
-    <Search
-      v-model:model="searchModel"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
-
-    <NCard>
-      <template #header>
-        <NSpace justify="space-between">
-          <span>{{ t('system.technician.title') }}</span>
-          <NButton type="primary" @click="handleAdd">
-            <template #icon>
-              <div class="i-material-symbols:add" />
-            </template>
-            {{ t('common.add') }}
-          </NButton>
-        </NSpace>
-      </template>
-
-      <NDataTable
-        :loading="loading"
-        :columns="columns"
-        :data="tableData"
-        :pagination="pagination"
-        @update:page="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
-    </NCard>
-
-    <Form
-      ref="formRef"
-      v-model:show="showForm"
-      :loading="formLoading"
-      :is-edit="!!currentId"
-      :edit-data="editData"
-      @submit="handleFormSubmit"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, h } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NSpace, NButton, NDataTable, NPopconfirm, NTag, NAvatar, useMessage } from 'naive-ui';
+import { NCard, NSpace, NButton, NDataTable, NTag, useMessage } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { getTechnicianList, deleteTechnician, updateTechnicianStatus } from '@/service/api/technician';
 import Search from './modules/search.vue';
 import Form from './modules/form.vue';
-import ExpertiseTag from '@/components/ExpertiseTag/index.vue'
 
 defineOptions({ name: 'TechnicianManagement' });
 
 const { t } = useI18n();
 const message = useMessage();
 
-// 搜索相关
-const searchModel = ref({
-  name: '',
-  phone: '',
-  email: '',
-  level: '',
-  status: ''
-});
+
 
 // 表格相关
 const loading = ref(false);
@@ -73,6 +23,15 @@ const pagination = ref({
   itemCount: 0,
   showSizePicker: true,
   pageSizes: [10, 20, 30, 40]
+});
+
+// 搜索相关
+const searchModel = ref({
+  name: '',
+  phone: '',
+  email: '',
+  level: '',
+  status: ''
 });
 
 // 表单相关
@@ -130,7 +89,8 @@ const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
       const statusMap = {
         active: { type: 'success', text: t('system.technician.statusActive') },
         onLeave: { type: 'warning', text: t('system.technician.statusOnLeave') },
-        deleted: { type: 'error', text: t('system.technician.statusDeleted') }
+        deleted: { type: 'error', text: t('system.technician.statusDeleted') },
+        terminated: { type: 'error', text: t('system.technician.statusTerminated') }
       };
       const status = statusMap[row.status];
       return h(NTag, { type: status.type }, { default: () => status.text });
@@ -148,44 +108,31 @@ const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
             size: 'small',
             onClick: () => handleEdit(row)
           }, { default: () => t('common.edit') }),
-          h(NPopconfirm, {
-            onPositiveClick: () => handleDelete(row._id),
-            positiveText: t('common.confirm'),
-            negativeText: t('common.cancel'),
-            width: '240px',
-            showIcon: true,
-            type: 'warning',
-          }, {
-            default: () => h('div', { class: 'delete-confirm' }, [
-              h('div', { class: 'confirm-title' }, t('common.confirmDeleteTitle')),
-              h('div', { class: 'confirm-content' }, t('common.confirmDeleteContent'))
-            ]),
-            trigger: () => h(NButton, {
-              size: 'small',
-              type: 'error'
-            }, { default: () => t('common.delete') })
-          })
+          h(NButton, {
+            size: 'small',
+            ghost: true,
+            type: 'error',
+            onClick: () => handleDelete(row)
+          }, { default: () => t('common.delete') }),
+
         ]
       });
     }
   }
 ];
 
-// 获取列表数据
-async function fetchData() {
+// 加载表格数据
+async function loadTableData() {
   loading.value = true;
   try {
     const params = {
       ...searchModel.value,
       page: pagination.value.page,
-      limit: pagination.value.pageSize
+      size: pagination.value.pageSize
     };
-    const res = await getTechnicianList(params);
-    tableData.value = res.data.records;
-    pagination.value.itemCount = res.data.total;
-  } catch (err) {
-    console.error(err);
-    message.error(t('common.error'));
+    const { data } = await getTechnicianList(params) as any
+    tableData.value = data.records;
+    pagination.value.itemCount = data.total;
   } finally {
     loading.value = false;
   }
@@ -194,31 +141,31 @@ async function fetchData() {
 // 搜索
 async function handleSearch() {
   pagination.value.page = 1;
-  await fetchData();
+  await loadTableData();
 }
 
 // 重置搜索
 async function handleReset() {
   pagination.value.page = 1;
-  await fetchData();
+  await loadTableData();
 }
 
 // 分页改变
 async function handlePageChange(page: number) {
   pagination.value.page = page;
-  await fetchData();
+  await loadTableData();
 }
 
 // 每页条数改变
 async function handlePageSizeChange(pageSize: number) {
   pagination.value.pageSize = pageSize;
   pagination.value.page = 1;
-  await fetchData();
+  await loadTableData();
 }
 
 // 新增
 function handleAdd() {
-  currentId.value = '';
+  currentId.value = undefined;
   editData.value = null;
   showForm.value = true;
 }
@@ -231,43 +178,66 @@ function handleEdit(row: Api.Technician.TechnicianInfo) {
 }
 
 // 删除
-async function handleDelete(id: string) {
-  try {
-    await deleteTechnician(id);
-    message.success(t('common.deleteSuccess'));
-    await fetchData();
-  } catch (err) {
-    console.error(err);
-    message.error(t('common.error'));
-  }
+async function handleDelete(row: Api.Technician.TechnicianInfo) {
+  window.$dialog?.warning({
+    title: t('common.warning'),
+    content: t('common.confirmDelete', { name: row.name }),
+    positiveText: t('common.confirm'),
+    negativeText: t('common.cancel'),
+    onPositiveClick: async () => {
+      await deleteTechnician(row._id);
+      message.success(t('common.deleteSuccess'));
+      if (tableData.value.length === 1 && pagination.value.page > 1) {
+        pagination.value.page -= 1;
+      }
+      await loadTableData();
+    }
+  });
 }
 
 // 更新状态
 async function handleUpdateStatus(id: string, status: Api.Technician.TechnicianInfo['status']) {
-  try {
-    await updateTechnicianStatus(id, { status });
-    message.success(t('common.updateSuccess'));
-    await fetchData();
-  } catch (err) {
-    console.error(err);
-    message.error(t('common.error'));
-  }
+  await updateTechnicianStatus(id, { status });
+  message.success(t('common.updateSuccess'));
+  await loadTableData();
 }
 
 // 表单提交
 async function handleFormSubmit() {
-  await fetchData();
+  await loadTableData();
   showForm.value = false;
 }
 
 // 初始化
-fetchData();
+loadTableData();
 
-// 如果专长领域是字符串，需要先转换为数组
-const formatExpertise = (expertise: string) => {
-  return expertise ? expertise.split(',') : []
-}
 </script>
+
+<template>
+  <div class="h-full flex flex-col gap-16px">
+    <Search v-model:model="searchModel" @search="handleSearch" @reset="handleReset" />
+
+    <NCard class="flex-1">
+      <template #header>
+        <NSpace justify="space-between">
+          <span>{{ t('system.technician.title') }}</span>
+          <NButton type="primary" @click="handleAdd" ghost>
+            <template #icon>
+              <div class="i-material-symbols:add" />
+            </template>
+            {{ t('common.add') }}
+          </NButton>
+        </NSpace>
+      </template>
+
+      <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
+        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" />
+    </NCard>
+
+    <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"
+      @submit="handleFormSubmit" />
+  </div>
+</template>
 
 <style scoped>
 .action-column {
@@ -290,4 +260,4 @@ const formatExpertise = (expertise: string) => {
   font-size: 14px;
   color: var(--n-text-color);
 }
-</style> 
+</style>

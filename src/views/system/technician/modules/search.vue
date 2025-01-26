@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NCard, NCollapse, NCollapseItem, NForm, NGrid, NFormItemGi, NInput, NSpace, NButton, NSelect } from 'naive-ui';
-
 defineOptions({ name: 'TechnicianSearch' });
 
 interface Emits {
@@ -20,13 +19,13 @@ const model = defineModel<{
   email?: string;
   level?: string;
   status?: string;
-}>('model', { 
+}>('model', {
   default: () => ({
     name: '',
     phone: '',
     email: '',
-    level: '',
-    status: ''
+    level: undefined,
+    status: undefined
   })
 });
 
@@ -47,6 +46,8 @@ const statusOptions = [
 // 搜索
 async function handleSearch() {
   loading.value = true;
+
+  console.log('handleSearch', model.value);
   try {
     emit('search');
   } finally {
@@ -60,15 +61,15 @@ function handleReset() {
     name: '',
     phone: '',
     email: '',
-    level: '',
-    status: ''
+    level: undefined,
+    status: undefined
   };
   emit('reset');
 }
 </script>
 
 <template>
-  <NCard class="search-wrapper">
+  <NCard :bordered="false" size="small">
     <NCollapse :default-expanded-names="['1']">
       <NCollapseItem name="1">
         <template #header>
@@ -76,43 +77,34 @@ function handleReset() {
             <span>{{ t('common.search') }}</span>
           </NSpace>
         </template>
-        
+
         <NForm :model="model" label-placement="left" :label-width="80">
           <NGrid :cols="24" :x-gap="24">
             <NFormItemGi :span="6" :label="t('system.technician.name')">
-              <NInput v-model:value="model.name" clearable
-              :placeholder="t('system.technician.namePlaceholder')" />
+              <NInput v-model:value="model.name" clearable :placeholder="t('system.technician.namePlaceholder')"
+                @keyup.enter="handleSearch" />
             </NFormItemGi>
-            
+
             <NFormItemGi :span="6" :label="t('system.technician.phone')">
-              <NInput v-model:value="model.phone" clearable
-              :placeholder="t('system.technician.phonePlaceholder')" />
+              <NInput v-model:value="model.phone" clearable :placeholder="t('system.technician.phonePlaceholder')"
+                @keyup.enter="handleSearch" />
             </NFormItemGi>
-            
+
             <NFormItemGi :span="6" :label="t('system.technician.email')">
-              <NInput v-model:value="model.email" clearable
-              :placeholder="t('system.technician.emailPlaceholder')" />
+              <NInput v-model:value="model.email" clearable :placeholder="t('system.technician.emailPlaceholder')"
+                @keyup.enter="handleSearch" />
             </NFormItemGi>
-            
             <NFormItemGi :span="6" :label="t('system.technician.level')">
-              <NSelect
-                v-model:value="model.level"
-                :options="levelOptions"
-                clearable
-                :placeholder="t('system.technician.levelPlaceholder')"
-              />
+              <NSelect v-model:value="model.level" :options="levelOptions"
+                :placeholder="t('system.technician.levelPlaceholder')" clearable @change="handleSearch" />
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('system.technician.status')">
-              <NSelect
-                v-model:value="model.status"
-                :options="statusOptions"
-                clearable
-                :placeholder="t('system.technician.statusPlaceholder')"
-              />
+              <NSelect v-model:value="model.status" :options="statusOptions" clearable
+                :placeholder="t('system.technician.statusPlaceholder')" @change="handleSearch" />
             </NFormItemGi>
 
-            <NFormItemGi :span="24">
+            <NFormItemGi :span="18">
               <NSpace class="w-full" justify="end">
                 <NButton :loading="loading" @click="handleReset">
                   <template #icon>
@@ -120,11 +112,7 @@ function handleReset() {
                   </template>
                   {{ t('common.reset') }}
                 </NButton>
-                <NButton 
-                  type="primary" 
-                  :loading="loading" 
-                  @click="handleSearch"
-                >
+                <NButton type="primary" :loading="loading" @click="handleSearch">
                   <template #icon>
                     <div class="i-material-symbols:search" />
                   </template>
@@ -160,4 +148,4 @@ function handleReset() {
     --search-wrapper-shadow: rgba(0, 0, 0, 0.12);
   }
 }
-</style> 
+</style>

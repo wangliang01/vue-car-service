@@ -178,8 +178,6 @@ async function loadTableData() {
 
     tableData.value = data.list;
     pagination.itemCount = data.total;
-  } catch (err) {
-    message.error(t('common.loadError'));
   } finally {
     loading.value = false;
   }
@@ -232,16 +230,13 @@ function handleEdit(row: UserInfo) {
 
 // 删除用户
 async function handleDelete(row: UserInfo) {
-  try {
-    await deleteUser(row.id);
-    message.success(t('common.deleteSuccess'));
-    if (tableData.value.length === 1 && pagination.page > 1) {
-      pagination.page -= 1;
-    }
-    loadTableData();
-  } catch (err) {
-    message.error(t('common.deleteError'));
+  await deleteUser(row.id);
+  message.success(t('common.deleteSuccess'));
+  if (tableData.value.length === 1 && pagination.page > 1) {
+    pagination.page -= 1;
   }
+  loadTableData();
+
 }
 
 // 处理表单提交
@@ -304,11 +299,7 @@ loadTableData();
 
 <template>
   <div>
-    <Search
-      v-model:model="searchModel"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
+    <Search v-model:model="searchModel" @search="handleSearch" @reset="handleReset" />
 
     <NCard>
       <template #header>
@@ -323,32 +314,14 @@ loadTableData();
         </NSpace>
       </template>
 
-      <NDataTable
-        :loading="loading"
-        :columns="columns"
-        :data="tableData"
-        :pagination="pagination"
-        @update:page="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
+      <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
+        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" />
     </NCard>
 
-    <Form
-      ref="formRef"
-      v-model:show="showForm"
-      :loading="formLoading"
-      :is-edit="!!currentId"
-      :edit-data="editData"
-      @submit="handleFormSubmit"
-    />
+    <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"
+      @submit="handleFormSubmit" />
 
-    <LinkRole
-      v-model:show="showLinkRole"
-      :loading="linkRoleLoading"
-      :user-id="currentUserId"
-      :username="currentUsername"
-      :linked-role-ids="linkedRoleIds"
-      @submit="handleLinkRoleSubmit"
-    />
+    <LinkRole v-model:show="showLinkRole" :loading="linkRoleLoading" :user-id="currentUserId"
+      :username="currentUsername" :linked-role-ids="linkedRoleIds" @submit="handleLinkRoleSubmit" />
   </div>
 </template>

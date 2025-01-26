@@ -54,7 +54,7 @@ function handleReset() {
 </script>
 
 <template>
-  <NCard class="search-wrapper">
+  <NCard :bordered="false" size="small">
     <NCollapse :default-expanded-names="['1']">
       <NCollapseItem name="1">
         <template #header>

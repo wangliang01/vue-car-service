@@ -1,28 +1,11 @@
 <template>
   <NDrawer v-model:show="show" :width="500">
-    <NDrawerContent 
-      :title="title"
-      :native-scrollbar="false"
-    >
-      <NForm
-        ref="formRef"
-        :model="model"
-        :rules="rules"
-        label-placement="left"
-        :label-width="100"
-        require-mark-placement="right-hanging"
-      >
+    <NDrawerContent :title="title" :native-scrollbar="false">
+      <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="100"
+        require-mark-placement="right-hanging">
         <NFormItem v-if="!isEdit" :label="t('system.technician.selectUser')" path="userId">
-          <NSelect
-            v-model:value="selectedUserId"
-            :options="userOptions"
-            :loading="loading"
-            filterable
-            remote
-            :placeholder="t('system.technician.selectUser')"
-            @search="handleSearch"
-            style="width: 100%"
-          />
+          <NSelect v-model:value="selectedUserId" :options="userOptions" :loading="loading" filterable remote
+            :placeholder="t('system.technician.selectUser')" @search="handleSearch" style="width: 100%" />
         </NFormItem>
 
         <template v-if="selectedUserId">
@@ -42,32 +25,18 @@
         </template>
 
         <NFormItem :label="t('system.technician.level')" path="level">
-          <NSelect
-            v-model:value="model.level"
-            :options="levelOptions"
-            :placeholder="t('system.technician.levelPlaceholder')"
-            style="width: 100%"
-          />
+          <NSelect v-model:value="model.level" :options="levelOptions"
+            :placeholder="t('system.technician.levelPlaceholder')" style="width: 100%" />
         </NFormItem>
 
         <NFormItem :label="t('system.technician.specialties')" path="specialties">
-          <NSelect
-            v-model:value="model.specialties"
-            :options="specialtiesOptions"
-            multiple
-            :placeholder="t('system.technician.specialtiesPlaceholder')"
-            style="width: 100%"
-          />
+          <NSelect v-model:value="model.specialties" :options="specialtiesOptions" multiple
+            :placeholder="t('system.technician.specialtiesPlaceholder')" style="width: 100%" />
         </NFormItem>
 
         <NFormItem :label="t('system.technician.workYears')" path="workYears">
-          <NInputNumber
-            v-model:value="model.workYears"
-            :min="0"
-            :precision="0"
-            :placeholder="t('system.technician.workYearsPlaceholder')"
-            style="width: 100%"
-          />
+          <NInputNumber v-model:value="model.workYears" :min="0" :precision="0"
+            :placeholder="t('system.technician.workYearsPlaceholder')" style="width: 100%" />
         </NFormItem>
       </NForm>
 
@@ -76,11 +45,7 @@
           <NButton @click="handleClose">
             {{ t('common.cancel') }}
           </NButton>
-          <NButton 
-            type="primary" 
-            :loading="loading"
-            @click="handleSubmit"
-          >
+          <NButton type="primary" :loading="loading" @click="handleSubmit">
             {{ t('common.confirm') }}
           </NButton>
         </NSpace>
@@ -182,7 +147,7 @@ const rules: FormRules = {
 // 搜索用户
 async function handleSearch(query: string) {
   if (!query) return
-  
+
   loading.value = true
   try {
     const { data } = await searchUsers({ keyword: query })
@@ -205,7 +170,6 @@ watch(selectedUserId, (newId) => {
   if (selectedOption) {
     const { user } = selectedOption
     model.value.name = user.name
-    model.value.avatar = user.avatar || ''
     model.value.phone = user.phone
     model.value.email = user.email
   }
@@ -213,25 +177,26 @@ watch(selectedUserId, (newId) => {
 
 // 提交表单
 async function handleSubmit() {
-  try {
-    await formRef.value?.validate()
-    const submitData = {
-      ...model.value,
-      userId: selectedUserId.value
-    }
-    if (props.isEdit && props.editData) {
-      await updateTechnician(props.editData._id, model.value)
-      message.success(t('common.updateSuccess'))
-    } else {
-      await createTechnician(submitData)
-      message.success(t('common.createSuccess'))
-    }
+  await formRef.value?.validate()
+  const submitData = {
+    ...model.value,
+    userId: selectedUserId.value
+  }
+  if (props.isEdit && props.editData) {
+    const { data } = await updateTechnician(props.editData._id, model.value)
+    if (!data) return
+    message.success(t('common.updateSuccess'))
     emit('submit')
     handleClose()
-  } catch (err) {
-    console.error(err)
-    message.error(t('common.error'))
+  } else {
+    const { data } = await createTechnician(submitData)
+    if (!data) return
+    message.success(t('common.createSuccess'))
+    emit('submit')
+    handleClose()
   }
+
+
 }
 
 // 关闭抽屉
@@ -299,4 +264,4 @@ defineExpose({
   border-radius: 4px;
   margin-top: 8px;
 }
-</style> 
+</style>

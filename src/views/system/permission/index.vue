@@ -114,7 +114,7 @@ getPermissionTree();
 </script>
 
 <template>
-  <div class="h-full">
+  <div class="h-full flex flex-col gap-16px">
     <PermissionSearch
       @search="handleSearch"
       @reset="handleReset"

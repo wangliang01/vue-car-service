@@ -1,3 +1,4 @@
+
 /**
  * Namespace Api
  *
@@ -52,7 +53,7 @@ declare namespace Api {
       size?: number;
     }
 
-    interface PaginationResult<T> {
+    interface PageResult<T> {
       records: T[];
       total: number;
     }
@@ -448,5 +449,11 @@ declare namespace Api {
     }
 
     interface UpdateParams extends Partial<CreateParams> {}
+  }
+
+  interface ApiResponse<T> {
+    data: T;
+    status: number;
+    message: string;
   }
 }

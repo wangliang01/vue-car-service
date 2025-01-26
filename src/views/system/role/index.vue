@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h, ref, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NDataTable, NSpace, NButton, NPopconfirm, useMessage, NTag } from 'naive-ui';
+import { NCard, NDataTable, NSpace, NButton, useMessage, NTag } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { getRoleList, createRole, updateRole, deleteRole } from '@/service/api/role';
 import type { RoleInfo, RoleForm } from '@/service/api/role';
@@ -29,14 +29,14 @@ const pagination = reactive({
 const searchModel = ref({
   name: '',
   code: '',
-  status: undefined
+  status: ''
 });
 
 // 表单控制
-const showForm = ref(false);
 const formRef = ref();
-const currentId = ref<string>();
+const showForm = ref(false);
 const formLoading = ref(false);
+const currentId = ref<string>('');
 const editData = ref<RoleForm | null>(null);
 
 // 权限设置控制
@@ -124,14 +124,12 @@ async function loadTableData() {
   loading.value = true;
   try {
     const { data } = await getRoleList({
+      ...searchModel.value,
       page: pagination.page,
       size: pagination.pageSize,
-      ...searchModel.value
     });
     tableData.value = data.records;
     pagination.itemCount = data.total;
-  } catch (err) {
-    message.error(t('common.loadError'));
   } finally {
     loading.value = false;
   }
@@ -172,35 +170,27 @@ function handleAdd() {
 // 编辑角色
 function handleEdit(row: RoleInfo) {
   currentId.value = row._id;
-  editData.value = {
-    name: row.name,
-    code: row.code,
-    description: row.description,
-    status: row.status
-  };
+  editData.value = row;
   showForm.value = true;
 }
 
 // 删除角色
 async function handleDelete(row: RoleInfo) {
-  try {
-    window.$dialog?.warning({
-      title: t('common.warning'),
-      content: t('common.confirmDelete', { name: row.name }),
-      positiveText: t('common.confirm'),
-      negativeText: t('common.cancel'),
-      onPositiveClick: async () => {
-        await deleteRole(row._id);
-        message.success(t('common.deleteSuccess'));
-        if (tableData.value.length === 1 && pagination.page > 1) {
-          pagination.page -= 1;
-        }
-        loadTableData();
+  window.$dialog?.warning({
+    title: t('common.warning'),
+    content: t('common.confirmDelete', { name: row.name }),
+    positiveText: t('common.confirm'),
+    negativeText: t('common.cancel'),
+    onPositiveClick: async () => {
+      await deleteRole(row._id);
+      message.success(t('common.deleteSuccess'));
+      if (tableData.value.length === 1 && pagination.page > 1) {
+        pagination.page -= 1;
       }
-    });
-  } catch (error) {
-    window.$message?.error(t('common.error'));
-  }
+      loadTableData();
+    }
+  });
+
 }
 
 // 处理表单提交
@@ -234,7 +224,7 @@ loadTableData();
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col gap-4">
     <Search v-model:model="searchModel" @search="handleSearch" @reset="handleReset" />
 
     <NCard>

@@ -1,7 +1,7 @@
 import { request } from '../request';
 
 /** 获取权限树 */
-export function fetchPermissionTree(params: any) {
+export function fetchPermissionTree(params?: any) {
   return request<Api.Permission.PermissionInfo[]>({
     url: '/permission/tree',
     method: 'get',
