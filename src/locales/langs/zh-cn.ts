@@ -351,7 +351,7 @@ const local: App.I18n.Schema = {
         registerError: '注册失败，请稍后重试'
       },
       pwdLogin: {
-        title: '密码录',
+        title: '密码登录',
         rememberMe: '记住我',
         forgetPassword: '忘记密码？',
         register: '注册账号',
