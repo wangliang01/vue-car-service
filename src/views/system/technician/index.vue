@@ -30,8 +30,8 @@ const searchModel = ref({
   name: '',
   phone: '',
   email: '',
-  level: '',
-  status: ''
+  level: undefined,
+  status: undefined
 });
 
 // 表单相关
