@@ -3,13 +3,13 @@
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="100"
         require-mark-placement="right-hanging">
-        <NFormItem v-if="!isEdit" :label="t('system.technician.selectUser')" path="userId">
-          <NSelect v-model:value="selectedUserId" :options="userOptions" :loading="loading" filterable remote
+        <NFormItem  :label="t('system.technician.selectUser')" path="userId">
+          <NSelect v-model:value="selectedUserId" :options="userOptions" :loading="loading" filterable remote :disabled="isEdit"
             :placeholder="t('system.technician.selectUser')" @search="handleSearch" style="width: 100%" />
         </NFormItem>
 
         <template v-if="selectedUserId">
-          <div class="bg-gray-100 dark:bg-gray-800 rounded p-4 mb-4">
+          <div class="bg-gray-100 dark:bg-gray-800 rounded py-2 mb-4 show-user-info">
             <NFormItem :label="t('system.technician.name')" path="name">
               <span>{{ model.name }}</span>
             </NFormItem>
@@ -263,5 +263,11 @@ defineExpose({
   object-fit: cover;
   border-radius: 4px;
   margin-top: 8px;
+}
+
+.show-user-info {
+  :deep(.n-form-item-feedback-wrapper) {
+    min-height: 0 !important;
+  }
 }
 </style>

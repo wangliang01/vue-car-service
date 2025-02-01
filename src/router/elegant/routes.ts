@@ -118,7 +118,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.repair_item',
         meta: {
           title: 'repair_item',
-          i18nKey: 'route.repair_item'
+          i18nKey: 'route.repair_item',
+          icon: 'material-symbols:handyman-outline',
+          order: 4
         }
       },
       {
@@ -127,7 +129,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.repair_list',
         meta: {
           title: 'repair_list',
-          i18nKey: 'route.repair_list'
+          i18nKey: 'route.repair_list',
+          icon: 'material-symbols:receipt-long-outline',
+          order: 1
         }
       },
       {
@@ -136,7 +140,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.repair_material',
         meta: {
           title: 'repair_material',
-          i18nKey: 'route.repair_material'
+          i18nKey: 'route.repair_material',
+          icon: 'material-symbols:inventory-2-outline',
+          order: 5
         }
       },
       {
@@ -145,7 +151,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.repair_record',
         meta: {
           title: 'repair_record',
-          i18nKey: 'route.repair_record'
+          i18nKey: 'route.repair_record',
+          icon: 'material-symbols:history',
+          order: 3
         }
       },
       {
@@ -154,7 +162,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.repair_settlement',
         meta: {
           title: 'repair_settlement',
-          i18nKey: 'route.repair_settlement'
+          i18nKey: 'route.repair_settlement',
+          icon: 'material-symbols:payments-outline',
+          order: 2
         }
       }
     ]
