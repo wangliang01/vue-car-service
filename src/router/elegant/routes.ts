@@ -91,6 +91,33 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'inventory',
+    path: '/inventory',
+    component: 'layout.base',
+    meta: {
+      order: 3,
+      requiresAuth: true,
+      title: 'menu.inventory',
+      i18nKey: 'route.inventory',
+      i18nTitle: true,
+      icon: 'material-symbols:inventory-2-outline'
+    },
+    children: [
+      {
+        name: 'inventory_list',
+        path: '/inventory/list',
+        component: 'view.inventory_list',
+        meta: {
+          title: 'menu.inventory.list',
+          i18nKey: 'route.inventory_list',
+          i18nTitle: true,
+          icon: 'material-symbols:list-alt-outline',
+          requiresAuth: true
+        }
+      }
+    ]
+  },
+  {
     name: 'login',
     path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?',
     component: 'layout.blank$view.login',

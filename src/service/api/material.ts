@@ -2,7 +2,7 @@ import { request } from '../request';
 
 /** 获取材料列表 */
 export function fetchMaterialList(params: Api.Material.SearchParams) {
-  return request<Api.Common.PaginationResult<Api.Material.MaterialInfo>>({
+  return request<Api.Common.PageResult<Api.Material.MaterialInfo>>({
     url: '/material',
     method: 'get',
     params

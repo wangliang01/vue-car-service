@@ -170,6 +170,8 @@ const routeMap: RouteMap = {
   "customer_list": "/customer/list",
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
+  "inventory": "/inventory",
+  "inventory_list": "/inventory/list",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
   "repair": "/repair",
   "repair_item": "/repair/item",

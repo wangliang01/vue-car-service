@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'CarAdmin',
+    title: 'Car Repair Management System',
     updateTitle: 'System Version Update Notification',
     updateContent: 'A new version of the system has been detected. Do you want to refresh the page immediately?',
     updateConfirm: 'Refresh immediately',
@@ -359,6 +359,30 @@ const local: App.I18n.Schema = {
       estimatedTime: 'Estimated Time',
       actualTime: 'Actual Time',
       deliveryTime: 'Delivery Time'
+    }
+  },
+  inventory: {
+    title: 'Inventory Management',
+    code: 'Material Code',
+    name: 'Material Name',
+    category: 'Category',
+    quantity: 'Quantity',
+    unit: 'Unit',
+    price: 'Price',
+    supplier: 'Supplier',
+    material: 'Material',
+    alertThreshold: 'Alert Threshold',
+    maxQuantity: 'Max Quantity',
+    codePlaceholder: 'Please enter material code',
+    namePlaceholder: 'Please enter material name',
+    categoryPlaceholder: 'Please enter category',
+    supplierPlaceholder: 'Please enter supplier',
+    materialPlaceholder: 'Please select material',
+    quantityPlaceholder: 'Please enter quantity',
+    alertThresholdPlaceholder: 'Please enter alert threshold',
+    maxQuantityPlaceholder: 'Please enter max quantity',
+    list: {
+      title: 'Inventory List'
     }
   }
 };

@@ -24,6 +24,8 @@ declare module "@elegant-router/types" {
     "customer_list": "/customer/list";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
+    "inventory": "/inventory";
+    "inventory_list": "/inventory/list";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "repair": "/repair";
     "repair_item": "/repair/item";
@@ -76,6 +78,7 @@ declare module "@elegant-router/types" {
     | "customer"
     | "home"
     | "iframe-page"
+    | "inventory"
     | "login"
     | "repair"
     | "system"
@@ -103,6 +106,7 @@ declare module "@elegant-router/types" {
     | "login"
     | "customer_list"
     | "home"
+    | "inventory_list"
     | "repair_item"
     | "repair_list"
     | "repair_material"

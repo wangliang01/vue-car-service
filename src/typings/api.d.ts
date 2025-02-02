@@ -1,4 +1,3 @@
-
 /**
  * Namespace Api
  *
@@ -449,6 +448,56 @@ declare namespace Api {
     }
 
     interface UpdateParams extends Partial<CreateParams> {}
+  }
+
+  namespace Inventory {
+    interface InventoryItem {
+      id: string;
+      materialId: string;
+      name: string;
+      code: string;
+      category: string;
+      quantity: number;
+      unit: string;
+      price: number;
+      supplier: string;
+      alertThreshold: number;
+      maxQuantity: number;
+      remarks?: string;
+      createTime: string;
+      updateTime: string;
+    }
+
+    interface CreateInventoryParams {
+      materialId: string;
+      quantity: number;
+      alertThreshold: number;
+      maxQuantity: number;
+      remarks?: string;
+    }
+
+    interface UpdateInventoryParams {
+      quantity: number;
+      remarks?: string;
+    }
+
+    interface SearchParams {
+      code?: string;
+      name?: string;
+      category?: string;
+      supplier?: string;
+      minQuantity?: number;
+      maxQuantity?: number;
+      minPrice?: number;
+      maxPrice?: number;
+      page?: number;
+      size?: number;
+    }
+
+    interface SearchResult {
+      records: InventoryItem[];
+      total: number;
+    }
   }
 
   interface ApiResponse<T> {

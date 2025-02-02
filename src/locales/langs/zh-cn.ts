@@ -329,7 +329,9 @@ const local: App.I18n.Schema = {
     system_permission: '权限管理',
     system_user: '用户管理',
     system_role: '角色管理',
-    system_technician: '技师管理'
+    system_technician: '技师管理',
+    inventory: '库存管理',
+    inventory_list: '库存列表'
   },
   page: {
     login: {
@@ -547,7 +549,10 @@ const local: App.I18n.Schema = {
       user: '用户管理',
       role: '角色管理'
     },
-
+    inventory: {
+      list: '库存列表',
+      management: '库存管理'
+    }
   },
   material: {
     list: '材料列表',
@@ -795,6 +800,30 @@ const local: App.I18n.Schema = {
     search: {
       minAmount: '最小金额',
       maxAmount: '最大金额'
+    }
+  },
+  inventory: {
+    title: '库存管理',
+    code: '材料编号',
+    name: '材料名称',
+    category: '类别',
+    quantity: '库存数量',
+    unit: '单位',
+    price: '单价',
+    supplier: '供应商',
+    material: '材料',
+    alertThreshold: '预警阈值',
+    maxQuantity: '最大库存',
+    codePlaceholder: '请输入材料编号',
+    namePlaceholder: '请输入材料名称',
+    categoryPlaceholder: '请输入类别',
+    supplierPlaceholder: '请输入供应商',
+    materialPlaceholder: '请选择材料',
+    quantityPlaceholder: '请输入库存数量',
+    alertThresholdPlaceholder: '请输入预警阈值',
+    maxQuantityPlaceholder: '请输入最大库存',
+    list: {
+      title: '库存列表'
     }
   }
 };
