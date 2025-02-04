@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NDatePicker, NSelect, NDivider } from 'naive-ui';
+import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NDatePicker, NSelect, NDivider, NGrid, NGridItem } from 'naive-ui';
 import type { FormInst, SelectOption } from 'naive-ui';
 import { fetchRepairItemList } from '@/service/api/repair-item';
 import { fetchMaterialList } from '@/service/api/material';
@@ -212,6 +212,13 @@ watch(() => show.value, (newVal) => {
     };
   }
 });
+
+// 处理折扣率变化
+function handleDiscountChange(value: number | null, index: number) {
+  if (value !== null) {
+    model.value.repairItems[index].laborDiscount = value / 100;
+  }
+}
 </script>
 
 <template>
@@ -221,7 +228,7 @@ watch(() => show.value, (newVal) => {
         <div v-for="(repairItem, repairIndex) in model.repairItems" :key="repairIndex" class="repair-item mb-4">
           <div class="repair-item-header">
             <span class="repair-item-title">{{ t('repairOrder.repair.items') }} #{{ repairIndex + 1 }}</span>
-            <NButton  type="error" @click="removeRepairItem(repairIndex)" ghost>
+            <NButton type="error" @click="removeRepairItem(repairIndex)" ghost>
               <template #icon>
                 <div class="i-material-symbols:delete" />
               </template>
@@ -231,38 +238,56 @@ watch(() => show.value, (newVal) => {
 
           <!-- 维修项目选择 -->
           <NFormItem :label="t('repairOrder.repair.itemName')" :path="`repairItems[${repairIndex}].repairItemId`">
-            <NSelect
-              v-model:value="repairItem.repairItemId"
-              :options="repairItemOptions"
-              filterable
-              clearable
-              @update:value="value => handleRepairItemSelect(value, repairIndex)"
-            />
+            <NSelect v-model:value="repairItem.repairItemId" :options="repairItemOptions" filterable clearable
+              @update:value="value => handleRepairItemSelect(value, repairIndex)" />
           </NFormItem>
 
           <!-- 维修项目信息 -->
-          <NSpace :wrap="false" :size="24" v-if="repairItem.repairItemId">
-            <NFormItem :label="t('repairOrder.repair.laborHours')">
-              <NInputNumber v-model:value="repairItem.laborHours" :min="0" :precision="1" disabled />
-            </NFormItem>
+          <NGrid :cols="2" :x-gap="24" v-if="repairItem.repairItemId">
+            <NGridItem>
+              <NFormItem :label="t('repairOrder.repair.laborHours')">
+                <NInputNumber v-model:value="repairItem.laborHours" :min="0" :precision="1"
+                  :show-button="false">
 
-            <NFormItem :label="t('repairOrder.repair.laborPrice')">
-              <NInputNumber v-model:value="repairItem.laborPrice" :min="0" disabled />
-            </NFormItem>
+                </NInputNumber>
+              </NFormItem>
+            </NGridItem>
 
-            <NFormItem :label="t('repairOrder.repair.complexityFactor')">
-              <NInputNumber v-model:value="repairItem.complexityFactor" :min="0" :precision="1" :step="0.1" disabled />
-            </NFormItem>
+            <NGridItem>
+              <NFormItem :label="t('repairOrder.repair.laborPrice')">
+                <NInputNumber v-model:value="repairItem.laborPrice" :min="0" :show-button="false">
+                  <template #prefix>
+                    ￥
+                  </template>
+                </NInputNumber>
+              </NFormItem>
+            </NGridItem>
 
-            <NFormItem :label="t('repairOrder.repair.laborDiscount')">
-              <NInputNumber v-model:value="repairItem.laborDiscount" :min="0" :max="1" :precision="2" :step="0.1" />
-            </NFormItem>
-          </NSpace>
+            <NGridItem>
+              <NFormItem :label="t('repairOrder.repair.complexityFactor')">
+                <NInputNumber v-model:value="repairItem.complexityFactor" :min="0" :precision="1" :step="0.1"
+                  :show-button="false" />
+              </NFormItem>
+            </NGridItem>
+
+            <NGridItem>
+              <NFormItem :label="t('repairOrder.repair.laborDiscount')">
+                <NInputNumber v-model:value="repairItem.laborDiscount" :min="0" :max="100" :precision="0" :step="1"
+                  :format="value => value * 100 + ''"
+                  @update:value="value => handleDiscountChange(value, repairIndex)" :show-button="false">
+
+                  <template #suffix>
+                    %
+                  </template>
+                </NInputNumber>
+              </NFormItem>
+            </NGridItem>
+          </NGrid>
 
           <!-- 配件列表 -->
           <NFormItem :label="t('repairOrder.repair.parts')">
             <div class="parts-header">
-              <NButton  type="primary" @click="addPart(repairIndex)" ghost>
+              <NButton type="primary" @click="addPart(repairIndex)" ghost>
                 <template #icon>
                   <div class="i-material-symbols:add" />
                 </template>
@@ -272,14 +297,10 @@ watch(() => show.value, (newVal) => {
 
             <div v-for="(part, partIndex) in repairItem.parts" :key="partIndex" class="part-item">
               <!-- 材料选择 -->
-              <NFormItem :label="t('repairOrder.repair.partName')" :path="`repairItems[${repairIndex}].parts[${partIndex}].materialId`">
-                <NSelect
-                  v-model:value="part.materialId"
-                  :options="materialOptions"
-                  filterable
-                  clearable
-                  @update:value="value => handleMaterialSelect(value, repairIndex, partIndex)"
-                />
+              <NFormItem :label="t('repairOrder.repair.partName')"
+                :path="`repairItems[${repairIndex}].parts[${partIndex}].materialId`">
+                <NSelect v-model:value="part.materialId" :options="materialOptions" filterable clearable
+                  @update:value="value => handleMaterialSelect(value, repairIndex, partIndex)" />
               </NFormItem>
 
               <NSpace :wrap="false" :size="24">
@@ -292,7 +313,8 @@ watch(() => show.value, (newVal) => {
                 </NFormItem>
 
                 <NFormItem :label="t('repairOrder.repair.managementFee')">
-                  <NInputNumber v-model:value="part.managementFee" :min="0" :max="1" :precision="2" :step="0.1" disabled />
+                  <NInputNumber v-model:value="part.managementFee" :min="0" :max="1" :precision="2" :step="0.1"
+                    disabled />
                 </NFormItem>
 
                 <NFormItem :label="t('repairOrder.repair.managementDiscount')">
@@ -320,13 +342,8 @@ watch(() => show.value, (newVal) => {
 
         <!-- 预计完工时间和维修技师 -->
         <NFormItem :label="t('repairOrder.repair.estimatedTime')" path="estimatedCompletionTime">
-          <NDatePicker
-            v-model:value="model.estimatedCompletionTime"
-            style="width: 100%;"
-            type="datetime"
-            clearable
-            :is-date-disabled="(ts: number) => ts < Date.now()"
-          />
+          <NDatePicker v-model:value="model.estimatedCompletionTime" style="width: 100%;" type="datetime" clearable
+            :is-date-disabled="(ts: number) => ts < Date.now()" />
         </NFormItem>
 
         <NFormItem :label="t('repairOrder.repair.mechanic')" path="mechanic">
