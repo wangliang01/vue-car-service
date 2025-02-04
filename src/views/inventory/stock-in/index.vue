@@ -165,7 +165,7 @@ loadData();
 
 
     <!-- 列表 -->
-    <NCard class="flex-1">
+    <NCard>
       <template #header>
         <div class="flex-y-center justify-between">
           <div class="flex-y-center">

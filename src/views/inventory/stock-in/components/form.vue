@@ -153,7 +153,6 @@ watch(() => show.value, (newVal) => {
             v-model:value="model.unitPrice"
             style="width: 100%;"
             :min="0"
-            :precision="2"
             :placeholder="t('inventory.stockIn.inputUnitPrice')"
           />
         </NFormItem>
