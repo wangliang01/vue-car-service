@@ -15,14 +15,14 @@ const { t } = useI18n();
 const loading = ref(false);
 
 const model = defineModel<{
-  materialId?: string;
+  material?: string;
   supplier?: string;
   status?: string;
   startDate?: number | null;
   endDate?: number | null;
 }>('model', {
   default: () => ({
-    materialId: '',
+    material: '',
     supplier: '',
     status: undefined,
     startDate: null,
@@ -49,13 +49,24 @@ async function handleSearch() {
 // 重置
 function handleReset() {
   model.value = {
-    materialId: '',
+    material: '',
     supplier: '',
     status: undefined,
     startDate: null,
     endDate: null
   };
   emit('reset');
+}
+
+const dateRange = ref<[number, number] | null>(null);
+
+function handleDateRangeUpdate(dates: [number, number] | null) {
+  if (dates) {
+    [model.value.startDate, model.value.endDate] = dates;
+  } else {
+    model.value.startDate = null;
+    model.value.endDate = null;
+  }
 }
 </script>
 
@@ -72,11 +83,11 @@ function handleReset() {
         <NForm :model="model" label-placement="left" :label-width="80">
           <NGrid :cols="24" :x-gap="24">
             <NFormItemGi :span="6" :label="t('inventory.stockIn.material')">
-              <NInput v-model:value="model.materialId" clearable />
+              <NInput v-model:value="model.material" clearable  @keyup.enter="handleSearch"/>
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('inventory.stockIn.supplier')">
-              <NInput v-model:value="model.supplier" clearable />
+              <NInput v-model:value="model.supplier" clearable  @keyup.enter="handleSearch"/>
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('inventory.stockIn.status')">
@@ -84,16 +95,19 @@ function handleReset() {
                 v-model:value="model.status"
                 :options="statusOptions"
                 clearable
+                @update:value="handleSearch"
               />
             </NFormItemGi>
 
             <NFormItemGi :span="6"  :label="t('inventory.stockIn.stockInDate')">
               <NSpace class="w-full stock-in-date">
                 <NDatePicker
-                  v-model:value="model.startDate"
-                  class="flex-1"
+                  v-model:value="dateRange"
                   type="daterange"
+                  value-format="yyyy-MM-dd"
                   clearable
+                  @update:value="handleDateRangeUpdate"
+                  @keyup.enter="handleSearch"
                 />
               </NSpace>
             </NFormItemGi>

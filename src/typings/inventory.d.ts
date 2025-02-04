@@ -89,7 +89,7 @@ declare namespace Api {
     }
 
     interface StockInSearchResult {
-      items: StockIn[];
+      records: StockIn[];
       total: number;
     }
 
@@ -98,7 +98,7 @@ declare namespace Api {
       quantity: number;
       unitPrice: number;
       supplier: string;
-      stockInDate: number  | null;
+      stockInDate: number;
       remarks?: string;
     }
   }

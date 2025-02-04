@@ -166,6 +166,7 @@ watch(() => show.value, (newVal) => {
           <NDatePicker
             v-model:value="model.stockInDate"
             type="date"
+            format="yyyy-MM-dd"
             :placeholder="t('inventory.stockIn.selectDate')"
           />
         </NFormItem>

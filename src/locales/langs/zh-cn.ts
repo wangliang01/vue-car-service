@@ -832,7 +832,7 @@ const local: App.I18n.Schema = {
     stockIn: {
       title: '入库管理',
       stockInNo: '入库单号',
-      material: '物料',
+      material: '材料',
       quantity: '数量',
       unitPrice: '单价',
       totalAmount: '总金额',

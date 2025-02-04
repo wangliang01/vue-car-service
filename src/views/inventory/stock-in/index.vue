@@ -6,6 +6,7 @@ import { getStockInList, cancelStockIn } from '@/service/api/inventory';
 import StockInForm from './components/form.vue';
 import StockInSearch from './components/search.vue';
 import { useI18n } from 'vue-i18n';
+import { formatDate } from '@/utils/common';
 
 
 defineOptions({ name: 'StockIn' });
@@ -42,7 +43,7 @@ const searchModel = ref({
 
 // 表格列定义
 const columns: DataTableColumns<Api.Inventory.StockIn> = [
-  { title: t('inventory.stockIn.stockInNo'), key: 'stockInNo' },
+  { title: t('inventory.stockIn.stockInNo'), key: 'stockInNo', width: '160px' },
   {
     title: t('inventory.stockIn.material'),
     key: 'material',
@@ -52,7 +53,9 @@ const columns: DataTableColumns<Api.Inventory.StockIn> = [
   { title: t('inventory.stockIn.unitPrice'), key: 'unitPrice' },
   { title: t('inventory.stockIn.totalAmount'), key: 'totalAmount' },
   { title: t('inventory.stockIn.supplier'), key: 'supplier' },
-  { title: t('inventory.stockIn.stockInDate'), key: 'stockInDate' },
+  { title: t('inventory.stockIn.stockInDate'), key: 'stockInDate', render: (row) => {
+    return formatDate(row.stockInDate)
+  } },
   {
     title: t('inventory.stockIn.status'),
     key: 'status',
@@ -67,6 +70,7 @@ const columns: DataTableColumns<Api.Inventory.StockIn> = [
   {
     title: t('common.action'),
     key: 'actions',
+    fixed: 'right',
     render: (row) => {
       if (row.status === 'active') {
         return h(
@@ -92,7 +96,7 @@ async function loadData() {
       size: pagination.value.pageSize,
       ...searchModel.value
     });
-    tableData.value = res.data.items;
+    tableData.value = res.data.records;
     pagination.value.itemCount = res.data.total;
   } catch (error) {
     message.error(t('common.loadError'));
