@@ -37,7 +37,7 @@ const model = ref<Api.Inventory.CreateStockInParams>({
   quantity: 0,
   unitPrice: 0,
   supplier: '',
-  stockInDate: null,
+  stockInDate: Date.now(),
   remarks: ''
 });
 
@@ -94,6 +94,9 @@ const totalAmount = computed(() => {
 async function handleSubmit() {
   try {
     await formRef.value?.validate();
+    if (typeof model.value.stockInDate === 'string') {
+      model.value.stockInDate = new Date(model.value.stockInDate).getTime();
+    }
     await createStockIn(model.value);
     show.value = false;
     emit('success');
@@ -102,19 +105,25 @@ async function handleSubmit() {
   }
 }
 
+// 重置表单时也要设置默认时间戳
+function resetForm() {
+  model.value = {
+    materialId: '',
+    quantity: 0,
+    unitPrice: 0,
+    supplier: '',
+    stockInDate: Date.now(),
+    remarks: ''
+  };
+  formRef.value?.restoreValidation();
+}
+
 // 监听显示状态
 watch(() => show.value, (newVal) => {
   if (newVal) {
     fetchMaterialOptions();
   } else {
-    model.value = {
-      materialId: '',
-      quantity: 0,
-      unitPrice: 0,
-      supplier: '',
-      stockInDate: null,
-      remarks: ''
-    };
+    resetForm();
   }
 });
 
@@ -143,7 +152,9 @@ watch(() => show.value, (newVal) => {
           <NInputNumber
             v-model:value="model.quantity"
             :min="0"
+            :precision="0"
             style="width: 100%"
+            :value-format="v => Number(v)"
             :placeholder="t('inventory.stockIn.inputQuantity')"
           />
         </NFormItem>
@@ -153,6 +164,7 @@ watch(() => show.value, (newVal) => {
             v-model:value="model.unitPrice"
             style="width: 100%;"
             :min="0"
+            :value-format="v => Number(v)"
             :placeholder="t('inventory.stockIn.inputUnitPrice')"
           />
         </NFormItem>
@@ -161,6 +173,7 @@ watch(() => show.value, (newVal) => {
           <NInput
             v-model:value="model.supplier"
             :placeholder="t('inventory.stockIn.inputSupplier')"
+            clearable
           />
         </NFormItem>
 
@@ -169,7 +182,8 @@ watch(() => show.value, (newVal) => {
             v-model:value="model.stockInDate"
             type="date"
             style="width: 100%;"
-            format="yyyy-MM-dd"
+            :actions="['clear', 'now']"
+            :is-date-disabled="(ts: number) => ts > Date.now()"
             :placeholder="t('inventory.stockIn.selectDate')"
           />
         </NFormItem>
