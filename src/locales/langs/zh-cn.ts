@@ -612,7 +612,7 @@ const local: App.I18n.Schema = {
       items: '维修项目',
       itemName: '项目名称',
       price: '维修费用',
-      parts: '配件清单',
+      parts: '维修材料',
       partName: '配件名称',
       quantity: '数量',
       partPrice: '配件单价',
