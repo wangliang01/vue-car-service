@@ -133,6 +133,7 @@ watch(() => show.value, (newVal) => {
         <NFormItem :label="t('inventory.stockIn.material')" path="materialId">
           <NSelect
             v-model:value="model.materialId"
+            filterable
             :options="materialOptions"
             :placeholder="t('inventory.stockIn.selectMaterial')"
           />
@@ -142,6 +143,7 @@ watch(() => show.value, (newVal) => {
           <NInputNumber
             v-model:value="model.quantity"
             :min="0"
+            style="width: 100%"
             :placeholder="t('inventory.stockIn.inputQuantity')"
           />
         </NFormItem>
@@ -149,6 +151,7 @@ watch(() => show.value, (newVal) => {
         <NFormItem :label="t('inventory.stockIn.unitPrice')" path="unitPrice">
           <NInputNumber
             v-model:value="model.unitPrice"
+            style="width: 100%;"
             :min="0"
             :precision="2"
             :placeholder="t('inventory.stockIn.inputUnitPrice')"
@@ -166,6 +169,7 @@ watch(() => show.value, (newVal) => {
           <NDatePicker
             v-model:value="model.stockInDate"
             type="date"
+            style="width: 100%;"
             format="yyyy-MM-dd"
             :placeholder="t('inventory.stockIn.selectDate')"
           />
