@@ -331,7 +331,11 @@ const local: App.I18n.Schema = {
     system_role: '角色管理',
     system_technician: '技师管理',
     inventory: '库存管理',
-    inventory_list: '库存列表'
+    inventory_list: '库存列表',
+    inventory_stock_in: '入库管理',
+    inventory_stock_out: '出库管理',
+    inventory_stock_adjust: '库存调整',
+    inventory_stock_check: '库存盘点'
   },
   page: {
     login: {
@@ -824,6 +828,34 @@ const local: App.I18n.Schema = {
     maxQuantityPlaceholder: '请输入最大库存',
     list: {
       title: '库存列表'
+    },
+    stockIn: {
+      title: '入库管理',
+      stockInNo: '入库单号',
+      material: '物料',
+      quantity: '数量',
+      unitPrice: '单价',
+      totalAmount: '总金额',
+      supplier: '供应商',
+      stockInDate: '入库日期',
+      operator: '操作人',
+      status: '状态',
+      remarks: '备注',
+
+      // 表单相关
+      selectMaterial: '请选择物料',
+      inputQuantity: '请输入数量',
+      inputUnitPrice: '请输入单价',
+      inputSupplier: '请输入供应商',
+      selectDate: '请选择入库日期',
+
+      // 状态
+      statusActive: '已入库',
+      statusInactive: '已取消',
+
+      // 按钮
+      create: '新建入库单',
+      cancel: '取消入库'
     }
   }
 };

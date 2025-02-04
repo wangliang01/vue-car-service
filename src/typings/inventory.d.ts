@@ -59,5 +59,47 @@ declare namespace Api {
       records: InventoryItem[];
       total: number;
     }
+
+    interface StockIn {
+      _id: string;
+      stockInNo: string;
+      material: Material;
+      quantity: number;
+      unitPrice: number;
+      totalAmount: number;
+      supplier: string;
+      stockInDate: string;
+      status: 'active' | 'inactive';
+      remarks?: string;
+      operator: {
+        _id: string;
+        username: string;
+      };
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface StockInSearchParams {
+      page?: number;
+      size?: number;
+      materialId?: string;
+      status?: 'active' | 'inactive';
+      startDate?: number | null;
+      endDate?: number | null;
+    }
+
+    interface StockInSearchResult {
+      items: StockIn[];
+      total: number;
+    }
+
+    interface CreateStockInParams {
+      materialId: string;
+      quantity: number;
+      unitPrice: number;
+      supplier: string;
+      stockInDate: number  | null;
+      remarks?: string;
+    }
   }
 }

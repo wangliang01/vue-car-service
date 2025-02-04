@@ -114,6 +114,15 @@ export const generatedRoutes: GeneratedRoute[] = [
           icon: 'material-symbols:list-alt-outline',
           requiresAuth: true
         }
+      },
+      {
+        name: 'inventory_stock-in',
+        path: '/inventory/stock-in',
+        component: 'view.inventory_stock-in',
+        meta: {
+          title: 'inventory_stock-in',
+          i18nKey: 'route.inventory_stock_in'
+        }
       }
     ]
   },
