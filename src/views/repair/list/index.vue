@@ -41,8 +41,8 @@ const columns = computed(() => [
   // { type: 'selection' as const, width: 50 },
   { title: t('common.index'), key: 'index', width: 60 },
   { title: t('menu.repairOrder.orderNo'), key: 'orderNo', width: 150 },
-  { 
-    title: t('menu.repairOrder.status'), 
+  {
+    title: t('menu.repairOrder.status'),
     key: 'status',
     width: 80,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
@@ -57,15 +57,15 @@ const columns = computed(() => [
       );
     }
   },
-  { 
-    title: t('menu.customer.name'), 
+  {
+    title: t('menu.customer.name'),
     key: 'customer',
     width: 100,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
       return row.customer?.name || '-';
     }
   },
-  { 
+  {
     title: t('menu.vehicle.licensePlate'),
     key: 'vehicle',
     width: 100,
@@ -110,7 +110,7 @@ const columns = computed(() => [
   { title: t('menu.repairOrder.faultDesc'), key: 'faultDesc', width: 150 },
   { title: t('common.remark'), key: 'remark', width: 150 },
   { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100 },
-  { 
+  {
     title: t('menu.repairOrder.inDate'),
     key: 'inDate',
     width: 120,
@@ -118,19 +118,19 @@ const columns = computed(() => [
       return dayjs(row.inDate).format('YYYY-MM-DD');
     }
   },
-  { 
-    title: t('menu.repairOrder.estimatedTime'), 
-    key: 'estimatedCompletionTime', 
+  {
+    title: t('menu.repairOrder.estimatedTime'),
+    key: 'estimatedCompletionTime',
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.estimatedCompletionTime 
+      return row.estimatedCompletionTime
         ? dayjs(row.estimatedCompletionTime).format('YYYY-MM-DD')
         : '-';
     }
   },
-  { 
-    title: t('menu.repairOrder.actualTime'), 
-    key: 'actualCompletionTime', 
+  {
+    title: t('menu.repairOrder.actualTime'),
+    key: 'actualCompletionTime',
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
       return row.actualCompletionTime
@@ -138,9 +138,9 @@ const columns = computed(() => [
         : '-';
     }
   },
-  { 
-    title: t('menu.repairOrder.deliveryTime'), 
-    key: 'deliveryTime', 
+  {
+    title: t('menu.repairOrder.deliveryTime'),
+    key: 'deliveryTime',
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
       return row.deliveryTime
@@ -166,7 +166,7 @@ const columns = computed(() => [
             },
             { default: () => t('common.edit') }
           ),
-         
+
           row.status === 'pending' && h(
             NButton,
             {
@@ -187,16 +187,16 @@ const columns = computed(() => [
             },
             { default: () => t('repairOrder.repair.action') }
           ),
-          row.status === 'repaired' && h(
-            NButton,
-            {
-              type: 'success',
-              size: 'small',
-              ghost: true,
-              onClick: () => handleComplete(row)
-            },
-            { default: () => t('repairOrder.complete') }
-          ),
+          // row.status === 'repaired' && h(
+          //   NButton,
+          //   {
+          //     type: 'success',
+          //     size: 'small',
+          //     ghost: true,
+          //     onClick: () => handleComplete(row)
+          //   },
+          //   { default: () => t('repairOrder.complete') }
+          // ),
           h(
             NButton,
             {
@@ -302,10 +302,10 @@ async function handleInspectionSubmit(orderId: string, data: Api.RepairOrder.Ins
   }
 }
 
-async function handleRepairSubmit(orderId: string, data: Api.RepairOrder.RepairData) {
+async function handleRepairSubmit( data: Api.RepairOrder.RepairData) {
   try {
-    console.log("data", orderId, data) 
-    await repairRepairOrder(orderId, {...data, status: 'repaired'});
+    console.log("data", data)
+    await repairRepairOrder(currentOrderId.value, data);
     window.$message?.success(t('repairOrder.repairSuccess'));
     showRepairDrawer.value = false;
     await getData();
@@ -393,4 +393,4 @@ const formatStatus = (status: string) => {
       @submit="handleRepairSubmit"
     />
   </div>
-</template> 
+</template>

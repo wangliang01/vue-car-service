@@ -193,7 +193,7 @@ declare namespace Api {
       remark?: string;
       mechanic?: string;
       inDate: string;
-      estimatedCompletionTime?: string;
+      estimatedCompletionDate?: string;
       actualCompletionTime?: string;
       deliveryTime?: string;
       createdAt: string;
@@ -229,7 +229,7 @@ declare namespace Api {
     interface StatusUpdateParams {
       status: RepairOrderInfo['status'];
       mechanic?: string;
-      estimatedCompletionTime?: string;
+      estimatedCompletionDate?: string;
       actualCompletionTime?: string;
       deliveryTime?: string;
     }
@@ -240,7 +240,7 @@ declare namespace Api {
       cost: number;
       laborCost: number;
       partsCost: number;
-      estimatedCompletionTime?: string;
+      estimatedCompletionDate?: string;
       // 根据实际需求添加其他必要字段
     }
   }

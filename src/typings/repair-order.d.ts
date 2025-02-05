@@ -9,13 +9,13 @@ export interface InspectionData {
     quantity: number
     remark: string
   }>
-} 
+}
 
 export interface RepairData {
   repairItems: RepairItem[]
-  estimatedCompletionTime: string | null
+  estimatedCompletionDate: string | null
   mechanic: string
-} 
+}
 
 declare namespace Api.RepairOrder {
   /** 完工结算参数 */
@@ -25,4 +25,4 @@ declare namespace Api.RepairOrder {
     /** 备注 */
     remark?: string;
   }
-} 
+}

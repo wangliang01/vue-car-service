@@ -82,11 +82,11 @@ interface RepairItem {
 
 const model = ref<{
   repairItems: RepairItem[];
-  estimatedCompletionTime: number | null;
+  estimatedCompletionDate: number | null;
   mechanic: string;
 }>({
   repairItems: [],
-  estimatedCompletionTime: null,
+  estimatedCompletionDate: null,
   mechanic: null
 });
 
@@ -97,7 +97,7 @@ const rules = {
     message: t('repairOrder.repair.atLeastOneItem'),
     trigger: ['blur', 'change']
   },
-  estimatedCompletionTime: {
+  estimatedCompletionDate: {
     required: true,
     message: t('repairOrder.repair.estimatedTimeRequired')
   },
@@ -223,7 +223,7 @@ watch(() => show.value, (newVal) => {
   } else {
     model.value = {
       repairItems: [],
-      estimatedCompletionTime: null,
+      estimatedCompletionDate: null,
       mechanic: null
     };
   }
@@ -426,8 +426,8 @@ function partsColumns(repairIndex: number) {
         <NDivider />
 
         <!-- 预计完工时间和维修技师 -->
-        <NFormItem :label="t('repairOrder.repair.estimatedTime')" path="estimatedCompletionTime">
-          <NDatePicker v-model:value="model.estimatedCompletionTime" style="width: 100%;" type="datetime" clearable
+        <NFormItem :label="t('repairOrder.repair.estimatedTime')" path="estimatedCompletionDate">
+          <NDatePicker v-model:value="model.estimatedCompletionDate" style="width: 100%;" type="date" clearable
             :is-date-disabled="(ts: number) => ts < Date.now()" />
         </NFormItem>
 

@@ -117,11 +117,11 @@ const columns = computed(() => [
   },
   {
     title: t('menu.repairOrder.estimatedTime'),
-    key: 'estimatedCompletionTime',
+    key: 'estimatedCompletionDate',
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.estimatedCompletionTime
-        ? dayjs(row.estimatedCompletionTime).format('YYYY-MM-DD')
+      return row.estimatedCompletionDate
+        ? dayjs(row.estimatedCompletionDate).format('YYYY-MM-DD')
         : '-';
     }
   },

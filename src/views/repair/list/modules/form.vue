@@ -55,7 +55,7 @@ interface FormModel extends Omit<Api.RepairOrder.CreateParams, 'customer' | 'veh
   faultDesc: string;
   remark?: string;
   inDate?: number | null;
-  estimatedCompletionTime?: number | null;
+  estimatedCompletionDate?: number | null;
 }
 
 const formModel = reactive<FormModel>({
@@ -85,7 +85,7 @@ const formModel = reactive<FormModel>({
   remark: '',
   isNewCustomer: true,
   inDate: dayjs().valueOf(),
-  estimatedCompletionTime: null
+  estimatedCompletionDate: null
 });
 
 const customerOptions = ref<{ label: string; value: string }[]>([]);
@@ -124,7 +124,7 @@ async function handleSubmit() {
       customerItems: [],
       isNewCustomer: !formModel.customer._id
     };
-    
+
     if (props.type === 'add') {
       await fetchCreateRepairOrder(submitData);
       window.$message?.success(t('common.addSuccess'));
@@ -132,7 +132,7 @@ async function handleSubmit() {
       await fetchUpdateRepairOrder(props.editData!._id, submitData);
       window.$message?.success(t('common.updateSuccess'));
     }
-    
+
     resetForm();
     show.value = false;
     emit('submit-success');
@@ -190,7 +190,7 @@ async function handleLicensePlateSearch() {
   try {
     loading.value = true;
     const { data } = await fetchVehicleByPlate(formModel.vehicle.licensePlate);
-    
+
     if (data) {
       formModel.vehicle = {
         _id: data._id,
@@ -204,7 +204,7 @@ async function handleLicensePlateSearch() {
         engineNo: data.engineNo || '',
         color: data.color || ''
       };
-      
+
       if (data.customer) {
         formModel.customer = {
           _id: data.customer._id,
@@ -217,7 +217,7 @@ async function handleLicensePlateSearch() {
           bankName: data.customer.bankName || ''
         };
       }
-    } 
+    }
   } catch (error) {
     console.error('获取车辆信息失败:', error);
     resetVehicleInfo();
@@ -269,7 +269,7 @@ function resetForm() {
   formModel.remark = '';
   formModel.isNewCustomer = false;
   formModel.inDate = Date.now();
-  formModel.estimatedCompletionTime = null;
+  formModel.estimatedCompletionDate = null;
 
 }
 
@@ -280,16 +280,16 @@ const themeVars = useThemeVars();
 // 获取工单详情
 async function getOrderDetail() {
   if (!props.editData?._id) return;
-  
+
   try {
     loading.value = true;
     const { data } = await fetchRepairOrderDetail(props.editData._id);
-    
+
     formModel.faultDesc = data.faultDesc;
     formModel.remark = data.remark;
     formModel.isNewCustomer = false;
     formModel.inDate = dayjs(data.createdAt).valueOf();
-    formModel.estimatedCompletionTime = dayjs(data.estimatedCompletionTime).valueOf();
+    formModel.estimatedCompletionDate = dayjs(data.estimatedCompletionDate).valueOf();
 
     if (data.vehicle) {
       formModel.vehicle = {
@@ -377,9 +377,9 @@ function formatTime(time: string | number | null | undefined): string {
                 </div>
                 <div class="info-item">
                   <span class="label">工单状态</span>
-                  <NTag 
-                    :type="statusTagTypes[editData?.status]" 
-                    size="small" 
+                  <NTag
+                    :type="statusTagTypes[editData?.status]"
+                    size="small"
                     class="status-tag"
                   >
                     {{ t(`repairOrder.status.${editData?.status}`) }}
@@ -488,7 +488,7 @@ function formatTime(time: string | number | null | undefined): string {
                 </div>
                 <div class="info-item full-width">
                   <span class="label">预计完工日期</span>
-                  <span class="value">{{ formatTime(formModel.estimatedCompletionTime) }}</span>
+                  <span class="value">{{ formatTime(formModel.estimatedCompletionDate) }}</span>
                 </div>
                 <div class="info-item full-width">
                   <span class="label">故障描述</span>
@@ -520,8 +520,8 @@ function formatTime(time: string | number | null | undefined): string {
             </h3>
             <div class="section-content">
               <NFormItem :label="t('menu.vehicle.licensePlate')" path="vehicle.licensePlate">
-                <NInput 
-                  v-model:value="formModel.vehicle.licensePlate" 
+                <NInput
+                  v-model:value="formModel.vehicle.licensePlate"
                   :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
                   :loading="loading"
                   @blur="handleLicensePlateSearch"
@@ -554,7 +554,7 @@ function formatTime(time: string | number | null | undefined): string {
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.vehicle.year')" path="vehicle.year">
-                    <NDatePicker 
+                    <NDatePicker
                       v-model:value="formModel.vehicle.year"
                       type="year"
                       :placeholder="t('menu.vehicle.yearPlaceholder')"
@@ -592,54 +592,54 @@ function formatTime(time: string | number | null | undefined): string {
                 />
               </NFormItem>
               <NFormItem :label="t('menu.customer.name')" path="customer.name" v-else>
-                <NInput 
-                  v-model:value="formModel.customer.name" 
+                <NInput
+                  v-model:value="formModel.customer.name"
                   :placeholder="t('menu.customer.nameSearch')"
                 />
               </NFormItem>
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.customer.contact')" path="customer.contact">
-                    <NInput 
-                      v-model:value="formModel.customer.contact" 
+                    <NInput
+                      v-model:value="formModel.customer.contact"
                       :placeholder="t('menu.customer.contactSearch')"
                     />
                   </NFormItem>
                 </NGi>
                 <NGi>
                   <NFormItem :label="t('menu.customer.phone')" path="customer.phone">
-                    <NInput 
-                      v-model:value="formModel.customer.phone" 
+                    <NInput
+                      v-model:value="formModel.customer.phone"
                       :placeholder="t('menu.customer.phoneSearch')"
                     />
                   </NFormItem>
                 </NGi>
               </NGrid>
               <NFormItem :label="t('menu.customer.email')" path="customer.email">
-                <NInput 
-                  v-model:value="formModel.customer.email" 
+                <NInput
+                  v-model:value="formModel.customer.email"
                   :placeholder="t('menu.customer.emailSearch')"
                 />
               </NFormItem>
               <NFormItem :label="t('menu.customer.address')" path="customer.address">
-                <NInput 
-                  v-model:value="formModel.customer.address" 
+                <NInput
+                  v-model:value="formModel.customer.address"
                   :placeholder="t('menu.customer.addressSearch')"
                 />
               </NFormItem>
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.customer.bankAccount')" path="customer.bankAccount">
-                    <NInput 
-                      v-model:value="formModel.customer.bankAccount" 
+                    <NInput
+                      v-model:value="formModel.customer.bankAccount"
                       :placeholder="t('menu.customer.bankAccountSearch')"
                     />
                   </NFormItem>
                 </NGi>
                 <NGi>
                   <NFormItem :label="t('menu.customer.bankName')" path="customer.bankName">
-                    <NInput 
-                      v-model:value="formModel.customer.bankName" 
+                    <NInput
+                      v-model:value="formModel.customer.bankName"
                       :placeholder="t('menu.customer.bankNameSearch')"
                     />
                   </NFormItem>
@@ -657,7 +657,7 @@ function formatTime(time: string | number | null | undefined): string {
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.repairOrder.inDate')" path="inDate" >
-                    <NDatePicker 
+                    <NDatePicker
                       v-model:value="formModel.inDate"
                       type="date"
                       :placeholder="t('menu.repairOrder.inDatePlaceholder')"
@@ -667,9 +667,9 @@ function formatTime(time: string | number | null | undefined): string {
                   </NFormItem>
                 </NGi>
                 <NGi>
-                  <NFormItem :label="t('menu.repairOrder.estimatedTime')" path="estimatedCompletionTime">
-                    <NDatePicker 
-                      v-model:value="formModel.estimatedCompletionTime"
+                  <NFormItem :label="t('menu.repairOrder.estimatedTime')" path="estimatedCompletionDate">
+                    <NDatePicker
+                      v-model:value="formModel.estimatedCompletionDate"
                       type="date"
                       :placeholder="t('menu.repairOrder.estimatedTimePlaceholder')"
                       clearable
@@ -697,8 +697,8 @@ function formatTime(time: string | number | null | undefined): string {
             </div>
           </div>
         </NForm>
-        
-       
+
+
       </template>
 
       <!-- 底部按钮 -->
@@ -707,9 +707,9 @@ function formatTime(time: string | number | null | undefined): string {
        <div class="action-buttons" v-if="props.type !== 'view'">
           <NSpace justify="end">
             <NButton @click="handleClose">{{ t('common.cancel') }}</NButton>
-            <NButton 
-              type="primary" 
-              :loading="loading" 
+            <NButton
+              type="primary"
+              :loading="loading"
               @click="handleSubmit"
             >
               {{ t('common.confirm') }}
@@ -893,7 +893,7 @@ function formatTime(time: string | number | null | undefined): string {
   .card-header {
     background: rgba(255, 255, 255, 0.04);
   }
-  
+
   .description {
     background: rgba(255, 255, 255, 0.04);
   }
@@ -904,11 +904,11 @@ function formatTime(time: string | number | null | undefined): string {
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .plate-number {
     font-size: 20px;
   }
-  
+
   .customer-name {
     font-size: 18px;
   }
@@ -1081,15 +1081,15 @@ function formatTime(time: string | number | null | undefined): string {
   .view-container {
     background: #18181b;
   }
-  
+
   .info-card {
     background: #27272a;
   }
-  
+
   .contact-item {
     background: rgba(255, 255, 255, 0.05);
   }
-  
+
   .desc-content {
     background: rgba(255, 255, 255, 0.05);
   }
@@ -1100,19 +1100,19 @@ function formatTime(time: string | number | null | undefined): string {
   .main-content {
     grid-template-columns: 1fr;
   }
-  
+
   .plate-number {
     font-size: 24px;
   }
-  
+
   .customer-name {
     font-size: 20px;
   }
-  
+
   .status-card {
     padding: 20px;
   }
-  
+
   .order-no {
     font-size: 20px;
   }
@@ -1212,15 +1212,15 @@ function formatTime(time: string | number | null | undefined): string {
   .detail-container {
     background: var(--n-card-color);
   }
-  
+
   .detail-section {
     background: var(--n-card-color);
   }
-  
+
   .section-header {
     background: rgba(255, 255, 255, 0.02);
   }
-  
+
   .desc-box,
   .timeline-item {
     background: rgba(255, 255, 255, 0.04);
@@ -1232,12 +1232,12 @@ function formatTime(time: string | number | null | undefined): string {
   .detail-container {
     padding: 16px;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
  .timeline-item {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -1248,4 +1248,4 @@ function formatTime(time: string | number | null | undefined): string {
   width: fit-content;
   padding: 2px 8px;
 }
-</style> 
+</style>
