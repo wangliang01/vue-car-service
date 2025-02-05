@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, h } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NDatePicker, NSelect, NDivider, NGrid, NGridItem } from 'naive-ui';
+import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSpace, NButton, NDatePicker, NSelect, NDivider, NGrid, NGridItem, NDataTable } from 'naive-ui';
 import type { FormInst, SelectOption } from 'naive-ui';
 import { fetchRepairItemList } from '@/service/api/repair-item';
 import { fetchMaterialList } from '@/service/api/material';
+import { getTechnicianList } from '@/service/api/technician';
 
 const { t } = useI18n();
 const formRef = ref<FormInst | null>(null);
@@ -16,6 +17,8 @@ const loading = defineModel<boolean>('loading', { default: false });
 const repairItemOptions = ref<SelectOption[]>([]);
 // 材料选项
 const materialOptions = ref<SelectOption[]>([]);
+// 维修技师选项
+const mechanicOptions = ref<SelectOption[]>([]);
 
 // 获取维修项目列表
 const fetchRepairItems = async () => {
@@ -36,13 +39,26 @@ const fetchMaterials = async () => {
   try {
     const res = await fetchMaterialList({});
     materialOptions.value = res.data.records.map(item => ({
+      ...item,
       label: item.name,
       value: item._id,
       data: item
     }));
+
+    console.log("materialOptions", materialOptions.value);
   } catch (error) {
     console.error('获取材料列表失败:', error);
   }
+};
+
+// 获取维修技师列表
+const fetchMechanics = async () => {
+  const res = await getTechnicianList({});
+  mechanicOptions.value = res.data.records.map(item => ({
+    label: item.name,
+    value: item._id,
+    data: item
+  }));
 };
 
 interface RepairPart {
@@ -71,7 +87,7 @@ const model = ref<{
 }>({
   repairItems: [],
   estimatedCompletionTime: null,
-  mechanic: ''
+  mechanic: null
 });
 
 const rules = {
@@ -196,7 +212,7 @@ async function handleSubmit() {
 
 // 初始化数据
 async function init() {
-  await Promise.all([fetchRepairItems(), fetchMaterials()]);
+  await Promise.all([fetchRepairItems(), fetchMaterials(), fetchMechanics()]);
   addRepairItem(); // 默认添加一个维修项目
 }
 
@@ -208,7 +224,7 @@ watch(() => show.value, (newVal) => {
     model.value = {
       repairItems: [],
       estimatedCompletionTime: null,
-      mechanic: ''
+      mechanic: null
     };
   }
 });
@@ -219,12 +235,119 @@ function handleDiscountChange(value: number | null, index: number) {
     model.value.repairItems[index].laborDiscount = value / 100;
   }
 }
+
+// 配件表格列定义
+function partsColumns(repairIndex: number) {
+  return [
+    {
+      title: t('repairOrder.repair.partName'),
+      key: 'materialId',
+      width: 140,
+      render: (row: RepairPart, index: number) => {
+        return h(NSelect, {
+          value: row.materialId,
+          options: materialOptions.value,
+          filterable: true,
+          clearable: true,
+          style: 'width: 140px',
+          onUpdateValue: (value: string) => handleMaterialSelect(value, repairIndex, index)
+        });
+      }
+    },
+    {
+      title: t('repairOrder.repair.quantity'),
+      key: 'quantity',
+      width: 120,
+      render: (row: RepairPart) => {
+        return h(NInputNumber, {
+          value: row.quantity,
+          min: 1,
+          precision: 0,
+          showButton: false,
+          'onUpdate:value': (value: number) => row.quantity = value
+        });
+      }
+    },
+    {
+      title: t('repairOrder.repair.purchasePrice'),
+      key: 'purchasePrice',
+      width: 120,
+      render: (row: RepairPart) => {
+        return h(NInputNumber, {
+          value: row.purchasePrice,
+          disabled: true,
+          prefix: '￥',
+          showButton: false
+        }, {
+          prefix: () => h('span', { style: 'color: var(--n-text-color-disabled)' }, '￥')
+        });
+      }
+    },
+    {
+      title: t('repairOrder.repair.managementFee'),
+      key: 'managementFee',
+      width: 120,
+      render: (row: RepairPart) => {
+        return h(NInputNumber, {
+          value: row.managementFee * 100,
+          disabled: true,
+          suffix: '%',
+          showButton: false
+        }, {
+          suffix: () => h('span', { style: 'color: var(--n-text-color-disabled)' }, '%')
+        });
+      }
+    },
+    {
+      title: t('repairOrder.repair.managementDiscount'),
+      key: 'managementDiscount',
+      width: 120,
+      render: (row: RepairPart, index: number) => {
+        return h(NInputNumber, {
+          value: row.managementDiscount * 100,
+          min: 0,
+          max: 100,
+          precision: 0,
+          suffix: '%',
+          showButton: false,
+          'onUpdate:value': (value: number) => {
+            if (value !== null) {
+              row.managementDiscount = value / 100;
+            }
+          }
+        }, {
+          suffix: () => h('span', { style: 'color: var(--n-text-color-disabled)' }, '%')
+        });
+      }
+    },
+    {
+      title: t('common.action'),
+      key: 'actions',
+      width: 80,
+      render: (_, index: number) => {
+        return h(NButton, {
+          text: true,
+          type: 'error',
+          onClick: () => removePart(repairIndex, index)
+        }, {
+          icon: () => h('div', { class: 'i-material-symbols:delete' })
+        });
+      }
+    }
+  ];
+}
 </script>
 
 <template>
-  <NDrawer v-model:show="show" :width="900">
-    <NDrawerContent :title="t('repairOrder.repair.title')" :native-scrollbar="false">
-      <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="120">
+  <NDrawer v-model:show="show" :width="1080">
+    <NDrawerContent :title="t('repairOrder.repair.action')" :native-scrollbar="false">
+      <NButton class="mt-4" @click="addRepairItem" type="primary">
+        <template #icon>
+          <div class="i-material-symbols:add" />
+        </template>
+        {{ t('repairOrder.repair.addItem') }}
+      </NButton>
+      <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="120" class="mt-4">
         <div v-for="(repairItem, repairIndex) in model.repairItems" :key="repairIndex" class="repair-item mb-4">
           <div class="repair-item-header">
             <span class="repair-item-title">{{ t('repairOrder.repair.items') }} #{{ repairIndex + 1 }}</span>
@@ -246,8 +369,7 @@ function handleDiscountChange(value: number | null, index: number) {
           <NGrid :cols="2" :x-gap="24" v-if="repairItem.repairItemId">
             <NGridItem>
               <NFormItem :label="t('repairOrder.repair.laborHours')">
-                <NInputNumber v-model:value="repairItem.laborHours" :min="0" :precision="1"
-                  :show-button="false">
+                <NInputNumber v-model:value="repairItem.laborHours" :min="0" :precision="1" :show-button="false">
 
                 </NInputNumber>
               </NFormItem>
@@ -273,8 +395,8 @@ function handleDiscountChange(value: number | null, index: number) {
             <NGridItem>
               <NFormItem :label="t('repairOrder.repair.laborDiscount')">
                 <NInputNumber v-model:value="repairItem.laborDiscount" :min="0" :max="100" :precision="0" :step="1"
-                  :format="value => value * 100 + ''"
-                  @update:value="value => handleDiscountChange(value, repairIndex)" :show-button="false">
+                  :format="value => value * 100 + ''" @update:value="value => handleDiscountChange(value, repairIndex)"
+                  :show-button="false">
 
                   <template #suffix>
                     %
@@ -286,57 +408,20 @@ function handleDiscountChange(value: number | null, index: number) {
 
           <!-- 配件列表 -->
           <NFormItem :label="t('repairOrder.repair.parts')">
-            <div class="parts-header">
-              <NButton type="primary" @click="addPart(repairIndex)" ghost>
+            <div class="bg-white rounded-md p-2 w-full">
+              <NDataTable :columns="partsColumns(repairIndex)" :data="repairItem.parts" class="w-full"
+                :pagination="false" v-if="repairItem.parts.length > 0" :bordered="false" />
+              <NButton class="parts-add-btn w-full block" @click="addPart(repairIndex)" ghost type="primary">
                 <template #icon>
                   <div class="i-material-symbols:add" />
                 </template>
-                {{ t('common.add') }}
+                {{ t('common.add') }}{{ t('repairOrder.repair.parts') }}
               </NButton>
-            </div>
-
-            <div v-for="(part, partIndex) in repairItem.parts" :key="partIndex" class="part-item">
-              <!-- 材料选择 -->
-              <NFormItem :label="t('repairOrder.repair.partName')"
-                :path="`repairItems[${repairIndex}].parts[${partIndex}].materialId`">
-                <NSelect v-model:value="part.materialId" :options="materialOptions" filterable clearable
-                  @update:value="value => handleMaterialSelect(value, repairIndex, partIndex)" />
-              </NFormItem>
-
-              <NSpace :wrap="false" :size="24">
-                <NFormItem :label="t('repairOrder.repair.quantity')">
-                  <NInputNumber v-model:value="part.quantity" :min="1" />
-                </NFormItem>
-
-                <NFormItem :label="t('repairOrder.repair.purchasePrice')">
-                  <NInputNumber v-model:value="part.purchasePrice" :min="0" disabled />
-                </NFormItem>
-
-                <NFormItem :label="t('repairOrder.repair.managementFee')">
-                  <NInputNumber v-model:value="part.managementFee" :min="0" :max="1" :precision="2" :step="0.1"
-                    disabled />
-                </NFormItem>
-
-                <NFormItem :label="t('repairOrder.repair.managementDiscount')">
-                  <NInputNumber v-model:value="part.managementDiscount" :min="0" :max="1" :precision="2" :step="0.1" />
-                </NFormItem>
-
-                <NButton text type="error" @click="removePart(repairIndex, partIndex)">
-                  <template #icon>
-                    <div class="i-material-symbols:delete" />
-                  </template>
-                </NButton>
-              </NSpace>
             </div>
           </NFormItem>
         </div>
 
-        <NButton class="mt-4" @click="addRepairItem" type="primary">
-          <template #icon>
-            <div class="i-material-symbols:add" />
-          </template>
-          {{ t('repairOrder.repair.addItem') }}
-        </NButton>
+
 
         <NDivider />
 
@@ -347,25 +432,8 @@ function handleDiscountChange(value: number | null, index: number) {
         </NFormItem>
 
         <NFormItem :label="t('repairOrder.repair.mechanic')" path="mechanic">
-          <NInput v-model:value="model.mechanic" />
+          <NSelect v-model:value="model.mechanic" filterable clearable :options="mechanicOptions" />
         </NFormItem>
-
-        <!-- 金额汇总 -->
-        <NDivider />
-        <div class="amount-summary">
-          <div class="amount-item">
-            <span>{{ t('repairOrder.repair.laborAmount') }}:</span>
-            <span class="amount">¥{{ laborAmount.toFixed(2) }}</span>
-          </div>
-          <div class="amount-item">
-            <span>{{ t('repairOrder.repair.partsAmount') }}:</span>
-            <span class="amount">¥{{ partsAmount.toFixed(2) }}</span>
-          </div>
-          <div class="amount-item total">
-            <span>{{ t('repairOrder.repair.totalAmount') }}:</span>
-            <span class="amount">¥{{ totalAmount.toFixed(2) }}</span>
-          </div>
-        </div>
       </NForm>
 
       <template #footer>
@@ -448,5 +516,21 @@ function handleDiscountChange(value: number | null, index: number) {
 
 .amount {
   color: var(--n-text-color-success);
+}
+
+.parts-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: var(--n-text-color-primary);
+  border: 1px dashed var(--n-border-color);
+  border-top: none;
+  cursor: pointer;
+  transition: color .3s var(--n-bezier);
+}
+
+.parts-add-btn:hover {
+  color: var(--n-primary-color);
 }
 </style>

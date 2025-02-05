@@ -31,8 +31,10 @@ export interface ApiResponse<T = any> {
 }
 
 export interface PageResult<T = any> {
-  list: T[];
+  records: T[];
   total: number;
+  size: number;
+  current: number;
 }
 
 export interface CommonResult {

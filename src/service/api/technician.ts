@@ -3,7 +3,7 @@ import type { ApiResponse, PageResult } from '@/typings/common'
 
 /** 获取技师列表 */
 export function getTechnicianList(params: Api.Technician.SearchParams) {
-  return request<ApiResponse<PageResult<Api.Technician.TechnicianInfo>>>({
+  return request<PageResult<Api.Technician.TechnicianInfo>>({
     url: '/technician',
     method: 'get',
     params
