@@ -8,6 +8,8 @@ const loading = ref(false);
 
 const model = defineModel<{
   status?: string;
+  settlementNo?: string;
+  repairOrderNo?: string;
   paymentMethod?: string;
   startDate?: string;
   endDate?: string;
@@ -49,48 +51,30 @@ function handleReset() {
             <span>{{ t('common.search') }}</span>
           </NSpace>
         </template>
-        
-        <NForm :model="model" label-placement="left" :label-width="80">
+
+        <NForm :model="model" label-placement="left" :label-width="100">
           <NGrid :cols="24" :x-gap="24" :y-gap="16">
             <NGridItem :span="6">
-              <NFormItem :label="t('settlement.statusLabel')">
-                <NSelect
-                  v-model:value="model.status"
-                  :options="statusOptions"
+              <NFormItem :label="t('settlement.settlementNo')">
+                <NInput
+                  v-model:value="model.settlementNo"
+                  @keyup.enter="handleSearch"
                   clearable
                 />
               </NFormItem>
             </NGridItem>
-            
             <NGridItem :span="6">
-              <NFormItem :label="t('settlement.paymentMethod')">
-                <NSelect
-                  v-model:value="model.paymentMethod"
-                  :options="paymentMethodOptions"
+              <NFormItem :label="t('settlement.repairOrderNo')">
+                <NInput
+                  v-model:value="model.repairOrderNo"
                   clearable
+                  @keyup.enter="handleSearch"
                 />
               </NFormItem>
             </NGridItem>
+
 
             <NGridItem :span="12">
-              <NFormItem :label="t('settlement.totalAmount')">
-                <NSpace align="center">
-                  <NInput
-                    v-model:value="model.minAmount"
-                    type="text"
-                    :placeholder="t('settlement.search.minAmount')"
-                  />
-                  <span>-</span>
-                  <NInput
-                    v-model:value="model.maxAmount"
-                    type="text"
-                    :placeholder="t('settlement.search.maxAmount')"
-                  />
-                </NSpace>
-              </NFormItem>
-            </NGridItem>
-
-            <NGridItem :span="24">
               <NSpace class="w-full" justify="end">
                 <NButton @click="handleReset">
                   <template #icon>
@@ -121,4 +105,4 @@ function handleReset() {
 .w-full {
   width: 100%;
 }
-</style> 
+</style>

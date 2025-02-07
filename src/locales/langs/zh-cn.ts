@@ -148,6 +148,7 @@ const local: App.I18n.Schema = {
     deleteSuccess: '删除成功',
     confirmDelete: '确认删除 {name} ?',
     edit: '编辑',
+    download: '下载',
     warning: '警告',
     error: '错误',
     index: '序号',
@@ -781,7 +782,7 @@ const local: App.I18n.Schema = {
   settlement: {
     title: '结算管理',
     settlementNo: '结算单号',
-    repairOrder: '维修管理',
+    repairOrderNo: '维修工单号',
     customer: '客户',
     vehicle: '车辆',
     partsAmount: '配件金额',

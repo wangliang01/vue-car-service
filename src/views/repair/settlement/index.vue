@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { ref, h } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NSpace, NDataTable, NButton } from 'naive-ui';
+import { NCard, NSpace, NDataTable, NButton, NTag } from 'naive-ui';
 import { fetchSettlementList, updateSettlementStatus } from '@/service/api/settlement';
 import Search from './modules/search.vue';
 
@@ -23,17 +23,22 @@ const searchModel = ref({
   maxAmount: undefined
 });
 
+const paymentStatusMap = {
+  'unpaid': t('settlement.status.unpaid'),
+  'paid': t('settlement.status.paid')
+};
+
 const resolveVehicle = (row: any) => {
   return (
     <div>
       <div class="flex items-center gap-2">
-        <img 
-          src={`/src/assets/imgs/brand/${row.vehicle.brand.toLowerCase()}.png`} 
-          class="w-6 h-6" 
-          alt={row.vehicle.brand} 
+        <img
+          src={`/src/assets/imgs/brand/${row.vehicle.brand.toLowerCase()}.png`}
+          class="w-6 h-6"
+          alt={row.vehicle.brand}
         />
         <span>{row.vehicle.brand}</span><span>{row.vehicle.model} </span>
-        
+
       </div>
       <div class="mt-1 text-gray-500">
        {row.vehicle.licensePlate}
@@ -44,10 +49,10 @@ const resolveVehicle = (row: any) => {
 
 const columns = [
   { title: t('settlement.settlementNo'), key: 'settlementNo'},
-  { title: t('settlement.repairOrder'), key: 'repairOrder', render: (row) => row.repairOrder.orderNo },
-  { 
-    title: t('settlement.customer'), 
-    key: 'customer', 
+  { title: t('settlement.repairOrderNo'), key: 'repairOrderNo', render: (row) => row.repairOrder.orderNo },
+  {
+    title: t('settlement.customer'),
+    key: 'customer',
     render: (row) => (
       <div>
         <div>{row.customer.name}</div>
@@ -55,16 +60,16 @@ const columns = [
       </div>
     )
   },
-  { 
-    title: t('settlement.vehicle'), 
-    key: 'vehicle', 
+  {
+    title: t('settlement.vehicle'),
+    key: 'vehicle',
     render: resolveVehicle
   },
-  { title: t('settlement.partsAmount'), key: 'partsAmount' },
-  { title: t('settlement.laborAmount'), key: 'laborAmount' },
-  { title: t('settlement.totalAmount'), key: 'totalAmount' },
+  { title: t('settlement.partsAmount'), key: 'partsAmount', render: row => row.formattedPartsAmount },
+  { title: t('settlement.laborAmount'), key: 'laborAmount', render: row => row.formattedLaborAmount },
+  { title: t('settlement.totalAmount'), key: 'totalAmount', render: row => row.formattedTotalAmount },
   { title: t('settlement.paymentMethod'), key: 'paymentMethod' },
-  { title: t('settlement.statusLabel'), key: 'status' },
+  { title: t('settlement.statusLabel'), key: 'paymentStatus', render: row => <NTag type={row.paymentStatus === 'paid' ? 'success' : 'warning'}>{paymentStatusMap[row.paymentStatus]}</NTag> },
   {
     title: t('common.action'),
     key: 'actions',
@@ -74,14 +79,45 @@ const columns = [
         {},
         {
           default: () => [
+            row.paymentStatus === 'unpaid' && h(
+              NButton,
+              {
+                size: 'small',
+                type: 'warning',
+                ghost: true,
+                onClick: () => handlePay(row._id)
+              },
+              { default: () => t('common.pay') }
+            ),
             h(
               NButton,
               {
                 size: 'small',
-                onClick: () => handlePay(row._id)
+                ghost: true,
+                onClick: () => handleView(row)
               },
-              { default: () => t('common.pay') }
-            )
+              { default: () => t('common.view') }
+            ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                type: 'primary',
+                ghost: true,
+                onClick: () => handleEdit(row)
+              },
+              { default: () => t('common.edit') }
+            ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                type: 'success',
+                ghost: true,
+                onClick: () => handleEdit(row)
+              },
+              { default: () => t('common.download') }
+            ),
           ]
         }
       );
@@ -95,7 +131,7 @@ async function loadData() {
     const { data } = await fetchSettlementList({
       ...searchModel.value,
       page: pagination.value.page,
-      limit: pagination.value.pageSize
+      size: pagination.value.pageSize
     });
 
     console.log(  'data', data);
@@ -115,6 +151,11 @@ async function handlePay(id: string) {
   }
 }
 
+async function handleView(row) {}
+
+
+async function handleEdit(row) {}
+
 // 初始加载
 loadData();
 </script>
@@ -132,7 +173,7 @@ loadData();
         <NSpace justify="space-between">
           <span>{{ t('settlement.title') }}</span>
           <NSpace>
-           
+
           </NSpace>
         </NSpace>
       </template>
@@ -153,4 +194,4 @@ loadData();
 .settlement-container {
   padding: 16px;
 }
-</style> 
+</style>

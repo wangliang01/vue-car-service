@@ -15,6 +15,8 @@ declare namespace Api.Settlement {
   }
 
   interface SearchParams extends Api.Common.PaginationParams {
+    page?: number,
+    size?: number,
     status?: string;
     paymentMethod?: string;
     startDate?: string;
@@ -37,4 +39,4 @@ declare namespace Api.Settlement {
   interface StatusUpdateParams {
     status: 'paid' | 'refunded';
   }
-} 
+}
