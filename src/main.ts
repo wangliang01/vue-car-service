@@ -25,6 +25,7 @@ async function setupApp() {
 
   setupAppVersionNotification();
 
+
   app.mount('#app');
 }
 

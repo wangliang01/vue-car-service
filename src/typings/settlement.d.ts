@@ -1,42 +1,90 @@
-declare namespace Api.Settlement {
-  interface SettlementInfo {
-    _id: string;
-    repairOrder: string;
-    customer: string;
-    vehicle: string;
-    partsAmount: number;
-    laborAmount: number;
-    totalAmount: number;
-    paymentMethod: 'cash' | 'wechat' | 'alipay' | 'card';
-    status: 'unpaid' | 'paid' | 'refunded';
-    remark?: string;
-    createdAt: string;
-    updatedAt: string;
-  }
+import { Api as CommonApi } from './common';
 
-  interface SearchParams extends Api.Common.PaginationParams {
-    page?: number,
-    size?: number,
-    status?: string;
-    paymentMethod?: string;
-    startDate?: string;
-    endDate?: string;
-    minAmount?: number;
-    maxAmount?: number;
-  }
+export declare namespace Api {
+  namespace Settlement {
+    interface SettlementInfo {
+      _id: string;
+      settlementNo: string;
+      createTime: string;
+      repairOrder: {
+        orderNo: string;
+        inDate: string;
+        repairItems: Array<{
+          name: string;
+          laborHours: number;
+          laborPrice: number;
+          complexityFactor: number;
+          laborDiscount: number;
+          actualLaborCost: number;
+          parts: Array<{
+            name: string;
+            purchasePrice: number;
+            managementFee: number;
+            managementDiscount: number;
+            actualMaterialCost: number;
+          }>;
+        }>;
+      };
+      customer: {
+        name: string;
+        phone: string;
+      };
+      vehicle: {
+        brand: string;
+        model: string;
+        licensePlate: string;
+      };
+      repairItems: Array<{
+        name: string;
+        laborHours: number;
+        laborPrice: number;
+        complexityFactor: number;
+        laborDiscount: number;
+        actualLaborCost: number;
+        materialName: string;
+        purchasePrice: number;
+        managementRate: number;
+        managementDiscount: number;
+        expectedMaterialCost: number;
+        actualMaterialCost: number;
+        subtotal: number;
+        laborAmount: number;
+        partsAmount: number;
+      }>;
+      partsAmount: number;
+      laborAmount: number;
+      totalAmount: number;
+      paymentMethod: string;
+      paymentStatus: 'paid' | 'unpaid';
+      formattedPartsAmount: string;
+      formattedLaborAmount: string;
+      formattedTotalAmount: string;
+    }
 
-  interface CreateParams {
-    repairOrder: string;
-    customer: string;
-    vehicle: string;
-    partsAmount: number;
-    laborAmount: number;
-    totalAmount: number;
-    paymentMethod: string;
-    remark?: string;
-  }
+    interface SearchParams extends CommonApi.Common.PaginationParams {
+      page?: number;
+      size?: number;
+      status?: string;
+      paymentMethod?: string;
+      startDate?: string;
+      endDate?: string;
+      minAmount?: number;
+      maxAmount?: number;
+    }
 
-  interface StatusUpdateParams {
-    status: 'paid' | 'refunded';
+    interface CreateParams {
+      repairOrder: string;
+      customer: string;
+      vehicle: string;
+      partsAmount: number;
+      laborAmount: number;
+      totalAmount: number;
+      paymentMethod: string;
+      remark?: string;
+    }
+
+    interface StatusUpdateParams {
+      status: 'paid' | 'refunded';
+    }
   }
 }

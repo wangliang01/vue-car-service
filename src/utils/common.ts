@@ -60,3 +60,5 @@ export function toggleHtmlClass(className: string) {
 export function formatDate(date: string, format = 'YYYY-MM-DD HH:mm:ss') {
   return dayjs(date).format(format);
 }
+
+

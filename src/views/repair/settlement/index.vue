@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { NCard, NSpace, NDataTable, NButton, NTag } from 'naive-ui';
 import { fetchSettlementList, updateSettlementStatus } from '@/service/api/settlement';
 import Search from './modules/search.vue';
+import Detail from './modules/detail.vue';
 
 const { t } = useI18n();
 const loading = ref(false);
@@ -13,6 +14,8 @@ const pagination = ref({
   pageSize: 10,
   total: 0
 });
+const detailVisible = ref(false);
+const currentRow = ref<Api.Settlement.SettlementInfo | null>(null);
 
 const searchModel = ref({
   status: '',
@@ -114,7 +117,7 @@ const columns = [
                 size: 'small',
                 type: 'success',
                 ghost: true,
-                onClick: () => handleEdit(row)
+                onClick: () => handleDownload(row)
               },
               { default: () => t('common.download') }
             ),
@@ -151,8 +154,15 @@ async function handlePay(id: string) {
   }
 }
 
-async function handleView(row) {}
+async function handleView(row: Api.Settlement.SettlementInfo) {
+  currentRow.value = row;
+  detailVisible.value = true;
+}
 
+async function handleDownload(row: Api.Settlement.SettlementInfo) {
+  currentRow.value = row;
+  detailVisible.value = true;
+}
 
 async function handleEdit(row) {}
 
@@ -187,6 +197,12 @@ loadData();
         @update:page-size="loadData"
       />
     </NCard>
+
+    <Detail
+      v-model:visible="detailVisible"
+      :data="currentRow"
+      :type="'view'"
+    />
   </div>
 </template>
 

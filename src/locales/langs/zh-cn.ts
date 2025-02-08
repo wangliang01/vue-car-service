@@ -780,32 +780,24 @@ const local: App.I18n.Schema = {
     }
   },
   settlement: {
-    title: '结算管理',
+    title: '维修结算单',
+    detail: '结算单详情',
     settlementNo: '结算单号',
     repairOrderNo: '维修工单号',
-    customer: '客户',
-    vehicle: '车辆',
-    partsAmount: '配件金额',
+    customer: '客户姓名',
+    customerPhone: '联系电话',
+    vehicle: '车辆信息',
+    licensePlate: '车牌号',
+    repairItem: '维修项目',
     laborAmount: '工时费',
+    partsAmount: '配件费',
     totalAmount: '总金额',
+    totalLabel: '合计',
     paymentMethod: '支付方式',
-    statusLabel: '结算状态',
-    remark: '备注',
-    createdAt: '创建时间',
-    paymentMethods: {
-      cash: '现金',
-      wechat: '微信',
-      alipay: '支付宝',
-      card: '银行卡'
-    },
+    paymentStatus: '支付状态',
     status: {
       unpaid: '未支付',
-      paid: '已支付',
-      refunded: '已退款'
-    },
-    search: {
-      minAmount: '最小金额',
-      maxAmount: '最大金额'
+      paid: '已支付'
     }
   },
   inventory: {

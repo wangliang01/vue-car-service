@@ -55,4 +55,22 @@ declare namespace Api {
     message: string;
     data: T;
   }
+
+  namespace Common {
+    interface PaginationParams {
+      page?: number;
+      size?: number;
+    }
+
+    interface Response<T> {
+      code: number;
+      message: string;
+      data: T;
+    }
+
+    interface PaginationResponse<T> {
+      total: number;
+      records: T[];
+    }
+  }
 }
