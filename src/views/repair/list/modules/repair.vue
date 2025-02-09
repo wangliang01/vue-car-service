@@ -14,9 +14,17 @@ const show = defineModel<boolean>('show');
 const loading = defineModel<boolean>('loading', { default: false });
 
 // 维修项目选项
-const repairItemOptions = ref<SelectOption[]>([]);
+interface RepairItemOption extends SelectOption {
+  data: Api.RepairItem.RepairItemInfo;
+}
+
 // 材料选项
-const materialOptions = ref<SelectOption[]>([]);
+interface MaterialOption extends SelectOption {
+  data: Api.Material.MaterialInfo;
+}
+
+const repairItemOptions = ref<RepairItemOption[]>([]);
+const materialOptions = ref<MaterialOption[]>([]);
 // 维修技师选项
 const mechanicOptions = ref<SelectOption[]>([]);
 
@@ -92,7 +100,7 @@ const model = ref<{
 
 const rules = {
   repairItems: {
-    type: 'array',
+    type: 'array' as const,
     required: true,
     message: t('repairOrder.repair.atLeastOneItem'),
     trigger: ['blur', 'change']
@@ -146,7 +154,7 @@ function removePart(repairItemIndex: number, partIndex: number) {
 
 // 选择维修项目
 function handleRepairItemSelect(repairItemId: string, index: number) {
-  const selectedItem = repairItemOptions.value.find(item => item.value === repairItemId);
+  const selectedItem = repairItemOptions.value.find(item => item.value === repairItemId) as RepairItemOption;
   if (selectedItem?.data) {
     const item = selectedItem.data;
     model.value.repairItems[index] = {
@@ -163,7 +171,7 @@ function handleRepairItemSelect(repairItemId: string, index: number) {
 
 // 选择材料
 function handleMaterialSelect(materialId: string, repairIndex: number, partIndex: number) {
-  const selectedMaterial = materialOptions.value.find(item => item.value === materialId);
+  const selectedMaterial = materialOptions.value.find(item => item.value === materialId) as MaterialOption;
   if (selectedMaterial?.data) {
     const material = selectedMaterial.data;
     model.value.repairItems[repairIndex].parts[partIndex] = {
