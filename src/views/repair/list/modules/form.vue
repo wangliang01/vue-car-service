@@ -128,10 +128,14 @@ async function handleSubmit() {
     };
 
     if (props.type === 'add') {
-      await fetchCreateRepairOrder(submitData);
+      const res = await fetchCreateRepairOrder(submitData);
+      if (res.response.status !== 200) return
+
       window.$message?.success(t('common.addSuccess'));
     } else {
-      await fetchUpdateRepairOrder(props.editData!._id, submitData);
+      const res = await fetchUpdateRepairOrder(props.editData!._id, submitData);
+      if (res.response.status !== 200) return
+
       window.$message?.success(t('common.updateSuccess'));
     }
 
