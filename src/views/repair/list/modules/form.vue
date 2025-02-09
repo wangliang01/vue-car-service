@@ -702,6 +702,7 @@ function formatTime(time: string | number | null | undefined): string {
                       :placeholder="t('menu.repairOrder.estimatedTimePlaceholder')"
                       clearable
                       style="width: 100%"
+                      :timezone="'Asia/Shanghai'"
                     />
                   </NFormItem>
                 </NGi>
