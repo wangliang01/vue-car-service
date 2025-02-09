@@ -98,7 +98,7 @@ const rules = {
     trigger: ['blur', 'change']
   },
   estimatedCompletionDate: {
-    required: false,
+    required: true,
     message: t('repairOrder.repair.estimatedTimeRequired')
   },
   mechanic: {
@@ -426,15 +426,14 @@ function partsColumns(repairIndex: number) {
         <NDivider />
 
         <!-- 预计完工时间和维修技师 -->
-        <NFormItem :label="t('repairOrder.repair.mechanic')" path="mechanic">
-          <NSelect v-model:value="model.mechanic" filterable clearable :options="mechanicOptions" />
-        </NFormItem>
         <NFormItem :label="t('repairOrder.repair.estimatedTime')" path="estimatedCompletionDate">
           <NDatePicker v-model:value="model.estimatedCompletionDate" style="width: 100%;" type="date" clearable
             :is-date-disabled="(ts: number) => ts < Date.now()" />
         </NFormItem>
 
-
+        <NFormItem :label="t('repairOrder.repair.mechanic')" path="mechanic">
+          <NSelect v-model:value="model.mechanic" filterable clearable :options="mechanicOptions" />
+        </NFormItem>
       </NForm>
 
       <template #footer>

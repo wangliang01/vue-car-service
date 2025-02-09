@@ -175,17 +175,17 @@ const columns = computed(() => [
             { default: () => t('common.edit') }
           ),
 
-          // row.status === 'pending' && h(
-          //   NButton,
-          //   {
-          //     type: 'primary',
-          //     size: 'small',
-          //     ghost: true,
-          //     onClick: () => handleCheck(row)
-          //   },
-          //   { default: () => t('repairOrder.check') }
-          // ),
           row.status === 'pending' && h(
+            NButton,
+            {
+              type: 'primary',
+              size: 'small',
+              ghost: true,
+              onClick: () => handleCheck(row)
+            },
+            { default: () => t('repairOrder.check') }
+          ),
+          row.status === 'checked' && h(
             NButton,
             {
               type: 'success',
