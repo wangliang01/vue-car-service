@@ -9,7 +9,6 @@ import RepairOrderSearch from './modules/search.vue';
 import RepairOrderForm from './modules/form.vue';
 import RepairOrderInspection from './modules/inspection.vue';
 import RepairOrderRepair from './modules/repair.vue';
-
 defineOptions({ name: 'RepairOrderList' });
 
 const { t } = useI18n();
@@ -231,8 +230,8 @@ const {
   updateSearchParams,
   resetSearchParams
 } = useTable({
-  apiFn: fetchRepairOrderList,
-  columns: () => columns.value,
+  apiFn: fetchRepairOrderList as any,
+  columns: () => columns.value as any,
   apiParams: searchModel,
   immediate: true
 });
