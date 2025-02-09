@@ -1197,16 +1197,16 @@ function formatTime(time: string | number | null | undefined): string {
 
 .label {
   font-size: 14px;
-  color: var(--n-text-color-3);
+  color: #666;
 }
 
 .value {
   font-size: 14px;
-  color: var(--n-text-color);
+  color: #333;
 }
 
 .value.highlight {
-  color: var(--n-primary-color);
+  color: #000;
   font-size: 16px;
   font-weight: 500;
 }
