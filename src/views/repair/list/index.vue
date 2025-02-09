@@ -111,28 +111,30 @@ const columns = computed(() => [
     key: 'vehicleMileage',
     width: 100,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.vehicle?.mileage ? `${row.vehicle.mileage}${t('common.unit.kilometer')}` : '-';
+      return row?.vehicle?.mileage ? `${row.vehicle.mileage}${t('common.unit.kilometer')}` : '-';
     }
   },
 
   { title: t('menu.repairOrder.faultDesc'), key: 'faultDesc', width: 150 },
   { title: t('common.remark'), key: 'remark', width: 150 },
-  { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100 },
+  { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100, render: (row: Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>) => {
+    return row.mechanic ? `${row.mechanic.name || '-'}` : '-';
+  } },
   {
     title: t('menu.repairOrder.inDate'),
     key: 'inDate',
     width: 120,
     render: (row) => {
-      return dayjs(row.inDate).format('YYYY-MM-DD');
+      return row.inDate ? dayjs(row.inDate).format('YYYY-MM-DD') : '-';
     }
   },
   {
     title: t('menu.repairOrder.estimatedTime'),
-    key: 'estimatedCompletionTime',
+    key: 'estimatedCompletionDate',
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.estimatedCompletionTime
-        ? dayjs(row.estimatedCompletionTime).format('YYYY-MM-DD')
+      return row.estimatedCompletionDate
+        ? dayjs(row.estimatedCompletionDate).format('YYYY-MM-DD')
         : '-';
     }
   },
@@ -175,17 +177,17 @@ const columns = computed(() => [
             { default: () => t('common.edit') }
           ),
 
+          // row.status === 'pending' && h(
+          //   NButton,
+          //   {
+          //     type: 'primary',
+          //     size: 'small',
+          //     ghost: true,
+          //     onClick: () => handleCheck(row)
+          //   },
+          //   { default: () => t('repairOrder.check') }
+          // ),
           row.status === 'pending' && h(
-            NButton,
-            {
-              type: 'primary',
-              size: 'small',
-              ghost: true,
-              onClick: () => handleCheck(row)
-            },
-            { default: () => t('repairOrder.check') }
-          ),
-          row.status === 'checked' && h(
             NButton,
             {
               type: 'success',
@@ -248,7 +250,7 @@ function handleAdd() {
 }
 
 function handleSearch() {
-  updateSearchParams(searchModel);
+  updateSearchParams(searchModel as Api.Common.CommonSearchParams);
   pagination.page = 1;
   getData();
 }

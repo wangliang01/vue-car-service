@@ -106,7 +106,9 @@ const columns = computed(() => [
 
   { title: t('menu.repairOrder.faultDesc'), key: 'faultDesc', width: 150 },
   { title: t('common.remark'), key: 'remark', width: 150 },
-  { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100 },
+  { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100, render: (row: Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>) => {
+    return row.mechanic ? `${row.mechanic.name || '-'}` : '-';
+  } },
   {
     title: t('menu.repairOrder.inDate'),
     key: 'inDate',

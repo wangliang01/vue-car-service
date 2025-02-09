@@ -184,7 +184,13 @@ declare namespace Api {
   }
 
   namespace RepairOrder {
-    interface RepairOrderInfo {
+    interface MechanicInfo {
+      _id: string;
+      name: string;
+      // 其他技工相关字段...
+    }
+
+    interface RepairOrderInfo<T = string> {
       _id: string;
       orderNo: string;
       status: 'pending' | 'checked' | 'repairing' | 'completed' | 'delivered';
@@ -192,7 +198,7 @@ declare namespace Api {
       vehicle: Vehicle.VehicleInfo;
       faultDesc: string;
       remark?: string;
-      mechanic?: string;
+      mechanic?: T; // T 可以是 string 或 MechanicInfo
       inDate: string;
       estimatedCompletionDate?: string;
       actualCompletionTime?: string;
