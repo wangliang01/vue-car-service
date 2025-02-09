@@ -1,7 +1,7 @@
 <template>
   <NCard :bordered="false" class="mb-16px">
-    <NCollapse>
-      <NCollapseItem>
+    <NCollapse :default-expanded-names="['0']">
+      <NCollapseItem name="0">
         <template #header>
           <div class="flex-y-center">
             <span>{{ t('common.search') }}</span>
@@ -10,13 +10,25 @@
         <NForm ref="formRef" :model="searchModel" label-placement="left">
           <NGrid :cols="24" :x-gap="24">
             <NFormItemGi :span="6" :label="t('menu.repairOrder.orderNo')" path="orderNo">
-              <NInput v-model:value="searchModel.orderNo" :placeholder="t('menu.repairOrder.orderNoPlaceholder')" />
+              <NInput v-model:value="searchModel.orderNo"
+              clearable
+              :placeholder="t('menu.repairOrder.orderNoPlaceholder')"
+              @keyup.enter="handleSearch"
+              />
             </NFormItemGi>
             <NFormItemGi :span="6" :label="t('menu.customer.name')" path="customerName">
-              <NInput v-model:value="searchModel.customerName" :placeholder="t('menu.repairOrder.customerNamePlaceholder')" />
+              <NInput v-model:value="searchModel.customerName"
+              clearable
+              :placeholder="t('menu.repairOrder.customerNamePlaceholder')"
+              @keyup.enter="handleSearch"
+              />
             </NFormItemGi>
             <NFormItemGi :span="6" :label="t('menu.vehicle.licensePlate')" path="licensePlate">
-              <NInput v-model:value="searchModel.licensePlate" :placeholder="t('menu.repairOrder.licensePlatePlaceholder')" />
+              <NInput v-model:value="searchModel.licensePlate"
+              clearable
+              :placeholder="t('menu.repairOrder.licensePlatePlaceholder')"
+              @keyup.enter="handleSearch"
+              />
             </NFormItemGi>
             <NFormItemGi :span="6" :label="t('menu.repairOrder.status')" path="status">
               <NSelect
@@ -24,6 +36,7 @@
                 :options="statusOptions"
                 :placeholder="t('menu.repairOrder.statusPlaceholder')"
                 clearable
+                @change="handleStatusChange"
               />
             </NFormItemGi>
           </NGrid>
@@ -50,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NCard, NCollapse, NCollapseItem, NForm, NGrid, NFormItemGi, NInput, NSelect, NSpace, NButton } from 'naive-ui';
 
@@ -70,10 +83,16 @@ const { t } = useI18n();
 const statusOptions = computed(() => [
   { label: t('repairOrder.status.pending'), value: 'pending' },
   { label: t('repairOrder.status.inspecting'), value: 'inspecting' },
-  { label: t('repairOrder.status.repairing'), value: 'repairing' },
+  { label: t('repairOrder.status.repaired'), value: 'repaired' },
   { label: t('repairOrder.status.completed'), value: 'completed' },
   { label: t('repairOrder.status.delivered'), value: 'delivered' }
 ]);
+
+const handleStatusChange = (value: string) => {
+  nextTick(() => {
+    emit('search');
+  });
+};
 
 const handleSearch = () => emit('search');
 const handleReset = () => emit('reset');
@@ -122,4 +141,4 @@ const handleReset = () => emit('reset');
 .justify-end {
   justify-content: flex-end;
 }
-</style> 
+</style>
