@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { InspectionData } from '@/types/repair-order'
 import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSelect, NInputNumber, NSpace, NButton, NGrid, NGridItem, NCard, NUpload, NImage } from 'naive-ui'
 import { uploadFile } from '@/service/api/upload';
 import { deleteFile } from '@/service/api/upload';
@@ -29,6 +28,21 @@ interface InspectionItem {
     id: string
     url: string
   }>
+}
+
+interface CustomerItem {
+  name: string
+  quantity: number
+  remark: string
+  images: Array<{
+    id: string
+    url: string
+  }>
+}
+
+interface InspectionData {
+  inspectionItems: InspectionItem[]
+  customerItems: CustomerItem[]
 }
 
 const inspectionData = ref<InspectionData>({
@@ -74,7 +88,7 @@ const formRef = ref<typeof NForm | null>(null)
 // 定义校验规则
 const rules = {
   inspectionItems: {
-    type: 'array',
+    type: 'array' as const,
     message: t('common.required'),
     trigger: 'submit',
     validator: (rule: any, value: InspectionItem[]) => {
@@ -85,7 +99,7 @@ const rules = {
     }
   },
   'inspectionItems.*': {
-    type: 'object',
+    type: 'object' as const,
     trigger: 'submit',
     rule: {
       name: {
@@ -111,7 +125,7 @@ const rules = {
     }
   },
   customerItems: {
-    type: 'array',
+    type: 'array' as const,
     trigger: 'submit',
     validator: (rule: any, value: CustomerItem[]) => {
       if (value && value.length > 0) {
@@ -121,7 +135,7 @@ const rules = {
     }
   },
   'customerItems.*': {
-    type: 'object',
+    type: 'object' as const,
     trigger: 'submit',
     rule: {
       name: {
@@ -153,7 +167,7 @@ async function handleSubmit() {
   try {
     // 表单校验
     await formRef.value?.validate()
-    
+
     // 在提交前再次确认数据的完整性
     const { inspectionItems } = inspectionData.value
     if (!inspectionItems.length) {
@@ -162,15 +176,15 @@ async function handleSubmit() {
     }
 
     // 检查所有必填字段
-    const hasInvalidItem = inspectionItems.some(item => 
+    const hasInvalidItem = inspectionItems.some(item =>
       !item.name?.trim() || !item.result
     )
-    
+
     if (hasInvalidItem) {
       window.$message?.warning(t('repairOrder.inspection.completeAllRequired'))
       return
     }
-    
+
     if (props.orderId) {
       emit('submit', props.orderId, inspectionData.value)
       handleClose() // 提交成功后关闭抽屉
@@ -196,11 +210,10 @@ async function handleCustomUpload({ file, onFinish, onError, item }: {
   file: { file: File }
   onFinish: (response: any) => void
   onError: (err: Error) => void
-  item: InspectionItem
+  item: InspectionItem | CustomerItem
 }) {
   try {
     const { data } = await uploadFile(file.file, 'inspection');
-    // 将文件id和url添加到对应item的images数组中
     if (!item.images) {
       item.images = [];
     }
@@ -208,7 +221,6 @@ async function handleCustomUpload({ file, onFinish, onError, item }: {
       id: data.id,
       url: data.url
     });
-    
     onFinish(data);
     window.$message?.success(t('common.uploadSuccess'));
   } catch (error: any) {
@@ -252,14 +264,14 @@ function beforeUpload(file: File) {
     window.$message?.error(t('common.fileTooLarge'))
     return false
   }
-  
+
   // 验证文件类型
   const allowTypes = ['image/jpeg', 'image/png']
   if (!allowTypes.includes(file.type)) {
     window.$message?.error(t('common.invalidFileType'))
     return false
   }
-  
+
   return true
 }
 
@@ -292,14 +304,14 @@ function beforeUpload(file: File) {
             </div>
           </div>
           <NSpace vertical>
-            <NCard 
-              v-for="(item, index) in inspectionData.inspectionItems" 
-              :key="index" 
+            <NCard
+              v-for="(item, index) in inspectionData.inspectionItems"
+              :key="index"
               size="small"
               class="relative"
             >
               <div class="absolute right-2 top-2">
-                <NButton 
+                <NButton
                   circle
                   size="tiny"
                   type="error"
@@ -313,7 +325,7 @@ function beforeUpload(file: File) {
               </div>
               <NGrid :cols="24" :x-gap="12">
                 <NGridItem :span="6">
-                  <NFormItem 
+                  <NFormItem
                     :label="t('repairOrder.inspection.itemName')"
                     required
                   >
@@ -321,7 +333,7 @@ function beforeUpload(file: File) {
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="6">
-                  <NFormItem 
+                  <NFormItem
                     :label="t('repairOrder.inspection.result')"
                     required
                   >
@@ -343,8 +355,8 @@ function beforeUpload(file: File) {
                   <NFormItem :label="t('repairOrder.inspection.images')">
                     <div class="upload-container">
                       <div class="image-preview-list">
-                        <div 
-                          v-for="image in item.images" 
+                        <div
+                          v-for="image in item.images"
                           :key="image.id"
                           class="image-preview-item"
                           @click="() => handlePreview(item)"
@@ -398,14 +410,14 @@ function beforeUpload(file: File) {
             </div>
           </div>
           <NSpace vertical>
-            <NCard 
-              v-for="(item, index) in inspectionData.customerItems" 
-              :key="index" 
+            <NCard
+              v-for="(item, index) in inspectionData.customerItems"
+              :key="index"
               size="small"
               class="relative"
             >
               <div class="absolute right-2 top-2">
-                <NButton 
+                <NButton
                   circle
                   size="tiny"
                   type="error"
@@ -419,7 +431,7 @@ function beforeUpload(file: File) {
               </div>
               <NGrid :cols="24" :x-gap="12">
                 <NGridItem :span="8">
-                  <NFormItem 
+                  <NFormItem
                     :label="t('repairOrder.inspection.customerItems.name')"
                     required
                   >
@@ -427,7 +439,7 @@ function beforeUpload(file: File) {
                   </NFormItem>
                 </NGridItem>
                 <NGridItem :span="4">
-                  <NFormItem 
+                  <NFormItem
                     :label="t('repairOrder.inspection.customerItems.quantity')"
                     required
                   >
@@ -443,11 +455,11 @@ function beforeUpload(file: File) {
                   <NFormItem :label="t('repairOrder.inspection.customerItems.images')">
                     <div class="upload-container">
                       <div class="image-preview-list">
-                        <div 
-                          v-for="image in item.images" 
+                        <div
+                          v-for="image in item.images"
                           :key="image.id"
                           class="image-preview-item"
-                          @click="() => handlePreview(item)"
+                          @click="() => handlePreview(item as any)"
                         >
                           <NImage
                             :src="image.url"
@@ -460,7 +472,7 @@ function beforeUpload(file: File) {
                               size="tiny"
                               type="error"
                               ghost
-                              @click.stop="() => handleRemoveImage(item, image.id)"
+                              @click.stop="() => handleRemoveImage(item as any, image.id)"
                             >
                               <template #icon>
                                 <div class="i-material-symbols:close" />
@@ -610,4 +622,4 @@ function beforeUpload(file: File) {
 :deep(.n-image img) {
   object-fit: contain;
 }
-</style> 
+</style>
