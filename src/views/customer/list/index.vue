@@ -35,9 +35,9 @@ const searchModel = reactive<Api.Customer.CustomerSearchParams>({
 const columns: DataTableColumns<Api.Customer.CustomerInfo> = [
   { type: 'selection' },
   { title: t('common.index'), key: 'index', width: 80 },
-  { title: t('menu.customer.name'), key: 'name', width: 120 },
-  { title: t('menu.customer.contact'), key: 'contact', width: 120 },
-  { title: t('menu.customer.phone'), key: 'phone', width: 120 },
+  { title: t('menu.customer.name'), key: 'name', width: 160 },
+  { title: t('menu.customer.contact'), key: 'contact', width: 100 },
+  { title: t('menu.customer.phone'), key: 'phone', width: 130 },
   { title: t('menu.customer.address'), key: 'address', width: 200 },
   { title: t('menu.customer.email'), key: 'email', width: 180 },
   { title: t('menu.customer.bankAccount'), key: 'bankAccount', width: 150 },
@@ -259,7 +259,7 @@ function handleSubmitSuccess() {
         :columns="tableColumns"
         :data="dataList"
         :pagination="pagination"
-        :scroll-x="1200"
+        :scroll-x="1300"
         :row-key="(row: Api.Customer.CustomerInfo) => row._id"
         @update:checked-row-keys="checkedRowKeys = $event"
         @update:page="getData"

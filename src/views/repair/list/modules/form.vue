@@ -642,18 +642,19 @@ function formatTime(time: string | number | null | undefined): string {
                   </NFormItem>
                 </NGi>
               </NGrid>
-              <NFormItem :label="t('menu.customer.email')" path="customer.email">
-                <NInput
-                  v-model:value="formModel.customer.email"
-                  :placeholder="t('menu.customer.emailSearch')"
-                />
-              </NFormItem>
               <NFormItem :label="t('menu.customer.address')" path="customer.address">
                 <NInput
                   v-model:value="formModel.customer.address"
                   :placeholder="t('menu.customer.addressSearch')"
                 />
               </NFormItem>
+              <NFormItem :label="t('menu.customer.email')" path="customer.email">
+                <NInput
+                  v-model:value="formModel.customer.email"
+                  :placeholder="t('menu.customer.emailSearch')"
+                />
+              </NFormItem>
+
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.customer.bankAccount')" path="customer.bankAccount">
