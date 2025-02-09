@@ -50,6 +50,7 @@ interface FormModel extends Omit<Api.RepairOrder.CreateParams, 'customer' | 'veh
     mileage: number;
     engineNo?: string;
     color?: string;
+    displacement?: string;
   };
   isNewCustomer: boolean;
   faultDesc: string;
@@ -75,11 +76,12 @@ const formModel = reactive<FormModel>({
     brand: '',
     model: '',
     year: null,
-    licensePlate: '',
+    licensePlate: '川A', // 默认值： 川A
     vin: '',
     mileage: 0,
     engineNo: '',
-    color: ''
+    color: '',
+    displacement: ''
   },
   faultDesc: '',
   remark: '',
@@ -180,10 +182,16 @@ async function handleCustomerChange(customerId: string) {
   }
 }
 
+const isValidLicensePlate = (licensePlate: string) => {
+  return /^[A-Z0-9]{7}$/.test(licensePlate)
+}
+
 // 根据车牌号查询车辆信息
 async function handleLicensePlateSearch() {
-  if (!formModel.vehicle.licensePlate) {
-    resetVehicleInfo();
+  // 对车牌号作大写处理
+  formModel.vehicle.licensePlate = formModel.vehicle.licensePlate.toUpperCase();
+  if (!formModel.vehicle.licensePlate || !isValidLicensePlate(formModel.vehicle.licensePlate)) {
+    // resetVehicleInfo();
     return;
   }
 
@@ -202,7 +210,8 @@ async function handleLicensePlateSearch() {
         vin: data.vin,
         mileage: data.mileage,
         engineNo: data.engineNo || '',
-        color: data.color || ''
+        color: data.color || '',
+        displacement: data.displacement || ''
       };
 
       if (data.customer) {
@@ -238,7 +247,8 @@ function resetVehicleInfo() {
     vin: '',
     mileage: 0,
     engineNo: '',
-    color: ''
+    color: '',
+    displacement: ''
   };
 }
 
@@ -259,11 +269,12 @@ function resetForm() {
     brand: '',
     model: '',
     year: null,
-    licensePlate: '',
+    licensePlate: '川A',
     vin: '',
     mileage: 0,
     engineNo: '',
-    color: ''
+    color: '',
+    displacement: ''
   };
   formModel.faultDesc = '';
   formModel.remark = '';
@@ -302,7 +313,8 @@ async function getOrderDetail() {
         vin: data.vehicle.vin,
         mileage: data.vehicle.mileage,
         engineNo: data.vehicle.engineNo || '',
-        color: data.vehicle.color || ''
+        color: data.vehicle.color || '',
+        displacement: data.vehicle.displacement || ''
       };
     }
 
@@ -429,6 +441,10 @@ function formatTime(time: string | number | null | undefined): string {
                   <span class="value">{{ formModel.vehicle.engineNo || '-' }}</span>
                 </div>
                 <div class="info-item">
+                  <span class="label">排量</span>
+                  <span class="value">{{ formModel.vehicle.displacement ? `${formModel.vehicle.displacement}L` : '-' }}</span>
+                </div>
+                <div class="info-item">
                   <span class="label">车辆颜色</span>
                   <span class="value">{{ formModel.vehicle.color || '-' }}</span>
                 </div>
@@ -524,6 +540,7 @@ function formatTime(time: string | number | null | undefined): string {
                   v-model:value="formModel.vehicle.licensePlate"
                   :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
                   :loading="loading"
+                  clearable
                   @blur="handleLicensePlateSearch"
                 />
               </NFormItem>
@@ -557,6 +574,7 @@ function formatTime(time: string | number | null | undefined): string {
                     <NDatePicker
                       v-model:value="formModel.vehicle.year"
                       type="year"
+                      style="width: 100%"
                       :placeholder="t('menu.vehicle.yearPlaceholder')"
                       :actions="['clear']"
                       clearable
@@ -570,9 +588,18 @@ function formatTime(time: string | number | null | undefined): string {
                   </NFormItem>
                 </NGi>
               </NGrid>
-              <NFormItem :label="t('menu.vehicle.vin')" path="vehicle.vin">
-                <NInput v-model:value="formModel.vehicle.vin" />
-              </NFormItem>
+              <NGrid :cols="2" :x-gap="12">
+                <NGi>
+                  <NFormItem :label="t('menu.vehicle.vin')" path="vehicle.vin">
+                    <NInput v-model:value="formModel.vehicle.vin" />
+                  </NFormItem>
+                </NGi>
+                <NGi>
+                  <NFormItem :label="t('menu.vehicle.displacement')" path="vehicle.displacement">
+                    <NInput v-model:value="formModel.vehicle.displacement" style="width: 100%" />
+                  </NFormItem>
+                </NGi>
+              </NGrid>
             </div>
           </div>
 

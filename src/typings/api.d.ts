@@ -100,6 +100,7 @@ declare namespace Api {
       mileage: number;
       engineNo?: string;
       color?: string;
+      displacement?: string;
       createdAt?: string;
       updatedAt?: string;
     }

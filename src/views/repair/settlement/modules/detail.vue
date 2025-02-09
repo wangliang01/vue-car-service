@@ -208,7 +208,7 @@ watch(() => props.data, (newVal) => {
   console.log("newVal", newVal);
   tableData.value = transformData(newVal)
   totalAmount.value = newVal?.formattedTotalAmount
-  upperCaseAmount.value = nzh.toMoney(newVal?.formattedTotalAmount, { outSymbol:false})
+  upperCaseAmount.value = newVal?.formattedTotalAmount ? nzh.toMoney(newVal?.formattedTotalAmount, { outSymbol:false}) : ''
 }, { deep: true, immediate: true });
 
 

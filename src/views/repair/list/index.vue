@@ -91,6 +91,14 @@ const columns = computed(() => [
     }
   },
   {
+    title: t('menu.vehicle.displacement'),
+    key: 'vehicleDisplacement',
+    width: 100,
+    render: (row: Api.RepairOrder.RepairOrderInfo) => {
+      return row.vehicle?.displacement ? `${row.vehicle.displacement}` : '-';
+    }
+  },
+  {
     title: `${t('menu.vehicle.color')}/${t('menu.vehicle.engineNo')}`,
     key: 'vehicleColor',
     width: 160,

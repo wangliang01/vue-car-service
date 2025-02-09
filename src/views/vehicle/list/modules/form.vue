@@ -1,11 +1,11 @@
 <template>
   <NDrawer v-model:show="show" :width="500" :mask-closable="true">
     <NDrawerContent :title="props.type === 'add' ? t('common.add') : t('common.edit')">
-      <NForm 
-        ref="formRef" 
-        :model="formModel" 
-        :rules="rules" 
-        label-placement="left" 
+      <NForm
+        ref="formRef"
+        :model="formModel"
+        :rules="rules"
+        label-placement="left"
         :label-width="100"
       >
         <NFormItem :label="t('menu.customer.name')" path="customerId">
@@ -51,7 +51,7 @@
             style="width: 100%"
           />
         </NFormItem>
-   
+
         <NFormItem :label="t('menu.vehicle.vin')" path="vin">
           <NInput
             v-model:value="formModel.vin"
@@ -64,7 +64,13 @@
             :placeholder="t('menu.vehicle.engineNoPlaceholder')"
           />
         </NFormItem>
-   
+        <NFormItem :label="t('menu.vehicle.displacement')" path="displacement">
+          <NInput
+            v-model:value="formModel.displacement"
+            :placeholder="t('menu.vehicle.displacementPlaceholder')"
+          />
+        </NFormItem>
+
         <NFormItem :label="t('menu.vehicle.mileage')" path="mileage">
           <NInputNumber
             v-model:value="formModel.mileage"
@@ -134,6 +140,7 @@ const formModel = reactive({
   vin: '',
   engineNo: '',
   color: '',
+  displacement: '',
   mileage: 0
 });
 
@@ -161,6 +168,7 @@ const rules = {
   vin: { required: false },
   engineNo: { required: false },
   color: { required: true, message: t('common.required') },
+  displacement: { required: false },
   mileage: { required: false }
 };
 
@@ -176,6 +184,7 @@ function resetForm() {
     vin: '',
     engineNo: '',
     color: '',
+    displacement: '',
     mileage: 0
   });
 }

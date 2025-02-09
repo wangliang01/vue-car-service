@@ -31,10 +31,10 @@ const appStore = useAppStore();
 const columns = computed(() => [
   { type: 'selection' as const },
   { title: t('common.index'), key: 'index', width: 80 },
-  
-  { 
-    title: t('menu.vehicle.brand') + ' / ' + t('menu.vehicle.model'), 
-    key: 'brand', 
+
+  {
+    title: t('menu.vehicle.brand') + ' / ' + t('menu.vehicle.model'),
+    key: 'brand',
     width: 120,
     render: (row: Api.Vehicle.VehicleInfo) => {
       return h(NSpace, { align: 'center' }, () => [
@@ -52,14 +52,22 @@ const columns = computed(() => [
       ]);
     }
   },
-  { 
+  {
+    title: t('menu.vehicle.displacement'),
+    key: 'displacement',
+    width: 100,
+    render: (row: Api.Vehicle.VehicleInfo) => {
+      return row.displacement ? `${row.displacement}` : '-';
+    }
+  },
+  {
     title: t('menu.vehicle.color'),
     key: 'color',
     width: 80
   },
-  { 
-    title: t('menu.customer.name'), 
-    key: 'customer', 
+  {
+    title: t('menu.customer.name'),
+    key: 'customer',
     width: 120,
     render: (row: Api.Vehicle.VehicleInfo) => {
       return row.customer?.name || '-';
@@ -74,10 +82,10 @@ const columns = computed(() => [
     key: 'engineNo',
     width: 120
   },
-  { 
-    title: t('menu.vehicle.mileage'), 
-    key: 'mileage', 
-    width: 100, 
+  {
+    title: t('menu.vehicle.mileage'),
+    key: 'mileage',
+    width: 100,
     render: (row: Api.Vehicle.VehicleInfo) => {
       return row.mileage ? `${row.mileage}${t('common.unit.kilometer')}` : '-';
     }
@@ -257,7 +265,7 @@ const handleBatchDelete = async () => {
     });
   } catch (error) {
     console.error('批量删除失败:', error);
-    $message.error(t('common.error')); 
+    $message.error(t('common.error'));
   }
 };
 
