@@ -389,7 +389,11 @@ function formatTime(time: string | number | null | undefined): string {
                 </div>
                 <div class="info-item">
                   <span class="label">工单状态</span>
-                  <NTag :type="statusTagTypes[editData?.status]" size="small" class="status-tag">
+                  <NTag
+                    :type="statusTagTypes[editData?.status]"
+                    size="small"
+                    class="status-tag"
+                  >
                     {{ t(`repairOrder.status.${editData?.status}`) }}
                   </NTag>
                 </div>
@@ -422,8 +426,7 @@ function formatTime(time: string | number | null | undefined): string {
                 </div>
                 <div class="info-item">
                   <span class="label">购车年份</span>
-                  <span class="value">{{ formModel.vehicle.year ? dayjs(formModel.vehicle.year).format('YYYY') : '-'
-                    }}</span>
+                  <span class="value">{{ formModel.vehicle.year ? dayjs(formModel.vehicle.year).format('YYYY') : '-' }}</span>
                 </div>
                 <div class="info-item">
                   <span class="label">行驶里程</span>
@@ -439,8 +442,7 @@ function formatTime(time: string | number | null | undefined): string {
                 </div>
                 <div class="info-item">
                   <span class="label">排量</span>
-                  <span class="value">{{ formModel.vehicle.displacement ? `${formModel.vehicle.displacement}L` : '-'
-                    }}</span>
+                  <span class="value">{{ formModel.vehicle.displacement ? `${formModel.vehicle.displacement}L` : '-' }}</span>
                 </div>
                 <div class="info-item">
                   <span class="label">车辆颜色</span>
@@ -508,39 +510,6 @@ function formatTime(time: string | number | null | undefined): string {
                   <span class="label">故障描述</span>
                   <div class="desc-box">{{ formModel.faultDesc }}</div>
                 </div>
-
-
-
-                <!-- 维修项目信息 -->
-                <div class="info-item full-width">
-                  <span class="label">维修项目</span>
-                  <div class="repair-items" v-if="editData?.repairItems?.length">
-                    <div class="repair-item" v-for="item in editData.repairItems" :key="item._id">
-                      <div class="repair-item-header">
-                        <span class="repair-item-name">{{ item.name }}</span>
-                      </div>
-                      <!-- 维修材料列表 -->
-                      <div class="repair-item-materials" v-if="item.parts?.length">
-                        <div class="material-list">
-                          <div class="material-item-header">维修材料：</div>
-                          <div class="material-item" v-for="material in item.parts" :key="material._id">
-                            <div class="material-item-header">
-                              <span class="material-item-name">{{ material.name }}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <span class="value" v-else>-</span>
-                </div>
-
-                <!-- 维修技师信息 -->
-                <div class="info-item full-width">
-                  <span class="label">维修技师</span>
-                  <span class="value">{{ editData.mechanic ? editData.mechanic.name : '-' }}</span>
-                </div>
-
                 <div class="info-item full-width" v-if="formModel.remark">
                   <span class="label">备注信息</span>
                   <div class="desc-box">{{ formModel.remark }}</div>
@@ -553,7 +522,13 @@ function formatTime(time: string | number | null | undefined): string {
 
       <!-- 编辑模式 -->
       <template v-else>
-        <NForm ref="formRef" :model="formModel" :rules="rules" label-placement="left" :label-width="100">
+        <NForm
+          ref="formRef"
+          :model="formModel"
+          :rules="rules"
+          label-placement="left"
+          :label-width="100"
+        >
           <!-- 车辆信息块 -->
           <div class="form-section" :style="{ '--section-marker-color': themeVars.primaryColor }">
             <h3 class="section-title">
@@ -561,9 +536,13 @@ function formatTime(time: string | number | null | undefined): string {
             </h3>
             <div class="section-content">
               <NFormItem :label="t('menu.vehicle.licensePlate')" path="vehicle.licensePlate">
-                <NInput v-model:value="formModel.vehicle.licensePlate"
-                  :placeholder="t('menu.vehicle.licensePlatePlaceholder')" :loading="loading" clearable
-                  @blur="handleLicensePlateSearch" />
+                <NInput
+                  v-model:value="formModel.vehicle.licensePlate"
+                  :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
+                  :loading="loading"
+                  clearable
+                  @blur="handleLicensePlateSearch"
+                />
               </NFormItem>
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
@@ -580,8 +559,7 @@ function formatTime(time: string | number | null | undefined): string {
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.vehicle.engineNo')" path="vehicle.engineNo">
-                    <NInput v-model:value="formModel.vehicle.engineNo"
-                      :placeholder="t('menu.vehicle.engineNoPlaceholder')" />
+                    <NInput v-model:value="formModel.vehicle.engineNo" :placeholder="t('menu.vehicle.engineNoPlaceholder')" />
                   </NFormItem>
                 </NGi>
                 <NGi>
@@ -593,9 +571,15 @@ function formatTime(time: string | number | null | undefined): string {
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.vehicle.year')" path="vehicle.year">
-                    <NDatePicker v-model:value="formModel.vehicle.year" type="year" style="width: 100%"
-                      :placeholder="t('menu.vehicle.yearPlaceholder')" :actions="['clear']" clearable
-                      :default-value="null" />
+                    <NDatePicker
+                      v-model:value="formModel.vehicle.year"
+                      type="year"
+                      style="width: 100%"
+                      :placeholder="t('menu.vehicle.yearPlaceholder')"
+                      :actions="['clear']"
+                      clearable
+                      :default-value="null"
+                    />
                   </NFormItem>
                 </NGi>
                 <NGi>
@@ -626,43 +610,66 @@ function formatTime(time: string | number | null | undefined): string {
             </h3>
             <div class="section-content">
               <NFormItem :label="t('menu.customer.name')" path="customer._id" v-if="formModel.customer._id">
-                <NSelect v-model:value="formModel.customer._id" :options="customerOptions"
-                  :placeholder="t('menu.customer.nameSearch')" clearable @update:value="handleCustomerChange" />
+                <NSelect
+                  v-model:value="formModel.customer._id"
+                  :options="customerOptions"
+                  :placeholder="t('menu.customer.nameSearch')"
+                  clearable
+                  @update:value="handleCustomerChange"
+                />
               </NFormItem>
               <NFormItem :label="t('menu.customer.name')" path="customer.name" v-else>
-                <NInput v-model:value="formModel.customer.name" :placeholder="t('menu.customer.nameSearch')" />
+                <NInput
+                  v-model:value="formModel.customer.name"
+                  :placeholder="t('menu.customer.nameSearch')"
+                />
               </NFormItem>
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.customer.contact')" path="customer.contact">
-                    <NInput v-model:value="formModel.customer.contact"
-                      :placeholder="t('menu.customer.contactSearch')" />
+                    <NInput
+                      v-model:value="formModel.customer.contact"
+                      :placeholder="t('menu.customer.contactSearch')"
+                    />
                   </NFormItem>
                 </NGi>
                 <NGi>
                   <NFormItem :label="t('menu.customer.phone')" path="customer.phone">
-                    <NInput v-model:value="formModel.customer.phone" :placeholder="t('menu.customer.phoneSearch')" />
+                    <NInput
+                      v-model:value="formModel.customer.phone"
+                      :placeholder="t('menu.customer.phoneSearch')"
+                    />
                   </NFormItem>
                 </NGi>
               </NGrid>
               <NFormItem :label="t('menu.customer.address')" path="customer.address">
-                <NInput v-model:value="formModel.customer.address" :placeholder="t('menu.customer.addressSearch')" />
+                <NInput
+                  v-model:value="formModel.customer.address"
+                  :placeholder="t('menu.customer.addressSearch')"
+                />
               </NFormItem>
               <NFormItem :label="t('menu.customer.email')" path="customer.email">
-                <NInput v-model:value="formModel.customer.email" :placeholder="t('menu.customer.emailSearch')" />
+                <NInput
+                  v-model:value="formModel.customer.email"
+                  :placeholder="t('menu.customer.emailSearch')"
+                />
               </NFormItem>
 
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
                   <NFormItem :label="t('menu.customer.bankAccount')" path="customer.bankAccount">
-                    <NInput v-model:value="formModel.customer.bankAccount"
-                      :placeholder="t('menu.customer.bankAccountSearch')" />
+                    <NInput
+                      v-model:value="formModel.customer.bankAccount"
+                      :placeholder="t('menu.customer.bankAccountSearch')"
+                    />
                   </NFormItem>
                 </NGi>
                 <NGi>
                   <NFormItem :label="t('menu.customer.bankName')" path="customer.bankName">
-                    <NInput v-model:value="formModel.customer.bankName"
-                      :placeholder="t('menu.customer.bankNameSearch')" />
+                    <NInput
+                      v-model:value="formModel.customer.bankName"
+                      :placeholder="t('menu.customer.bankNameSearch')"
+                    />
                   </NFormItem>
                 </NGi>
               </NGrid>
@@ -677,26 +684,44 @@ function formatTime(time: string | number | null | undefined): string {
             <div class="section-content">
               <NGrid :cols="2" :x-gap="12">
                 <NGi>
-                  <NFormItem :label="t('menu.repairOrder.inDate')" path="inDate">
-                    <NDatePicker v-model:value="formModel.inDate" type="date"
-                      :placeholder="t('menu.repairOrder.inDatePlaceholder')" clearable style="width: 100%" />
+                  <NFormItem :label="t('menu.repairOrder.inDate')" path="inDate" >
+                    <NDatePicker
+                      v-model:value="formModel.inDate"
+                      type="date"
+                      :placeholder="t('menu.repairOrder.inDatePlaceholder')"
+                      clearable
+                      style="width: 100%"
+                    />
                   </NFormItem>
                 </NGi>
                 <NGi>
                   <NFormItem :label="t('menu.repairOrder.estimatedTime')" path="estimatedCompletionDate">
-                    <NDatePicker v-model:value="formModel.estimatedCompletionDate" type="date"
-                      :placeholder="t('menu.repairOrder.estimatedTimePlaceholder')" clearable style="width: 100%"
-                      :timezone="'Asia/Shanghai'" />
+                    <NDatePicker
+                      v-model:value="formModel.estimatedCompletionDate"
+                      type="date"
+                      :placeholder="t('menu.repairOrder.estimatedTimePlaceholder')"
+                      clearable
+                      style="width: 100%"
+                      :timezone="'Asia/Shanghai'"
+                    />
                   </NFormItem>
                 </NGi>
               </NGrid>
               <NFormItem :label="t('menu.repairOrder.faultDesc')" path="faultDesc">
-                <NInput v-model:value="formModel.faultDesc" type="textarea" :rows="3"
-                  :placeholder="t('menu.repairOrder.faultDescPlaceholder')" />
+                <NInput
+                  v-model:value="formModel.faultDesc"
+                  type="textarea"
+                  :rows="3"
+                  :placeholder="t('menu.repairOrder.faultDescPlaceholder')"
+                />
               </NFormItem>
               <NFormItem :label="t('common.remark')">
-                <NInput v-model:value="formModel.remark" type="textarea" :rows="3"
-                  :placeholder="t('common.remarkPlaceholder')" />
+                <NInput
+                  v-model:value="formModel.remark"
+                  type="textarea"
+                  :rows="3"
+                  :placeholder="t('common.remarkPlaceholder')"
+                />
               </NFormItem>
             </div>
           </div>
@@ -707,11 +732,15 @@ function formatTime(time: string | number | null | undefined): string {
 
       <!-- 底部按钮 -->
       <template #footer>
-        <!-- 操作按钮 -->
-        <div class="action-buttons" v-if="props.type !== 'view'">
+       <!-- 操作按钮 -->
+       <div class="action-buttons" v-if="props.type !== 'view'">
           <NSpace justify="end">
             <NButton @click="handleClose">{{ t('common.cancel') }}</NButton>
-            <NButton type="primary" :loading="loading" @click="handleSubmit">
+            <NButton
+              type="primary"
+              :loading="loading"
+              @click="handleSubmit"
+            >
               {{ t('common.confirm') }}
             </NButton>
           </NSpace>
@@ -928,30 +957,11 @@ function formatTime(time: string | number | null | undefined): string {
   color: #fff;
 }
 
-.status-card.pending {
-  --primary-start: #64748b;
-  --primary-end: #475569;
-}
-
-.status-card.inspecting {
-  --primary-start: #f59e0b;
-  --primary-end: #d97706;
-}
-
-.status-card.repairing {
-  --primary-start: #3b82f6;
-  --primary-end: #2563eb;
-}
-
-.status-card.completed {
-  --primary-start: #10b981;
-  --primary-end: #059669;
-}
-
-.status-card.delivered {
-  --primary-start: #6366f1;
-  --primary-end: #4f46e5;
-}
+.status-card.pending { --primary-start: #64748b; --primary-end: #475569; }
+.status-card.inspecting { --primary-start: #f59e0b; --primary-end: #d97706; }
+.status-card.repairing { --primary-start: #3b82f6; --primary-end: #2563eb; }
+.status-card.completed { --primary-start: #10b981; --primary-end: #059669; }
+.status-card.delivered { --primary-start: #6366f1; --primary-end: #4f46e5; }
 
 .status-info {
   display: flex;
@@ -1257,7 +1267,7 @@ function formatTime(time: string | number | null | undefined): string {
     gap: 16px;
   }
 
-  .timeline-item {
+ .timeline-item {
     grid-template-columns: 1fr;
     gap: 8px;
   }
@@ -1266,189 +1276,5 @@ function formatTime(time: string | number | null | undefined): string {
 .status-tag {
   width: fit-content;
   padding: 2px 8px;
-}
-
-/* 维修信息相关样式 */
-.technician-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.technician-tag {
-  background: rgba(var(--n-primary-color-rgb), 0.1);
-}
-
-.repair-items,
-.repair-materials {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.repair-item,
-.material-item {
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 4px;
-}
-
-.repair-item-header,
-.material-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-.repair-item-name,
-.material-item-name {
-  font-weight: 500;
-  color: var(--n-text-color);
-}
-
-.repair-item-price,
-.material-item-price {
-  color: var(--n-error-color);
-  font-weight: 500;
-}
-
-.material-item-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.material-item-quantity {
-  color: var(--n-text-color-3);
-}
-
-.repair-item-desc,
-.material-item-desc {
-  font-size: 13px;
-  color: var(--n-text-color-2);
-  margin-top: 4px;
-}
-
-/* 暗黑模式适配 */
-:deep(.dark) {
-
-  .repair-item,
-  .material-item {
-    background: rgba(255, 255, 255, 0.04);
-  }
-}
-
-/* 维修信息相关样式 */
-.repair-items {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.repair-item {
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 8px;
-}
-
-.repair-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.repair-item-name {
-  font-weight: 500;
-  font-size: 15px;
-  color: var(--n-text-color);
-}
-
-.repair-item-costs {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.repair-item-labor {
-  color: var(--n-text-color-2);
-  font-size: 14px;
-}
-
-.repair-item-price {
-  color: var(--n-error-color);
-  font-weight: 500;
-}
-
-.repair-item-desc {
-  font-size: 13px;
-  color: var(--n-text-color-2);
-  margin-bottom: 12px;
-}
-
-.repair-item-materials {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(0, 0, 0, 0.1);
-}
-
-.material-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.material-item {
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 4px;
-}
-
-.material-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.material-item-name {
-  font-size: 14px;
-  color: var(--n-text-color);
-}
-
-.material-item-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.material-item-quantity {
-  color: var(--n-text-color-3);
-}
-
-.material-item-price {
-  color: var(--n-error-color);
-}
-
-.material-item-desc {
-  font-size: 12px;
-  color: var(--n-text-color-3);
-  margin-top: 4px;
-}
-
-/* 暗黑模式适配 */
-:deep(.dark) {
-  .repair-item {
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .material-item {
-    background: rgba(0, 0, 0, 0.2);
-  }
-
-  .repair-item-materials {
-    border-top-color: rgba(255, 255, 255, 0.1);
-  }
 }
 </style>

@@ -192,7 +192,7 @@ declare namespace Api {
       vehicle: Vehicle.VehicleInfo;
       faultDesc: string;
       remark?: string;
-      mechanic?: Technician.TechnicianInfo | string;
+      mechanic?: string;
       inDate: string;
       estimatedCompletionDate?: string;
       actualCompletionTime?: string;
