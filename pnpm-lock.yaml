@@ -32,6 +32,9 @@ importers:
       '@swc/core':
         specifier: ^1.10.9
         version: 1.10.9
+      '@vicons/ionicons5':
+        specifier: ^0.13.0
+        version: 0.13.0
       '@vueuse/core':
         specifier: 11.1.0
         version: 11.1.0(vue@3.5.7)
@@ -2619,6 +2622,10 @@ packages:
       - rollup
       - supports-color
     dev: true
+
+  /@vicons/ionicons5@0.13.0:
+    resolution: {integrity: sha512-zvZKBPjEXKN7AXNo2Na2uy+nvuv6SP4KAMQxpKL2vfHMj0fSvuw7JZcOPCjQC3e7ayssKnaoFVAhbYcW6v41qQ==}
+    dev: false
 
   /@vitejs/plugin-vue-jsx@4.0.1(vite@5.4.6)(vue@3.5.7):
     resolution: {integrity: sha512-7mg9HFGnFHMEwCdB6AY83cVK4A6sCqnrjFYF4WIlebYAQVVJ/sC/CiTruVdrRlhrFoeZ8rlMxY9wYpPTIRhhAg==}

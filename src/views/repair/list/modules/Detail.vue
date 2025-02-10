@@ -3,11 +3,11 @@ import { computed } from 'vue';
 import { NTag, NIcon } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
-// import {
-//   Car as CarIcon,
-//   Person as PersonIcon,
-//   Tools as ConstructIcon
-// } from '@vicons/carbon';
+import {
+  CarSportOutline as CarIcon,
+  PersonCircleOutline as PersonIcon,
+  BuildOutline as ConstructIcon
+} from '@vicons/ionicons5';
 
 defineOptions({ name: 'RepairOrderDetail' });
 
@@ -90,96 +90,85 @@ function formatTime(time: string | number | null | undefined): string {
     </div>
 
     <div class="detail-main">
-      <!-- 左侧信息 -->
-      <div class="detail-left">
-        <!-- 车辆信息卡片 -->
-        <div class="info-card">
-          <div class="card-header">
-            <div class="header-icon">
-              <NIcon>
-                <CarIcon />
-              </NIcon>
-            </div>
-            <span class="header-title">车辆信息</span>
+      <!-- 左侧车辆信息 -->
+      <div class="info-card">
+        <div class="card-header">
+          <div class="header-icon">
+            <NIcon size="18">
+              <CarIcon />
+            </NIcon>
           </div>
-          <div class="card-content">
+          <span class="header-title">车辆信息</span>
+        </div>
+        <div class="card-content">
+          <div class="main-info">
             <div class="plate-number">{{ formModel.vehicle.licensePlate }}</div>
-            <div class="info-list">
-              <div class="info-item">
-                <span class="label">品牌型号</span>
-                <span class="value">{{ formModel.vehicle.brand }} {{ formModel.vehicle.model }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">购车年份</span>
-                <span class="value">{{ formModel.vehicle.year ? dayjs(formModel.vehicle.year).format('YYYY') : '-'
-                  }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">行驶里程</span>
-                <span class="value">{{ formModel.vehicle.mileage }} km</span>
-              </div>
-              <div class="info-item">
-                <span class="label">车架号</span>
-                <span class="value mono">{{ formModel.vehicle.vin || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">发动机号</span>
-                <span class="value mono">{{ formModel.vehicle.engineNo || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">排量</span>
-                <span class="value">{{ formModel.vehicle.displacement ? `${formModel.vehicle.displacement}L` : '-'
-                  }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">车辆颜色</span>
-                <span class="value">{{ formModel.vehicle.color || '-' }}</span>
-              </div>
+            <div class="sub-info">{{ formModel.vehicle.brand }} {{ formModel.vehicle.model }}</div>
+          </div>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="label">购车年份</span>
+              <span class="value">{{ formModel.vehicle.year ? dayjs(formModel.vehicle.year).format('YYYY') : '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">行驶里程</span>
+              <span class="value">{{ formModel.vehicle.mileage }} km</span>
+            </div>
+            <div class="info-item">
+              <span class="label">车架号</span>
+              <span class="value mono">{{ formModel.vehicle.vin || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">发动机号</span>
+              <span class="value mono">{{ formModel.vehicle.engineNo || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">排量</span>
+              <span class="value">{{ formModel.vehicle.displacement ? `${formModel.vehicle.displacement}L` : '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">车辆颜色</span>
+              <span class="value">{{ formModel.vehicle.color || '-' }}</span>
             </div>
           </div>
         </div>
-
-
       </div>
 
-      <!-- 右侧信息 -->
-      <div class="detail-right">
-        <!-- 客户信息卡片 -->
-        <div class="info-card">
-          <div class="card-header">
-            <div class="header-icon">
-              <NIcon>
-                <PersonIcon />
-              </NIcon>
-            </div>
-            <span class="header-title">客户信息</span>
+      <!-- 右侧客户信息 -->
+      <div class="info-card">
+        <div class="card-header">
+          <div class="header-icon">
+            <NIcon size="18">
+              <PersonIcon />
+            </NIcon>
           </div>
-          <div class="card-content">
-            <div class="customer-header">
-              <div class="customer-name">{{ formModel.customer.name }}</div>
-              <div class="customer-contact">{{ formModel.customer.contact }}</div>
+          <span class="header-title">客户信息</span>
+        </div>
+        <div class="card-content">
+          <div class="main-info">
+            <div class="customer-name">{{ formModel.customer.name }}</div>
+            <div class="sub-info">{{ formModel.customer.contact }}</div>
+          </div>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="label">联系电话</span>
+              <span class="value highlight">{{ formModel.customer.phone }}</span>
             </div>
-            <div class="info-list">
-              <div class="info-item">
-                <span class="label">联系电话</span>
-                <span class="value highlight">{{ formModel.customer.phone }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">电子邮箱</span>
-                <span class="value">{{ formModel.customer.email || '-' }}</span>
-              </div>
-              <div class="info-item full-width">
-                <span class="label">联系地址</span>
-                <span class="value">{{ formModel.customer.address || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">银行账号</span>
-                <span class="value mono">{{ formModel.customer.bankAccount || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">开户行</span>
-                <span class="value">{{ formModel.customer.bankName || '-' }}</span>
-              </div>
+            <div class="info-item">
+              <span class="label">电子邮箱</span>
+              <span class="value">{{ formModel.customer.email || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">联系地址</span>
+              <span class="value">{{ formModel.customer.address || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">银行账号</span>
+              <span class="value mono">{{ formModel.customer.bankAccount || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">开户行</span>
+              <span class="value">{{ formModel.customer.bankName || '-' }}</span>
             </div>
           </div>
         </div>
@@ -231,8 +220,23 @@ function formatTime(time: string | number | null | undefined): string {
   background: #fff;
   border-radius: 8px;
   padding: 20px 24px;
-  margin-bottom: 24px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  &.pending {
+    background: linear-gradient(to left, #fff, #fff 50%, rgba(51, 54, 57, 0.06));
+  }
+  &.checked {
+    background: linear-gradient(to left, #fff, #fff 50%, rgba(250, 173, 20, 0.08));
+  }
+  &.repaired {
+    background: linear-gradient(to left, #fff, #fff 50%, rgba(22, 93, 255, 0.08));
+  }
+  &.completed {
+    background: linear-gradient(to left, #fff, #fff 50%, rgba(82, 196, 26, 0.08));
+  }
+  &.delivered {
+    background: linear-gradient(to left, #fff, #fff 50%, rgba(82, 196, 26, 0.08));
+  }
 }
 
 .status-header {
@@ -280,7 +284,7 @@ function formatTime(time: string | number | null | undefined): string {
 /* 主体内容布局 */
 .detail-main {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
@@ -289,11 +293,13 @@ function formatTime(time: string | number | null | undefined): string {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24px;
+  height: 100%; /* 确保卡片高度一致 */
+  display: flex;
+  flex-direction: column;
 }
 
 .card-header {
-  padding: 16px 24px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--n-border-color);
   display: flex;
   align-items: center;
@@ -319,17 +325,29 @@ function formatTime(time: string | number | null | undefined): string {
 }
 
 .card-content {
-  padding: 20px 24px;
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 车牌号特殊样式 */
-.plate-number {
+.main-info {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--n-border-color);
+}
+
+.plate-number,
+.customer-name {
   font-size: 24px;
   font-weight: 600;
   color: var(--n-primary-color);
-  margin-bottom: 20px;
-  font-family: var(--n-font-family-mono);
-  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.sub-info {
+  font-size: 14px;
+  color: var(--n-text-color-3);
 }
 
 /* 信息列表样式 */
@@ -337,27 +355,25 @@ function formatTime(time: string | number | null | undefined): string {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+  flex: 1;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.info-item.full-width {
-  grid-column: 1 / -1;
+  gap: 4px;
 }
 
 .label {
   font-size: 13px;
-  color: var(--n-text-color-3);
+  color: #8c8c8c;
 }
 
 .value {
   font-size: 14px;
-  color: var(--n-text-color);
+  color: #2c3e50;
   line-height: 1.6;
+  min-height: 22px;
 }
 
 .value.highlight {
@@ -368,25 +384,13 @@ function formatTime(time: string | number | null | undefined): string {
 .value.mono {
   font-family: var(--n-font-family-mono);
   font-size: 13px;
+  letter-spacing: 0.5px;
 }
 
-/* 客户信息特殊样式 */
-.customer-header {
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px dashed var(--n-border-color);
-}
-
-.customer-name {
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--n-text-color);
-  margin-bottom: 4px;
-}
-
-.customer-contact {
-  font-size: 14px;
-  color: var(--n-text-color-3);
+.value:empty::after,
+.value:contains("-")::after {
+  content: "-";
+  color: #c0c4cc;
 }
 
 /* 维修信息特殊样式 */
@@ -444,6 +448,19 @@ function formatTime(time: string | number | null | undefined): string {
 
   .header-icon {
     background: rgba(var(--n-primary-color-rgb), 0.15);
+  }
+
+  .label {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .value {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .value:empty::after,
+  .value:contains("-")::after {
+    color: rgba(255, 255, 255, 0.25);
   }
 }
 
