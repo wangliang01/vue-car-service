@@ -7,6 +7,7 @@ import { fetchCustomers, fetchCustomerById } from '@/service/api/customer';
 import { fetchVehicleByPlate } from '@/service/api/vehicle';
 import { fetchCreateRepairOrder, fetchUpdateRepairOrder, fetchRepairOrderDetail } from '@/service/api/repair-order';
 import dayjs from 'dayjs';
+import RepairOrderDetail from './Detail.vue';
 
 defineOptions({ name: 'RepairOrderForm' });
 
@@ -379,149 +380,10 @@ function formatTime(time: string | number | null | undefined): string {
     <NDrawerContent :title="title">
       <!-- 查看模式 -->
       <template v-if="props.type === 'view'">
-        <div class="detail-container">
-          <!-- 基础信息卡片 -->
-          <div class="detail-section">
-            <div class="section-header">
-              <span>基础信息</span>
-            </div>
-            <div class="section-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">工单编号</span>
-                  <span class="value">{{ editData?.orderNo }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">工单状态</span>
-                  <NTag
-                    :type="statusTagTypes[editData?.status]"
-                    size="small"
-                    class="status-tag"
-                  >
-                    {{ t(`repairOrder.status.${editData?.status}`) }}
-                  </NTag>
-                </div>
-                <div class="info-item">
-                  <span class="label">创建时间</span>
-                  <span class="value">{{ formatTime(editData?.createdAt) }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">更新时间</span>
-                  <span class="value">{{ formatTime(editData?.updatedAt) }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 车辆信息卡片 -->
-          <div class="detail-section">
-            <div class="section-header">
-              <span>车辆信息</span>
-            </div>
-            <div class="section-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">车牌号</span>
-                  <span class="value highlight">{{ formModel.vehicle.licensePlate }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">品牌型号</span>
-                  <span class="value">{{ formModel.vehicle.brand }} {{ formModel.vehicle.model }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">购车年份</span>
-                  <span class="value">{{ formModel.vehicle.year ? dayjs(formModel.vehicle.year).format('YYYY') : '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">行驶里程</span>
-                  <span class="value">{{ formModel.vehicle.mileage }} km</span>
-                </div>
-                <div class="info-item full-width">
-                  <span class="label">车架号</span>
-                  <span class="value">{{ formModel.vehicle.vin || '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">发动机编号</span>
-                  <span class="value">{{ formModel.vehicle.engineNo || '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">排量</span>
-                  <span class="value">{{ formModel.vehicle.displacement ? `${formModel.vehicle.displacement}L` : '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">车辆颜色</span>
-                  <span class="value">{{ formModel.vehicle.color || '-' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 客户信息卡片 -->
-          <div class="detail-section">
-            <div class="section-header">
-              <span>客户信息</span>
-            </div>
-            <div class="section-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">客户姓名</span>
-                  <span class="value">{{ formModel.customer.name }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">联系人</span>
-                  <span class="value">{{ formModel.customer.contact || '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">联系方式</span>
-                  <span class="value">{{ formModel.customer.phone }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">电子邮箱</span>
-                  <span class="value">{{ formModel.customer.email || '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">联系地址</span>
-                  <span class="value">{{ formModel.customer.address || '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">银行账号</span>
-                  <span class="value">{{ formModel.customer.bankAccount || '-' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">开户行</span>
-                  <span class="value">{{ formModel.customer.bankName || '-' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 维修信息卡片 -->
-          <div class="detail-section">
-            <div class="section-header">
-              <span>维修信息</span>
-            </div>
-            <div class="section-content">
-              <div class="info-grid">
-                <div class="info-item full-width">
-                  <span class="label">进厂日期</span>
-                  <span class="value">{{ formatTime(formModel.inDate) }}</span>
-                </div>
-                <div class="info-item full-width">
-                  <span class="label">预计完工日期</span>
-                  <span class="value">{{ formatTime(formModel.estimatedCompletionDate) }}</span>
-                </div>
-                <div class="info-item full-width">
-                  <span class="label">故障描述</span>
-                  <div class="desc-box">{{ formModel.faultDesc }}</div>
-                </div>
-                <div class="info-item full-width" v-if="formModel.remark">
-                  <span class="label">备注信息</span>
-                  <div class="desc-box">{{ formModel.remark }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <RepairOrderDetail
+          :edit-data="props.editData"
+          :form-model="formModel"
+        />
       </template>
 
       <!-- 编辑模式 -->
