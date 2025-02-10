@@ -30,7 +30,7 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
       if(response.config.responseType === 'blob') {
         return true;
       }
-      return String(response.data.code) === import.meta.env.VITE_SERVICE_SUCCESS_CODE;
+      return String(response.data.code) === '200';
     },
     async onBackendFail(response, instance) {
       const authStore = useAuthStore();
@@ -130,44 +130,4 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
   }
 );
 
-export const demoRequest = createRequest<App.Service.DemoResponse>(
-  {
-    baseURL: otherBaseURL.demo
-  },
-  {
-    async onRequest(config) {
-      const { headers } = config;
 
-      // set token
-      const token = localStg.get('token');
-      const Authorization = token ? `Bearer ${token}` : null;
-      Object.assign(headers, { Authorization });
-
-      return config;
-    },
-    isBackendSuccess(response) {
-      // when the backend response code is "200", it means the request is success
-      // you can change this logic by yourself
-      return response.data.status === '200';
-    },
-    async onBackendFail(_response) {
-      // when the backend response code is not "200", it means the request is fail
-      // for example: the token is expired, refresh token and retry request
-    },
-    transformBackendResponse(response) {
-      return response.data.result;
-    },
-    onError(error) {
-      // when the request is fail, you can show error message
-
-      let message = error.message;
-
-      // show backend error message
-      if (error.code === BACKEND_ERROR_CODE) {
-        message = error.response?.data?.message || message;
-      }
-
-      window.$message?.error(message);
-    }
-  }
-);
