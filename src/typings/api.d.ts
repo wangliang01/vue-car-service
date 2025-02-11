@@ -205,6 +205,7 @@ declare namespace Api {
       deliveryTime?: string;
       createdAt: string;
       updatedAt: string;
+      repairItems?: RepairItem[];
     }
 
     interface SearchParams {

@@ -58,6 +58,27 @@ interface FormModel extends Omit<Api.RepairOrder.CreateParams, 'customer' | 'veh
   remark?: string;
   inDate?: number | null;
   estimatedCompletionDate?: number | null;
+  repairItems?: {
+    _id: string;
+    name: string;
+    description?: string;
+    laborCost: number;
+    estimatedHours: number;
+    technicians: {
+      _id: string;
+      name: string;
+      role: string;
+    }[];
+    materials: {
+      _id: string;
+      name: string;
+      partNo?: string;
+      quantity: number;
+      unit: string;
+      unitPrice: number;
+    }[];
+    status: 'pending' | 'in_progress' | 'completed';
+  }[];
 }
 
 const formModel = reactive<FormModel>({
@@ -334,6 +355,10 @@ async function getOrderDetail() {
         bankAccount: data.customer.bankAccount || '',
         bankName: data.customer.bankName || ''
       };
+    }
+
+    if (data.repairItems) {
+      formModel.repairItems = data.repairItems;
     }
   } catch (error) {
     window.$message?.error(t('common.error'));

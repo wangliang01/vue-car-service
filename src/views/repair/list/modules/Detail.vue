@@ -12,36 +12,7 @@ import {
 defineOptions({ name: 'RepairOrderDetail' });
 
 interface Props {
-  editData?: Api.RepairOrder.RepairOrderInfo;
-  formModel: {
-    customer: {
-      _id: string;
-      name: string;
-      phone: string;
-      email: string;
-      address: string;
-      contact: string;
-      bankAccount?: string;
-      bankName?: string;
-    };
-    vehicle: {
-      _id: string;
-      customerId: string;
-      brand: string;
-      model: string;
-      year: number | null;
-      licensePlate: string;
-      vin: string;
-      mileage: number;
-      engineNo?: string;
-      color?: string;
-      displacement?: string;
-    };
-    faultDesc: string;
-    remark?: string;
-    inDate?: number | null;
-    estimatedCompletionDate?: number | null;
-  }
+  editData?: Api.RepairOrder.RepairOrderInfo
 }
 
 const props = defineProps<Props>();
@@ -102,33 +73,33 @@ function formatTime(time: string | number | null | undefined): string {
         </div>
         <div class="card-content">
           <div class="main-info">
-            <div class="plate-number">{{ formModel.vehicle.licensePlate }}</div>
-            <div class="sub-info">{{ formModel.vehicle.brand }} {{ formModel.vehicle.model }}</div>
+            <div class="plate-number">{{ editData.vehicle.licensePlate }}</div>
+            <div class="sub-info">{{ editData.vehicle.brand }} {{ editData.vehicle.model }}</div>
           </div>
           <div class="info-list">
             <div class="info-item">
               <span class="label">购车年份</span>
-              <span class="value">{{ formModel.vehicle.year ? dayjs(formModel.vehicle.year).format('YYYY') : '-' }}</span>
+              <span class="value">{{ editData.vehicle.year ? dayjs(editData.vehicle.year).format('YYYY') : '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">行驶里程</span>
-              <span class="value">{{ formModel.vehicle.mileage }} km</span>
+              <span class="value">{{ editData.vehicle.mileage }} km</span>
             </div>
             <div class="info-item">
               <span class="label">车架号</span>
-              <span class="value mono">{{ formModel.vehicle.vin || '-' }}</span>
+              <span class="value mono">{{ editData.vehicle.vin || '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">发动机号</span>
-              <span class="value mono">{{ formModel.vehicle.engineNo || '-' }}</span>
+              <span class="value mono">{{ editData.vehicle.engineNo || '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">排量</span>
-              <span class="value">{{ formModel.vehicle.displacement ? `${formModel.vehicle.displacement}L` : '-' }}</span>
+              <span class="value">{{ editData.vehicle.displacement ? `${editData.vehicle.displacement}L` : '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">车辆颜色</span>
-              <span class="value">{{ formModel.vehicle.color || '-' }}</span>
+              <span class="value">{{ editData.vehicle.color || '-' }}</span>
             </div>
           </div>
         </div>
@@ -146,29 +117,29 @@ function formatTime(time: string | number | null | undefined): string {
         </div>
         <div class="card-content">
           <div class="main-info">
-            <div class="customer-name">{{ formModel.customer.name }}</div>
-            <div class="sub-info">{{ formModel.customer.contact }}</div>
+            <div class="customer-name">{{ editData.customer.name }}</div>
+            <div class="sub-info">{{ editData.customer.contact }}</div>
           </div>
           <div class="info-list">
             <div class="info-item">
               <span class="label">联系电话</span>
-              <span class="value highlight">{{ formModel.customer.phone }}</span>
+              <span class="value highlight">{{ editData.customer.phone }}</span>
             </div>
             <div class="info-item">
               <span class="label">电子邮箱</span>
-              <span class="value">{{ formModel.customer.email || '-' }}</span>
+              <span class="value">{{ editData.customer.email || '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">联系地址</span>
-              <span class="value">{{ formModel.customer.address || '-' }}</span>
+              <span class="value">{{ editData.customer.address || '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">银行账号</span>
-              <span class="value mono">{{ formModel.customer.bankAccount || '-' }}</span>
+              <span class="value mono">{{ editData.customer.bankAccount || '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">开户行</span>
-              <span class="value">{{ formModel.customer.bankName || '-' }}</span>
+              <span class="value">{{ editData.customer.bankName || '-' }}</span>
             </div>
           </div>
         </div>
@@ -189,20 +160,91 @@ function formatTime(time: string | number | null | undefined): string {
         <div class="time-line">
           <div class="time-item">
             <span class="time-label">进厂日期</span>
-            <span class="time-value">{{ formatTime(formModel.inDate) }}</span>
+            <span class="time-value">{{ formatTime(editData.inDate) }}</span>
           </div>
           <div class="time-item">
             <span class="time-label">预计完工</span>
-            <span class="time-value">{{ formatTime(formModel.estimatedCompletionDate) }}</span>
+            <span class="time-value">{{ formatTime(editData.estimatedCompletionDate) }}</span>
           </div>
         </div>
         <div class="desc-section">
           <div class="desc-title">故障描述</div>
-          <div class="desc-content">{{ formModel.faultDesc }}</div>
+          <div class="desc-content">{{ editData.faultDesc }}</div>
         </div>
-        <div class="desc-section" v-if="formModel.remark">
+        <div class="desc-section" v-if="editData.remark">
           <div class="desc-title">备注信息</div>
-          <div class="desc-content">{{ formModel.remark }}</div>
+          <div class="desc-content">{{ editData.remark }}</div>
+        </div>
+
+        <!-- 维修项目列表 -->
+        <div class="repair-items" v-if="editData.repairItems?.length">
+          <div class="section-title">维修项目</div>
+          <div class="items-list">
+            <div v-for="item in editData.repairItems" :key="item._id" class="repair-item">
+              <div class="item-header">
+                <div class="item-name">{{ item.name }}</div>
+              </div>
+
+
+              <div class="item-details">
+                <div class="detail-row">
+                  <span class="detail-label">工时定额</span>
+                  <span class="detail-value">{{ item.laborHours }}小时</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">工时单价</span>
+                  <span class="detail-value">¥{{ item.laborPrice }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">复杂系数</span>
+                  <span class="detail-value">{{ item.complexityFactor }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">工时费优惠率</span>
+                  <span class="detail-value">{{ item.laborDiscount }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">工时费用</span>
+                  <span class="detail-value">¥{{ editData.laborAmount }}</span>
+                </div>
+              </div>
+
+              <!-- 维修技师 -->
+              <div class="technicians-section">
+                <div class="sub-title">维修技师</div>
+                <div class="technicians-list">
+                  {{ editData.mechanic.name }}
+                </div>
+              </div>
+
+              <!-- 维修材料 -->
+              <div class="materials-section">
+                <div class="sub-title">维修材料</div>
+                <div class="materials-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>材料名称</th>
+                        <th>型号</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>小计</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="material in item.parts" :key="material._id">
+                        <td>{{ material.name }}</td>
+                        <td>{{ material.partNo || '-' }}</td>
+                        <td>{{ material.quantity }}{{ material.unit }}</td>
+                        <td>¥{{ material.purchasePrice }}</td>
+                        <td>¥{{ material.quantity * material.unitPrice }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -211,7 +253,6 @@ function formatTime(time: string | number | null | undefined): string {
 
 <style scoped>
 .detail-container {
-  padding: 16px 24px;
   background: #f5f7fa;
 }
 
@@ -225,15 +266,19 @@ function formatTime(time: string | number | null | undefined): string {
   &.pending {
     background: linear-gradient(to left, #fff, #fff 50%, rgba(51, 54, 57, 0.06));
   }
+
   &.checked {
     background: linear-gradient(to left, #fff, #fff 50%, rgba(250, 173, 20, 0.08));
   }
+
   &.repaired {
     background: linear-gradient(to left, #fff, #fff 50%, rgba(22, 93, 255, 0.08));
   }
+
   &.completed {
     background: linear-gradient(to left, #fff, #fff 50%, rgba(82, 196, 26, 0.08));
   }
+
   &.delivered {
     background: linear-gradient(to left, #fff, #fff 50%, rgba(82, 196, 26, 0.08));
   }
@@ -293,7 +338,8 @@ function formatTime(time: string | number | null | undefined): string {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  height: 100%; /* 确保卡片高度一致 */
+  height: 100%;
+  /* 确保卡片高度一致 */
   display: flex;
   flex-direction: column;
 }
@@ -490,6 +536,128 @@ function formatTime(time: string | number | null | undefined): string {
 
   .time-info {
     text-align: left;
+  }
+}
+
+.repair-items {
+  margin-top: 24px;
+  border-top: 1px dashed var(--n-border-color);
+  padding-top: 24px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: var(--n-text-color);
+}
+
+.repair-item {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.item-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--n-text-color);
+}
+
+.item-desc {
+  font-size: 14px;
+  color: var(--n-text-color-3);
+  margin-bottom: 12px;
+}
+
+.item-details {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: var(--n-text-color-3);
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--n-text-color);
+  font-weight: 500;
+}
+
+.sub-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--n-text-color);
+}
+
+.technicians-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.technician-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tech-role {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.materials-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.materials-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.materials-table th,
+.materials-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--n-border-color);
+}
+
+.materials-table th {
+  background: rgba(0, 0, 0, 0.02);
+  font-weight: 500;
+  color: var(--n-text-color-2);
+}
+
+/* 暗黑模式适配 */
+:deep(.dark) {
+  .repair-item {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .materials-table th {
+    background: rgba(255, 255, 255, 0.06);
   }
 }
 </style>
