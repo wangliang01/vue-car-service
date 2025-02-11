@@ -9,12 +9,13 @@
     <n-drawer-content :title="title" :native-scrollbar="false">
       <template #footer>
         <div style="text-align: right;">
-          <n-button @click="emit('update:visible', false)" type="primary">关闭</n-button>
+          <n-button @click="emit('update:visible', false)" type="default">关闭</n-button>
+          <n-button v-print="'#repairDetail'" type="primary" class="ml-2 w-20">打印</n-button>
         </div>
       </template>
-      <div class="repair-detail">
+      <div id="repairDetail" class="repair-detail">
         <div class="repair-header">
-          <h2 class="main-title">在某省级单位公务用车维修项目清单</h2>
+          <h2 class="main-title">在蓉省级单位公务用车维修项目清单</h2>
           <div class="info-row">
             <div class="info-item">
               <span class="label">送修单位：</span>
@@ -197,15 +198,6 @@ const transformData = (data: Api.Settlement.SettlementInfo) => {
   return result
 }
 
-// const upperCaseAmount = computed(() => {
-//   const amount = totalAmount.value
-//   console.log("amount", amount)
-//   if (amount) {
-//     return nzh.toMoney(amount)
-//   }
-//   return ''
-// })
-
 watch(() => props.data, (newVal) => {
   console.log("newVal", newVal);
   tableData.value = transformData(newVal)
@@ -347,13 +339,13 @@ watch(() => props.data, (newVal) => {
 :deep(.n-table col:nth-child(5)) { width: 90px; }  /* 工时费相关 */
 :deep(.n-table col:nth-child(6)),
 :deep(.n-table col:nth-child(7)) { width: 110px; } /* 应收工时费相关 */
-:deep(.n-table col:nth-child(8)) { width: 140px; } /* 材料名称 */
-:deep(.n-table col:nth-child(9)) { width: 90px; }  /* 购买进价 */
+:deep(.n-table col:nth-child(8)) { width: 80px; } /* 材料名称 */
+:deep(.n-table col:nth-child(9)) { width: 80px; }  /* 购买进价 */
 :deep(.n-table col:nth-child(10)),
 :deep(.n-table col:nth-child(11)) { width: 110px; } /* 管理费相关 */
 :deep(.n-table col:nth-child(12)),
 :deep(.n-table col:nth-child(13)) { width: 110px; } /* 维修材料费相关 */
-:deep(.n-table col:nth-child(14)) { width: 90px; }  /* 小计 */
+:deep(.n-table col:nth-child(14)) { width: 80px; }  /* 小计 */
 
 .repair-footer {
   margin: 40px 40px 0;
@@ -412,26 +404,41 @@ watch(() => props.data, (newVal) => {
 /* 打印样式优化 */
 @media print {
   .repair-detail {
-    padding: 40px;
-    border: 2px solid #000;
+    padding: 20px;
     margin: 0;
-    box-shadow: none;
+    width: 100%;
   }
 
-  .main-title {
-    margin-top: 10px;
+  /* 隐藏不需要打印的元素 */
+  .n-drawer-header,
+  .n-drawer-footer {
+    display: none !important;
   }
 
+  /* 确保表格边框显示 */
   :deep(.n-table) {
     border: 2px solid #000 !important;
   }
 
   :deep(.n-table th),
   :deep(.n-table td) {
-    border-color: #000 !important;
+    border: 1px solid #000 !important;
   }
 
-  .repair-footer {
+  /* 确保背景色打印 */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 分页设置 */
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* 避免表格在页面间断开 */
+  .repair-table {
     page-break-inside: avoid;
   }
 }

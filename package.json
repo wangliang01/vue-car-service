@@ -72,6 +72,7 @@
     "vue-draggable-plus": "0.5.3",
     "vue-i18n": "10.0.1",
     "vue-router": "4.4.5",
+    "vue3-print-nb": "^0.1.4",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
