@@ -88,7 +88,28 @@ const columns = computed(() => [
     key: 'vehicleBrandModel',
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.vehicle ? `${row.vehicle.brand || '-'}/${row.vehicle.model || '-'}` : '-';
+      return row.vehicle ? h(
+        'div',
+        {
+          style: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }
+        },
+        [
+          h('img', {
+            src: `/src/assets/imgs/brand/${row.vehicle.brand.toLowerCase()}.png`,
+            style: {
+              width: '24px',
+              height: '24px',
+              objectFit: 'contain'
+            },
+            alt: row.vehicle.brand
+          }),
+          `${row.vehicle.brand || '-'}/${row.vehicle.model || '-'}`
+        ]
+      ) : '-';
     }
   },
   {

@@ -83,7 +83,14 @@ function formatTime(time: string | number | null | undefined, format: string = '
             <div class="card-content">
               <div class="main-info" >
                 <div class="plate-number">{{ editData.vehicle.licensePlate }}</div>
-                <div class="sub-info">{{ editData.vehicle.brand }} {{ editData.vehicle.model }}</div>
+                <div class="sub-info">
+                  <img
+                    :src="`/src/assets/imgs/brand/${editData.vehicle.brand.toLowerCase()}.png`"
+                    class="brand-logo"
+                    :alt="editData.vehicle.brand"
+                  />
+                  {{ editData.vehicle.brand }} {{ editData.vehicle.model }}
+                </div>
               </div>
               <div class="info-list">
                 <div class="info-item">
@@ -414,8 +421,17 @@ function formatTime(time: string | number | null | undefined, format: string = '
 }
 
 .sub-info {
+  display: flex;
+  align-items: center;
   font-size: 14px;
   color: var(--n-text-color-3);
+}
+
+.brand-logo {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  object-fit: contain;
 }
 
 /* 信息列表样式 */
