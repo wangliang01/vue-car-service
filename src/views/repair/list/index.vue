@@ -367,7 +367,7 @@ const formatStatus = (status: string) => {
     </NCard>
     <RepairOrderForm
       v-model:show="showDrawer"
-      type="edit"
+      :type="drawerType"
       :edit-data="editData"
       @submit-success="handleSubmitSuccess"
       @update:show="handleDrawerClose"

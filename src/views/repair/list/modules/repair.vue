@@ -149,7 +149,7 @@ function addPart(repairItemIndex: number) {
     quantity: 1,
     purchasePrice: 0,
     managementFee: 0.1,
-    managementDiscount: 0
+    managementDiscount: 1
   });
 }
 
@@ -189,7 +189,7 @@ function handleMaterialSelect(materialId: string, repairIndex: number, partIndex
       specification: material.specification,
       purchasePrice: material.purchasePrice,
       managementFee: material.managementFeeRate,
-      managementDiscount: 0
+      managementDiscount: 1
     };
   }
 }
