@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, h, ref, computed } from 'vue';
-import { NButton, NSpace, NCard, NDataTable, NSelect, NTag, useDialog, useMessage } from 'naive-ui';
+import { NButton, NSpace, NCard, NDataTable, NSelect, NTag, useDialog, useMessage, NDrawer, NDrawerContent } from 'naive-ui';
 import dayjs from 'dayjs';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
@@ -9,6 +9,8 @@ import RepairOrderSearch from './modules/search.vue';
 import RepairOrderForm from './modules/form.vue';
 import RepairOrderInspection from './modules/inspection.vue';
 import RepairOrderRepair from './modules/repair.vue';
+import RepairOrderDetail from './modules/Detail.vue';
+
 defineOptions({ name: 'RepairOrderList' });
 
 const { t } = useI18n();
@@ -175,17 +177,6 @@ const columns = computed(() => [
             },
             { default: () => t('common.edit') }
           ),
-
-          // row.status === 'pending' && h(
-          //   NButton,
-          //   {
-          //     type: 'primary',
-          //     size: 'small',
-          //     ghost: true,
-          //     onClick: () => handleCheck(row)
-          //   },
-          //   { default: () => t('repairOrder.check') }
-          // ),
           row.status === 'pending' && h(
             NButton,
             {
@@ -196,16 +187,6 @@ const columns = computed(() => [
             },
             { default: () => t('repairOrder.repair.action') }
           ),
-          // row.status === 'repaired' && h(
-          //   NButton,
-          //   {
-          //     type: 'success',
-          //     size: 'small',
-          //     ghost: true,
-          //     onClick: () => handleComplete(row)
-          //   },
-          //   { default: () => t('repairOrder.complete') }
-          // ),
           h(
             NButton,
             {
@@ -242,6 +223,8 @@ const showRepairDrawer = ref(false);
 const drawerType = ref<'add' | 'edit' | 'view'>('add');
 const editData = ref<Api.RepairOrder.RepairOrderInfo | null>(null);
 const currentOrderId = ref<string | null>(null);
+const showDetail = ref(false);
+const currentOrder = ref<Api.RepairOrder.RepairOrderInfo>();
 
 function handleAdd() {
   drawerType.value = 'add';
@@ -274,15 +257,13 @@ function handleSubmitSuccess() {
 }
 
 function handleEdit(row: Api.RepairOrder.RepairOrderInfo) {
-  drawerType.value = 'edit';
   editData.value = row;
   showDrawer.value = true;
 }
 
 function handleView(row: Api.RepairOrder.RepairOrderInfo) {
-  drawerType.value = 'view';
-  editData.value = row;
-  showDrawer.value = true;
+  currentOrder.value = row;
+  showDetail.value = true;
 }
 
 function handleDrawerClose() {
@@ -386,7 +367,7 @@ const formatStatus = (status: string) => {
     </NCard>
     <RepairOrderForm
       v-model:show="showDrawer"
-      :type="drawerType"
+      type="edit"
       :edit-data="editData"
       @submit-success="handleSubmitSuccess"
       @update:show="handleDrawerClose"
@@ -400,6 +381,10 @@ const formatStatus = (status: string) => {
       v-model:show="showRepairDrawer"
       :order-id="currentOrderId"
       @submit="handleRepairSubmit"
+    />
+    <RepairOrderDetail
+      v-model:show="showDetail"
+      :edit-data="currentOrder"
     />
   </div>
 </template>

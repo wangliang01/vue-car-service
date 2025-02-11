@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { NTag, NIcon } from 'naive-ui';
+import { NTag, NIcon, NDrawer, NDrawerContent, useThemeVars } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
 import {
@@ -12,11 +12,18 @@ import {
 defineOptions({ name: 'RepairOrderDetail' });
 
 interface Props {
-  editData?: Api.RepairOrder.RepairOrderInfo
+  editData?: Api.RepairOrder.RepairOrderInfo;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  editData: undefined
+});
+
+const show = defineModel('show', { type: Boolean, default: false });
 const { t } = useI18n();
+
+// 获取主题变量
+const themeVars = useThemeVars();
 
 // 添加状态标签类型映射
 const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' | 'error'> = {
@@ -35,228 +42,233 @@ function formatTime(time: string | number | null | undefined): string {
 </script>
 
 <template>
-  <div class="detail-container">
-    <!-- 顶部状态卡片 -->
-    <div class="status-card" :class="editData?.status">
-      <div class="status-header">
-        <div class="status-left">
-          <div class="order-no">{{ editData?.orderNo }}</div>
-          <NTag :type="statusTagTypes[editData?.status]" class="status-tag">
-            {{ t(`repairOrder.status.${editData?.status}`) }}
-          </NTag>
-        </div>
-        <div class="status-right">
-          <div class="time-info">
-            <div class="time-item">
-              <span class="time-label">创建时间：</span>
-              <span class="time-value">{{ formatTime(editData?.createdAt) }}</span>
+  <NDrawer v-model:show="show" :width="800">
+    <NDrawerContent :title="t('common.view')">
+      <div class="detail-container bg-white p-4">
+        <!-- 顶部状态卡片 -->
+        <div class="status-card" :class="editData?.status">
+          <div class="status-header">
+            <div class="status-left">
+              <div class="order-no">{{ editData?.orderNo }}</div>
+              <NTag :type="statusTagTypes[editData?.status]" class="status-tag">
+                {{ t(`repairOrder.status.${editData?.status}`) }}
+              </NTag>
             </div>
-            <div class="time-item">
-              <span class="time-label">更新时间：</span>
-              <span class="time-value">{{ formatTime(editData?.updatedAt) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-main">
-      <!-- 左侧车辆信息 -->
-      <div class="info-card">
-        <div class="card-header">
-          <div class="header-icon">
-            <NIcon size="18">
-              <CarIcon />
-            </NIcon>
-          </div>
-          <span class="header-title">车辆信息</span>
-        </div>
-        <div class="card-content">
-          <div class="main-info" >
-            <div class="plate-number">{{ editData.vehicle.licensePlate }}</div>
-            <div class="sub-info">{{ editData.vehicle.brand }} {{ editData.vehicle.model }}</div>
-          </div>
-          <div class="info-list">
-            <div class="info-item">
-              <span class="label">购车年份</span>
-              <span class="value">{{ editData.vehicle.year ? dayjs(editData.vehicle.year).format('YYYY') : '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">行驶里程</span>
-              <span class="value">{{ editData.vehicle.mileage }} km</span>
-            </div>
-            <div class="info-item">
-              <span class="label">车架号</span>
-              <span class="value mono">{{ editData.vehicle.vin || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">发动机号</span>
-              <span class="value mono">{{ editData.vehicle.engineNo || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">排量</span>
-              <span class="value">{{ editData.vehicle.displacement || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">车辆颜色</span>
-              <span class="value">{{ editData.vehicle.color || '-' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右侧客户信息 -->
-      <div class="info-card">
-        <div class="card-header">
-          <div class="header-icon">
-            <NIcon size="18">
-              <PersonIcon />
-            </NIcon>
-          </div>
-          <span class="header-title">客户信息</span>
-        </div>
-        <div class="card-content">
-          <div class="main-info">
-            <div class="customer-name">{{ editData.customer.name }}</div>
-            <div class="sub-info">{{ editData.customer.contact }}</div>
-          </div>
-          <div class="info-list">
-            <div class="info-item">
-              <span class="label">联系电话</span>
-              <span class="value highlight">{{ editData.customer.phone }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">电子邮箱</span>
-              <span class="value">{{ editData.customer.email || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">联系地址</span>
-              <span class="value">{{ editData.customer.address || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">银行账号</span>
-              <span class="value mono">{{ editData.customer.bankAccount || '-' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">开户行</span>
-              <span class="value">{{ editData.customer.bankName || '-' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 维修信息卡片 -->
-    <div class="info-card">
-      <div class="card-header">
-        <div class="header-icon">
-          <NIcon>
-            <ConstructIcon />
-          </NIcon>
-        </div>
-        <span class="header-title">维修信息</span>
-      </div>
-      <div class="card-content">
-        <div class="time-line">
-          <div class="time-item">
-            <span class="time-label">进厂日期</span>
-            <span class="time-value">{{ formatTime(editData.inDate) }}</span>
-          </div>
-          <div class="time-item">
-            <span class="time-label">预计完工</span>
-            <span class="time-value">{{ formatTime(editData.estimatedCompletionDate) }}</span>
-          </div>
-        </div>
-        <div class="desc-section">
-          <div class="desc-title">故障描述</div>
-          <div class="desc-content">{{ editData.faultDesc }}</div>
-        </div>
-        <div class="desc-section" v-if="editData.remark">
-          <div class="desc-title">备注信息</div>
-          <div class="desc-content">{{ editData.remark }}</div>
-        </div>
-
-        <!-- 维修项目列表 -->
-        <div class="repair-items" v-if="editData.repairItems?.length">
-          <div class="section-title">维修项目</div>
-          <div class="items-list">
-            <div v-for="item in editData.repairItems" :key="item._id" class="repair-item">
-              <div class="item-header">
-                <div class="detail-row">
-                  <span class="detail-label">项目名称</span>
-                  <span class="detail-value">{{ item.name }}</span>
+            <div class="status-right">
+              <div class="time-info">
+                <div class="time-item">
+                  <span class="time-label">创建时间：</span>
+                  <span class="time-value">{{ formatTime(editData?.createdAt) }}</span>
                 </div>
-              </div>
-
-
-              <div class="item-details">
-                <div class="detail-row">
-                  <span class="detail-label">工时定额</span>
-                  <span class="detail-value">{{ item.laborHours }}小时</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">工时单价</span>
-                  <span class="detail-value">¥{{ item.laborPrice }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">复杂系数</span>
-                  <span class="detail-value">{{ item.complexityFactor }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">工时费优惠率</span>
-                  <span class="detail-value">{{ item.laborDiscount }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">工时费用</span>
-                  <span class="detail-value">¥{{ editData.laborAmount }}</span>
-                </div>
-              </div>
-
-              <!-- 维修技师 -->
-              <div class="technicians-section">
-                <div class="sub-title">维修技师</div>
-                <div class="technicians-list">
-                  {{ editData.mechanic.name }}
-                </div>
-              </div>
-
-              <!-- 维修材料 -->
-              <div class="materials-section">
-                <div class="sub-title">维修材料</div>
-                <div class="materials-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>材料名称</th>
-                        <th>型号</th>
-                        <th>数量</th>
-                        <th>单价</th>
-                        <th>小计</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="material in item.parts" :key="material._id">
-                        <td>{{ material.name }}</td>
-                        <td>{{ material.partNo || '-' }}</td>
-                        <td>{{ material.quantity }}{{ material.unit }}</td>
-                        <td>¥{{ material.purchasePrice }}</td>
-                        <td>¥{{ material.quantity * material.unitPrice }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="time-item">
+                  <span class="time-label">更新时间：</span>
+                  <span class="time-value">{{ formatTime(editData?.updatedAt) }}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <div class="detail-main gap-4 mt-4">
+          <!-- 左侧车辆信息 -->
+          <div class="info-card">
+            <div class="card-header">
+              <div class="header-icon">
+                <NIcon size="18">
+                  <CarIcon />
+                </NIcon>
+              </div>
+              <span class="header-title">{{ t('menu.repairOrder.vehicle') }}</span>
+            </div>
+            <div class="card-content">
+              <div class="main-info" >
+                <div class="plate-number">{{ editData.vehicle.licensePlate }}</div>
+                <div class="sub-info">{{ editData.vehicle.brand }} {{ editData.vehicle.model }}</div>
+              </div>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="label">购车年份</span>
+                  <span class="value">{{ editData.vehicle.year ? dayjs(editData.vehicle.year).format('YYYY') : '-' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">行驶里程</span>
+                  <span class="value">{{ editData.vehicle.mileage }} km</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">车架号</span>
+                  <span class="value mono">{{ editData.vehicle.vin || '-' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">发动机号</span>
+                  <span class="value mono">{{ editData.vehicle.engineNo || '-' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">排量</span>
+                  <span class="value">{{ editData.vehicle.displacement || '-' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">车辆颜色</span>
+                  <span class="value">{{ editData.vehicle.color || '-' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右侧客户信息 -->
+          <div class="info-card">
+            <div class="card-header">
+              <div class="header-icon">
+                <NIcon size="18">
+                  <PersonIcon />
+                </NIcon>
+              </div>
+              <span class="header-title">客户信息</span>
+            </div>
+            <div class="card-content">
+              <div class="main-info">
+                <div class="customer-name">{{ editData.customer.name }}</div>
+                <div class="sub-info">{{ editData.customer.contact }}</div>
+              </div>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="label">联系电话</span>
+                  <span class="value highlight">{{ editData.customer.phone }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">电子邮箱</span>
+                  <span class="value">{{ editData.customer.email || '-' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">联系地址</span>
+                  <span class="value">{{ editData.customer.address || '-' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">银行账号</span>
+                  <span class="value mono">{{ editData.customer.bankAccount || '-' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">开户行</span>
+                  <span class="value">{{ editData.customer.bankName || '-' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 维修信息卡片 -->
+        <div class="info-card mt-4">
+          <div class="card-header">
+            <div class="header-icon">
+              <NIcon>
+                <ConstructIcon />
+              </NIcon>
+            </div>
+            <span class="header-title">维修信息</span>
+          </div>
+          <div class="card-content">
+            <div class="time-line">
+              <div class="time-item">
+                <span class="time-label">进厂日期</span>
+                <span class="time-value">{{ formatTime(editData.inDate) }}</span>
+              </div>
+              <div class="time-item">
+                <span class="time-label">预计完工</span>
+                <span class="time-value">{{ formatTime(editData.estimatedCompletionDate) }}</span>
+              </div>
+            </div>
+            <div class="desc-section">
+              <div class="desc-title">故障描述</div>
+              <div class="desc-content">{{ editData.faultDesc }}</div>
+            </div>
+            <div class="desc-section" v-if="editData.remark">
+              <div class="desc-title">备注信息</div>
+              <div class="desc-content">{{ editData.remark }}</div>
+            </div>
+
+            <!-- 维修项目列表 -->
+            <div class="repair-items" v-if="editData.repairItems?.length">
+              <div class="section-title">维修项目</div>
+              <div class="items-list">
+                <div v-for="item in editData.repairItems" :key="item._id" class="repair-item">
+                  <div class="item-header">
+                    <div class="detail-row">
+                      <span class="detail-label">项目名称</span>
+                      <span class="detail-value">{{ item.name }}</span>
+                    </div>
+                  </div>
+
+
+                  <div class="item-details">
+                    <div class="detail-row">
+                      <span class="detail-label">工时定额</span>
+                      <span class="detail-value">{{ item.laborHours }}小时</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">工时单价</span>
+                      <span class="detail-value">¥{{ item.laborPrice }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">复杂系数</span>
+                      <span class="detail-value">{{ item.complexityFactor }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">工时费优惠率</span>
+                      <span class="detail-value">{{ item.laborDiscount }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">工时费用</span>
+                      <span class="detail-value">¥{{ editData?.laborAmount }}</span>
+                    </div>
+                  </div>
+
+                  <!-- 维修技师 -->
+                  <div class="technicians-section">
+                    <div class="sub-title">维修技师</div>
+                    <div class="technicians-list">
+                      {{ editData?.mechanic?.name }}
+                    </div>
+                  </div>
+
+                  <!-- 维修材料 -->
+                  <div class="materials-section">
+                    <div class="sub-title">维修材料</div>
+                    <div class="materials-table">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>材料名称</th>
+                            <th>型号</th>
+                            <th>数量</th>
+                            <th>单价</th>
+                            <th>小计</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="material in item.parts" :key="material._id">
+                            <td>{{ material.name }}</td>
+                            <td>{{ material.partNo || '-' }}</td>
+                            <td>{{ material.quantity }}{{ material.unit }}</td>
+                            <td>¥{{ material.purchasePrice }}</td>
+                            <td>¥{{ material.quantity * material.unitPrice }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </NDrawerContent>
+  </NDrawer>
 </template>
 
 <style scoped>
 .detail-container {
-  background: #f5f7fa;
+  background: #fff;
+  min-height: 100%;
 }
 
 /* 顶部状态卡片样式 */
@@ -333,14 +345,15 @@ function formatTime(time: string | number | null | undefined): string {
 .detail-main {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 /* 信息卡片通用样式 */
 .info-card {
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgb(239, 239, 245);
   height: 100%;
   /* 确保卡片高度一致 */
   display: flex;
@@ -348,19 +361,27 @@ function formatTime(time: string | number | null | undefined): string {
 }
 
 .card-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--n-border-color);
+  padding: 16px;
+  /* 使用 CSS 变量 */
+  border-bottom: 1px solid rgb(239, 239, 245);
   display: flex;
   align-items: center;
-  background: #fafafa;
+  background: rgba(var(--primary-color), 0.08);
+  border-radius: 8px 8px 0 0;
+}
+
+/* 暗黑模式下的边框颜色 */
+:deep(.dark) .card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.09);
 }
 
 .header-icon {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  background: var(--n-primary-color-1);
-  color: var(--n-primary-color);
+  border-radius: 8px;
+  /* 使用主色但透明度降低 */
+  background: rgba(var(--primary-color), 0.1);
+  color: rgb(var(--primary-color));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +391,8 @@ function formatTime(time: string | number | null | undefined): string {
 .header-title {
   font-size: 16px;
   font-weight: 500;
-  color: var(--n-text-color);
+  /* 使用主色 */
+  color: rgb(var(--primary-color));
 }
 
 .card-content {
@@ -478,17 +500,17 @@ function formatTime(time: string | number | null | undefined): string {
 /* 暗黑模式适配 */
 :deep(.dark) {
   .detail-container {
-    background: #18181c;
+    background: var(--n-card-color);
   }
 
   .info-card,
   .status-card {
-    background: #1f1f23;
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: var(--n-card-color);
+    border: 1px solid var(--n-border-color);
   }
 
   .card-header {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(var(--primary-color), 0.15);
   }
 
   .desc-content {
@@ -496,7 +518,7 @@ function formatTime(time: string | number | null | undefined): string {
   }
 
   .header-icon {
-    background: rgba(var(--n-primary-color-rgb), 0.15);
+    background: rgba(var(--primary-color), 0.2);
   }
 
   .label {

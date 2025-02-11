@@ -7,7 +7,6 @@ import { fetchCustomers, fetchCustomerById } from '@/service/api/customer';
 import { fetchVehicleByPlate } from '@/service/api/vehicle';
 import { fetchCreateRepairOrder, fetchUpdateRepairOrder, fetchRepairOrderDetail } from '@/service/api/repair-order';
 import dayjs from 'dayjs';
-import RepairOrderDetail from './Detail.vue';
 
 defineOptions({ name: 'RepairOrderForm' });
 
@@ -403,242 +402,220 @@ function formatTime(time: string | number | null | undefined): string {
 <template>
   <NDrawer v-model:show="show" :width="800" :mask-closable="true">
     <NDrawerContent :title="title">
-      <!-- 查看模式 -->
-      <template v-if="props.type === 'view'">
-        <RepairOrderDetail
-          :edit-data="props.editData"
-          :form-model="formModel"
-        />
-      </template>
-
-      <!-- 编辑模式 -->
-      <template v-else>
-        <NForm
-          ref="formRef"
-          :model="formModel"
-          :rules="rules"
-          label-placement="left"
-          :label-width="100"
-        >
-          <!-- 车辆信息块 -->
-          <div class="form-section" :style="{ '--section-marker-color': themeVars.primaryColor }">
-            <h3 class="section-title">
-              <span>{{ t('menu.repairOrder.vehicle') }}</span>
-            </h3>
-            <div class="section-content">
-              <NFormItem :label="t('menu.vehicle.licensePlate')" path="vehicle.licensePlate">
-                <NInput
-                  v-model:value="formModel.vehicle.licensePlate"
-                  :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
-                  :loading="loading"
-                  clearable
-                  @blur="handleLicensePlateSearch"
-                />
-              </NFormItem>
-              <NGrid :cols="2" :x-gap="12">
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.brand')" path="vehicle.brand">
-                    <NInput v-model:value="formModel.vehicle.brand" />
-                  </NFormItem>
-                </NGi>
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.model')" path="vehicle.model">
-                    <NInput v-model:value="formModel.vehicle.model" />
-                  </NFormItem>
-                </NGi>
-              </NGrid>
-              <NGrid :cols="2" :x-gap="12">
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.engineNo')" path="vehicle.engineNo">
-                    <NInput v-model:value="formModel.vehicle.engineNo" :placeholder="t('menu.vehicle.engineNoPlaceholder')" />
-                  </NFormItem>
-                </NGi>
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.color')" path="vehicle.color">
-                    <NInput v-model:value="formModel.vehicle.color" :placeholder="t('menu.vehicle.colorPlaceholder')" />
-                  </NFormItem>
-                </NGi>
-              </NGrid>
-              <NGrid :cols="2" :x-gap="12">
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.year')" path="vehicle.year">
-                    <NDatePicker
-                      v-model:value="formModel.vehicle.year"
-                      type="year"
-                      style="width: 100%"
-                      :placeholder="t('menu.vehicle.yearPlaceholder')"
-                      :actions="['clear']"
-                      clearable
-                      :default-value="null"
-                    />
-                  </NFormItem>
-                </NGi>
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.mileage')" path="vehicle.mileage">
-                    <NInputNumber v-model:value="formModel.vehicle.mileage" :min="0" style="width: 100%" />
-                  </NFormItem>
-                </NGi>
-              </NGrid>
-              <NGrid :cols="2" :x-gap="12">
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.vin')" path="vehicle.vin">
-                    <NInput v-model:value="formModel.vehicle.vin" />
-                  </NFormItem>
-                </NGi>
-                <NGi>
-                  <NFormItem :label="t('menu.vehicle.displacement')" path="vehicle.displacement">
-                    <NInput v-model:value="formModel.vehicle.displacement" style="width: 100%" />
-                  </NFormItem>
-                </NGi>
-              </NGrid>
-            </div>
+      <NForm
+        ref="formRef"
+        :model="formModel"
+        :rules="rules"
+        label-placement="left"
+        :label-width="100"
+      >
+        <!-- 车辆信息块 -->
+        <div class="form-section" :style="{ '--section-marker-color': themeVars.primaryColor }">
+          <h3 class="section-title">
+            <span>{{ t('menu.repairOrder.vehicle') }}</span>
+          </h3>
+          <div class="section-content">
+            <NFormItem :label="t('menu.vehicle.licensePlate')" path="vehicle.licensePlate">
+              <NInput
+                v-model:value="formModel.vehicle.licensePlate"
+                :placeholder="t('menu.vehicle.licensePlatePlaceholder')"
+                :loading="loading"
+                clearable
+                @blur="handleLicensePlateSearch"
+              />
+            </NFormItem>
+            <NGrid :cols="2" :x-gap="12">
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.brand')" path="vehicle.brand">
+                  <NInput v-model:value="formModel.vehicle.brand" />
+                </NFormItem>
+              </NGi>
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.model')" path="vehicle.model">
+                  <NInput v-model:value="formModel.vehicle.model" />
+                </NFormItem>
+              </NGi>
+            </NGrid>
+            <NGrid :cols="2" :x-gap="12">
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.engineNo')" path="vehicle.engineNo">
+                  <NInput v-model:value="formModel.vehicle.engineNo" :placeholder="t('menu.vehicle.engineNoPlaceholder')" />
+                </NFormItem>
+              </NGi>
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.color')" path="vehicle.color">
+                  <NInput v-model:value="formModel.vehicle.color" :placeholder="t('menu.vehicle.colorPlaceholder')" />
+                </NFormItem>
+              </NGi>
+            </NGrid>
+            <NGrid :cols="2" :x-gap="12">
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.year')" path="vehicle.year">
+                  <NDatePicker
+                    v-model:value="formModel.vehicle.year"
+                    type="year"
+                    style="width: 100%"
+                    :placeholder="t('menu.vehicle.yearPlaceholder')"
+                    :actions="['clear']"
+                    clearable
+                    :default-value="null"
+                  />
+                </NFormItem>
+              </NGi>
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.mileage')" path="vehicle.mileage">
+                  <NInputNumber v-model:value="formModel.vehicle.mileage" :min="0" style="width: 100%" />
+                </NFormItem>
+              </NGi>
+            </NGrid>
+            <NGrid :cols="2" :x-gap="12">
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.vin')" path="vehicle.vin">
+                  <NInput v-model:value="formModel.vehicle.vin" />
+                </NFormItem>
+              </NGi>
+              <NGi>
+                <NFormItem :label="t('menu.vehicle.displacement')" path="vehicle.displacement">
+                  <NInput v-model:value="formModel.vehicle.displacement" style="width: 100%" />
+                </NFormItem>
+              </NGi>
+            </NGrid>
           </div>
-
-          <!-- 客户信息块 -->
-          <div class="form-section" :style="{ '--section-marker-color': themeVars.primaryColor }">
-            <h3 class="section-title">
-              <span>{{ t('menu.repairOrder.customer') }}</span>
-            </h3>
-            <div class="section-content">
-              <NFormItem :label="t('menu.customer.name')" path="customer._id" v-if="formModel.customer._id">
-                <NSelect
-                  v-model:value="formModel.customer._id"
-                  :options="customerOptions"
-                  :placeholder="t('menu.customer.nameSearch')"
-                  clearable
-                  @update:value="handleCustomerChange"
-                />
-              </NFormItem>
-              <NFormItem :label="t('menu.customer.name')" path="customer.name" v-else>
-                <NInput
-                  v-model:value="formModel.customer.name"
-                  :placeholder="t('menu.customer.nameSearch')"
-                />
-              </NFormItem>
-              <NGrid :cols="2" :x-gap="12">
-                <NGi>
-                  <NFormItem :label="t('menu.customer.contact')" path="customer.contact">
-                    <NInput
-                      v-model:value="formModel.customer.contact"
-                      :placeholder="t('menu.customer.contactSearch')"
-                    />
-                  </NFormItem>
-                </NGi>
-                <NGi>
-                  <NFormItem :label="t('menu.customer.phone')" path="customer.phone">
-                    <NInput
-                      v-model:value="formModel.customer.phone"
-                      :placeholder="t('menu.customer.phoneSearch')"
-                    />
-                  </NFormItem>
-                </NGi>
-              </NGrid>
-              <NFormItem :label="t('menu.customer.address')" path="customer.address">
-                <NInput
-                  v-model:value="formModel.customer.address"
-                  :placeholder="t('menu.customer.addressSearch')"
-                />
-              </NFormItem>
-              <NFormItem :label="t('menu.customer.email')" path="customer.email">
-                <NInput
-                  v-model:value="formModel.customer.email"
-                  :placeholder="t('menu.customer.emailSearch')"
-                />
-              </NFormItem>
-
-              <NGrid :cols="2" :x-gap="12">
-                <NGi>
-                  <NFormItem :label="t('menu.customer.bankAccount')" path="customer.bankAccount">
-                    <NInput
-                      v-model:value="formModel.customer.bankAccount"
-                      :placeholder="t('menu.customer.bankAccountSearch')"
-                    />
-                  </NFormItem>
-                </NGi>
-                <NGi>
-                  <NFormItem :label="t('menu.customer.bankName')" path="customer.bankName">
-                    <NInput
-                      v-model:value="formModel.customer.bankName"
-                      :placeholder="t('menu.customer.bankNameSearch')"
-                    />
-                  </NFormItem>
-                </NGi>
-              </NGrid>
-            </div>
-          </div>
-
-          <!-- 维修信息块 -->
-          <div class="form-section" :style="{ '--section-marker-color': themeVars.primaryColor }">
-            <h3 class="section-title">
-              <span>{{ t('menu.repairOrder._value') }}</span>
-            </h3>
-            <div class="section-content">
-              <NGrid :cols="2" :x-gap="12">
-                <NGi>
-                  <NFormItem :label="t('menu.repairOrder.inDate')" path="inDate" >
-                    <NDatePicker
-                      v-model:value="formModel.inDate"
-                      type="date"
-                      :placeholder="t('menu.repairOrder.inDatePlaceholder')"
-                      clearable
-                      style="width: 100%"
-                    />
-                  </NFormItem>
-                </NGi>
-                <NGi>
-                  <NFormItem :label="t('menu.repairOrder.estimatedTime')" path="estimatedCompletionDate">
-                    <NDatePicker
-                      v-model:value="formModel.estimatedCompletionDate"
-                      type="date"
-                      :placeholder="t('menu.repairOrder.estimatedTimePlaceholder')"
-                      clearable
-                      style="width: 100%"
-                      :timezone="'Asia/Shanghai'"
-                    />
-                  </NFormItem>
-                </NGi>
-              </NGrid>
-              <NFormItem :label="t('menu.repairOrder.faultDesc')" path="faultDesc">
-                <NInput
-                  v-model:value="formModel.faultDesc"
-                  type="textarea"
-                  :rows="3"
-                  :placeholder="t('menu.repairOrder.faultDescPlaceholder')"
-                />
-              </NFormItem>
-              <NFormItem :label="t('common.remark')">
-                <NInput
-                  v-model:value="formModel.remark"
-                  type="textarea"
-                  :rows="3"
-                  :placeholder="t('common.remarkPlaceholder')"
-                />
-              </NFormItem>
-            </div>
-          </div>
-        </NForm>
-
-
-      </template>
-
-      <!-- 底部按钮 -->
-      <template #footer>
-       <!-- 操作按钮 -->
-       <div class="action-buttons" v-if="props.type !== 'view'">
-          <NSpace justify="end">
-            <NButton @click="handleClose">{{ t('common.cancel') }}</NButton>
-            <NButton
-              type="primary"
-              :loading="loading"
-              @click="handleSubmit"
-            >
-              {{ t('common.confirm') }}
-            </NButton>
-          </NSpace>
         </div>
-        <NSpace justify="end" v-else>
-          <NButton @click="handleClose">
-            {{ t('common.close') }}
+
+        <!-- 客户信息块 -->
+        <div class="form-section" :style="{ '--section-marker-color': themeVars.primaryColor }">
+          <h3 class="section-title">
+            <span>{{ t('menu.repairOrder.customer') }}</span>
+          </h3>
+          <div class="section-content">
+            <NFormItem :label="t('menu.customer.name')" path="customer._id" v-if="formModel.customer._id">
+              <NSelect
+                v-model:value="formModel.customer._id"
+                :options="customerOptions"
+                :placeholder="t('menu.customer.nameSearch')"
+                clearable
+                @update:value="handleCustomerChange"
+              />
+            </NFormItem>
+            <NFormItem :label="t('menu.customer.name')" path="customer.name" v-else>
+              <NInput
+                v-model:value="formModel.customer.name"
+                :placeholder="t('menu.customer.nameSearch')"
+              />
+            </NFormItem>
+            <NGrid :cols="2" :x-gap="12">
+              <NGi>
+                <NFormItem :label="t('menu.customer.contact')" path="customer.contact">
+                  <NInput
+                    v-model:value="formModel.customer.contact"
+                    :placeholder="t('menu.customer.contactSearch')"
+                  />
+                </NFormItem>
+              </NGi>
+              <NGi>
+                <NFormItem :label="t('menu.customer.phone')" path="customer.phone">
+                  <NInput
+                    v-model:value="formModel.customer.phone"
+                    :placeholder="t('menu.customer.phoneSearch')"
+                  />
+                </NFormItem>
+              </NGi>
+            </NGrid>
+            <NFormItem :label="t('menu.customer.address')" path="customer.address">
+              <NInput
+                v-model:value="formModel.customer.address"
+                :placeholder="t('menu.customer.addressSearch')"
+              />
+            </NFormItem>
+            <NFormItem :label="t('menu.customer.email')" path="customer.email">
+              <NInput
+                v-model:value="formModel.customer.email"
+                :placeholder="t('menu.customer.emailSearch')"
+              />
+            </NFormItem>
+
+            <NGrid :cols="2" :x-gap="12">
+              <NGi>
+                <NFormItem :label="t('menu.customer.bankAccount')" path="customer.bankAccount">
+                  <NInput
+                    v-model:value="formModel.customer.bankAccount"
+                    :placeholder="t('menu.customer.bankAccountSearch')"
+                  />
+                </NFormItem>
+              </NGi>
+              <NGi>
+                <NFormItem :label="t('menu.customer.bankName')" path="customer.bankName">
+                  <NInput
+                    v-model:value="formModel.customer.bankName"
+                    :placeholder="t('menu.customer.bankNameSearch')"
+                  />
+                </NFormItem>
+              </NGi>
+            </NGrid>
+          </div>
+        </div>
+
+        <!-- 维修信息块 -->
+        <div class="form-section" :style="{ '--section-marker-color': themeVars.primaryColor }">
+          <h3 class="section-title">
+            <span>{{ t('menu.repairOrder._value') }}</span>
+          </h3>
+          <div class="section-content">
+            <NGrid :cols="2" :x-gap="12">
+              <NGi>
+                <NFormItem :label="t('menu.repairOrder.inDate')" path="inDate" >
+                  <NDatePicker
+                    v-model:value="formModel.inDate"
+                    type="date"
+                    :placeholder="t('menu.repairOrder.inDatePlaceholder')"
+                    clearable
+                    style="width: 100%"
+                  />
+                </NFormItem>
+              </NGi>
+              <NGi>
+                <NFormItem :label="t('menu.repairOrder.estimatedTime')" path="estimatedCompletionDate">
+                  <NDatePicker
+                    v-model:value="formModel.estimatedCompletionDate"
+                    type="date"
+                    :placeholder="t('menu.repairOrder.estimatedTimePlaceholder')"
+                    clearable
+                    style="width: 100%"
+                    :timezone="'Asia/Shanghai'"
+                  />
+                </NFormItem>
+              </NGi>
+            </NGrid>
+            <NFormItem :label="t('menu.repairOrder.faultDesc')" path="faultDesc">
+              <NInput
+                v-model:value="formModel.faultDesc"
+                type="textarea"
+                :rows="3"
+                :placeholder="t('menu.repairOrder.faultDescPlaceholder')"
+              />
+            </NFormItem>
+            <NFormItem :label="t('common.remark')">
+              <NInput
+                v-model:value="formModel.remark"
+                type="textarea"
+                :rows="3"
+                :placeholder="t('common.remarkPlaceholder')"
+              />
+            </NFormItem>
+          </div>
+        </div>
+      </NForm>
+
+      <template #footer>
+        <NSpace justify="end">
+          <NButton @click="handleClose">{{ t('common.cancel') }}</NButton>
+          <NButton
+            type="primary"
+            :loading="loading"
+            @click="handleSubmit"
+          >
+            {{ t('common.confirm') }}
           </NButton>
         </NSpace>
       </template>
