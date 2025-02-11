@@ -12,7 +12,7 @@ import {
 defineOptions({ name: 'RepairOrderDetail' });
 
 interface Props {
-  editData?: Api.RepairOrder.RepairOrderInfo;
+  editData?: Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -35,16 +35,16 @@ const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' 
 };
 
 // 添加时间格式化函数
-function formatTime(time: string | number | null | undefined): string {
+function formatTime(time: string | number | null | undefined, format: string = 'YYYY-MM-DD HH:mm:ss'): string {
   if (!time) return '-';
-  return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
+  return dayjs(time).format(format);
 }
 </script>
 
 <template>
-  <NDrawer v-model:show="show" :width="800">
+  <NDrawer v-model:show="show" :width="1000">
     <NDrawerContent :title="t('common.view')">
-      <div class="detail-container bg-white p-4">
+      <div class="detail-container bg-white">
         <!-- 顶部状态卡片 -->
         <div class="status-card" :class="editData?.status">
           <div class="status-header">
@@ -169,11 +169,11 @@ function formatTime(time: string | number | null | undefined): string {
             <div class="time-line">
               <div class="time-item">
                 <span class="time-label">进厂日期</span>
-                <span class="time-value">{{ formatTime(editData.inDate) }}</span>
+                <span class="time-value">{{ formatTime(editData.inDate, 'YYYY-MM-DD') }}</span>
               </div>
               <div class="time-item">
-                <span class="time-label">预计完工</span>
-                <span class="time-value">{{ formatTime(editData.estimatedCompletionDate) }}</span>
+                <span class="time-label">预计完工日期</span>
+                <span class="time-value">{{ formatTime(editData.estimatedCompletionDate, 'YYYY-MM-DD') }}</span>
               </div>
             </div>
             <div class="desc-section">
@@ -192,7 +192,6 @@ function formatTime(time: string | number | null | undefined): string {
                 <div v-for="item in editData.repairItems" :key="item._id" class="repair-item">
                   <div class="item-header">
                     <div class="detail-row">
-                      <span class="detail-label">项目名称</span>
                       <span class="detail-value">{{ item.name }}</span>
                     </div>
                   </div>
@@ -240,16 +239,14 @@ function formatTime(time: string | number | null | undefined): string {
                             <th>型号</th>
                             <th>数量</th>
                             <th>单价</th>
-                            <th>小计</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr v-for="material in item.parts" :key="material._id">
                             <td>{{ material.name }}</td>
-                            <td>{{ material.partNo || '-' }}</td>
+                            <td>{{ material.specification || '-' }}</td>
                             <td>{{ material.quantity }}{{ material.unit }}</td>
                             <td>¥{{ material.purchasePrice }}</td>
-                            <td>¥{{ material.quantity * material.unitPrice }}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -565,7 +562,6 @@ function formatTime(time: string | number | null | undefined): string {
 }
 
 .repair-items {
-  margin-top: 24px;
   border-top: 1px dashed var(--n-border-color);
   padding-top: 24px;
 }
@@ -604,7 +600,8 @@ function formatTime(time: string | number | null | undefined): string {
 }
 
 .item-details {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 24px;
   margin-bottom: 16px;
 }

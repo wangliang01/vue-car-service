@@ -192,7 +192,7 @@ const columns = computed(() => [
             {
               size: 'small',
               ghost: true,
-              onClick: () => handleView(row)
+              onClick: () => handleView(row as any)
             },
             { default: () => t('common.view') }
           ),
@@ -224,7 +224,7 @@ const drawerType = ref<'add' | 'edit' | 'view'>('add');
 const editData = ref<Api.RepairOrder.RepairOrderInfo | null>(null);
 const currentOrderId = ref<string | null>(null);
 const showDetail = ref(false);
-const currentOrder = ref<Api.RepairOrder.RepairOrderInfo>();
+const currentOrder = ref<Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>>();
 
 function handleAdd() {
   drawerType.value = 'add';
@@ -261,7 +261,7 @@ function handleEdit(row: Api.RepairOrder.RepairOrderInfo) {
   showDrawer.value = true;
 }
 
-function handleView(row: Api.RepairOrder.RepairOrderInfo) {
+function handleView(row: Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>) {
   currentOrder.value = row;
   showDetail.value = true;
 }

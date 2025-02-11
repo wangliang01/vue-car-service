@@ -187,7 +187,13 @@ declare namespace Api {
     interface MechanicInfo {
       _id: string;
       name: string;
-      // 其他技工相关字段...
+      employeeId: string;
+      phone: string;
+      email: string;
+      level: string;
+      specialties: string[];
+      workYears: number;
+      status: 'active' | 'onLeave' | 'deleted';
     }
 
     interface RepairOrderInfo<T = string> {
@@ -198,14 +204,15 @@ declare namespace Api {
       vehicle: Vehicle.VehicleInfo;
       faultDesc: string;
       remark?: string;
-      mechanic?: T; // T 可以是 string 或 MechanicInfo
+      mechanic?: T; // T 可以是 string (ID) 或 MechanicInfo (完整对象)
       inDate: string;
       estimatedCompletionDate?: string;
       actualCompletionTime?: string;
       deliveryTime?: string;
       createdAt: string;
       updatedAt: string;
-      repairItems?: RepairItem[];
+      repairItems?: RepairItem.RepairItemInfo[];
+      laborAmount?: number;  // 添加工时费用字段
     }
 
     interface SearchParams {
@@ -422,23 +429,38 @@ declare namespace Api {
     interface RepairItemInfo {
       _id: string;
       name: string;
-      laborHours: number;
-      laborPrice: number;
-      complexityFactor: number;
-      laborDiscountRate: number;
-      materials: {
-        materialId: string;
-        quantity: number;
-        managementFeeRate: number;
-        materialDiscountRate: number;
-      }[];
       description?: string;
-      isActive: boolean;
+      laborCost: number;
+      laborHours?: number;
+      laborPrice?: number;
+      complexityFactor?: number;
+      laborDiscount?: number;
+      estimatedHours: number;
+      laborDiscountRate: number;
+      technicians: {
+        _id: string;
+        name: string;
+        role: string;
+      }[];
+      materials: {
+        _id: string;
+        name: string;
+        partNo?: string;
+        quantity: number;
+        unit: string;
+        unitPrice: number;
+      }[];
+      parts: {
+        _id: string;
+        name: string;
+        specification?: string;
+        quantity: number;
+        unit: string;
+        purchasePrice: number;
+      }[];
+      status: 'pending' | 'in_progress' | 'completed';
       createdAt: string;
       updatedAt: string;
-      totalLaborCost: number;
-      totalMaterialCost: number;
-      totalCost: number;
     }
 
     interface SearchParams extends Common.PaginationParams {
