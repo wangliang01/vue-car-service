@@ -108,15 +108,15 @@
               </tr>
               <tr class="total-row">
                 <td colspan="3" class="text-right">承修单位名称：</td>
-                <td colspan="4" class="text-left"></td>
+                <td colspan="4" class="text-left">蓉虹兴科</td>
                 <td colspan="2" class="text-right">填表日期：</td>
                 <td colspan="2" class="text-left"></td>
                 <td colspan="1" class="text-right">流水号：</td>
-                <td colspan="3" class="text-left"></td>
+                <td colspan="3" class="text-left">{{ data.settlementNo }}</td>
               </tr>
               <tr class="total-row">
                 <td colspan="3" class="text-right">送修单位经办人：</td>
-                <td colspan="4" class="text-left"></td>
+                <td colspan="4" class="text-left">{{ data.customer?.contact }}</td>
                 <td colspan="2" class="text-right">维修厂承办人：</td>
                 <td colspan="5" class="text-left"></td>
               </tr>
@@ -179,13 +179,13 @@ const transformData = (data: Api.Settlement.SettlementInfo) => {
         repairItemQuantity: item.laborHours, // 工时定额
         complexityFactor: item.complexityFactor, // 复杂系数
         repairItemDiscount: item.laborDiscount * 100 + '%', // 工时费优惠率
-        repairItemAmount: item.totalLaborCost, // 实收工时费
+        repairItemAmount: item.actualLaborCost, // 实收工时费
         repairItemPartsName: part.name, // 材料名称
         repairItemPartsPrice: part.purchasePrice, // 购买进价
         repairItemPartsManagementFee: part.managementFee * 100 + '%', // 管理费
         repairItemPartsManagementDiscount: part.managementDiscount * 100 + '%', // 管理费优惠率
-        repairItemPartsAmount: part.actualMaterialCost, // 实收材料费
-        repairItemPartsActualAmount: part.totalPartsCost, // 实收材料费
+        repairItemPartsAmount: part.receivablePartsCost, // 实收材料费
+        repairItemPartsActualAmount: part.actualPartsCost, // 实收材料费
         repairItemTotal: item.subtotal, // 小计
       }
 

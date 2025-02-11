@@ -16,12 +16,15 @@ export declare namespace Api {
           complexityFactor: number;
           laborDiscount: number;
           actualLaborCost: number;
+          subtotal: number;
           parts: Array<{
             name: string;
             purchasePrice: number;
             managementFee: number;
             managementDiscount: number;
             actualMaterialCost: number;
+            receivablePartsCost: number;
+            actualPartsCost: number;
           }>;
         }>;
       };
@@ -47,6 +50,8 @@ export declare namespace Api {
         managementDiscount: number;
         expectedMaterialCost: number;
         actualMaterialCost: number;
+        receivablePartsCost: number;
+        actualPartsCost: number;
         subtotal: number;
         laborAmount: number;
         partsAmount: number;
@@ -85,6 +90,25 @@ export declare namespace Api {
 
     interface StatusUpdateParams {
       status: 'paid' | 'refunded';
+    }
+
+    interface RepairItem {
+      name: string;
+      laborHours: number;
+      laborPrice: number;
+      complexityFactor: number;
+      laborDiscount: number;
+      actualLaborCost: number;
+      subtotal: number;
+      parts: {
+        name: string;
+        purchasePrice: number;
+        managementFee: number;
+        managementDiscount: number;
+        actualMaterialCost: number;
+        receivablePartsCost: number;
+        actualPartsCost: number;
+      }[];
     }
   }
 }

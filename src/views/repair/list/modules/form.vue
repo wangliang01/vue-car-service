@@ -208,7 +208,12 @@ async function handleCustomerChange(customerId: string) {
 }
 
 const isValidLicensePlate = (licensePlate: string) => {
-  return /^[A-Z0-9]{7}$/.test(licensePlate)
+  // 普通车牌：省份简称（1个汉字）+ 字母 + 5位字母或数字
+  const normalPattern = /^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5}$/
+  // 新能源车牌：省份简称（1个汉字）+ 字母 + 6位字母或数字
+  const newEnergyPattern = /^[\u4e00-\u9fa5][A-Z][A-Z0-9]{6}$/
+
+  return normalPattern.test(licensePlate) || newEnergyPattern.test(licensePlate)
 }
 
 // 根据车牌号查询车辆信息
