@@ -72,7 +72,7 @@ function formatTime(time: string | number | null | undefined): string {
           <span class="header-title">车辆信息</span>
         </div>
         <div class="card-content">
-          <div class="main-info">
+          <div class="main-info" >
             <div class="plate-number">{{ editData.vehicle.licensePlate }}</div>
             <div class="sub-info">{{ editData.vehicle.brand }} {{ editData.vehicle.model }}</div>
           </div>
@@ -95,7 +95,7 @@ function formatTime(time: string | number | null | undefined): string {
             </div>
             <div class="info-item">
               <span class="label">排量</span>
-              <span class="value">{{ editData.vehicle.displacement ? `${editData.vehicle.displacement}L` : '-' }}</span>
+              <span class="value">{{ editData.vehicle.displacement || '-' }}</span>
             </div>
             <div class="info-item">
               <span class="label">车辆颜色</span>
@@ -182,7 +182,10 @@ function formatTime(time: string | number | null | undefined): string {
           <div class="items-list">
             <div v-for="item in editData.repairItems" :key="item._id" class="repair-item">
               <div class="item-header">
-                <div class="item-name">{{ item.name }}</div>
+                <div class="detail-row">
+                  <span class="detail-label">项目名称</span>
+                  <span class="detail-value">{{ item.name }}</span>
+                </div>
               </div>
 
 

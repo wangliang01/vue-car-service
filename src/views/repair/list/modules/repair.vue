@@ -72,6 +72,9 @@ const fetchMechanics = async () => {
 interface RepairPart {
   materialId: string;
   name: string;
+  code: string;
+  unit: string;
+  specification: string;
   quantity: number;
   purchasePrice: number;
   managementFee: number;
@@ -140,6 +143,9 @@ function addPart(repairItemIndex: number) {
   model.value.repairItems[repairItemIndex].parts.push({
     materialId: '',
     name: '',
+    code: '',
+    unit: '',
+    specification: '',
     quantity: 1,
     purchasePrice: 0,
     managementFee: 0.1,
@@ -178,6 +184,9 @@ function handleMaterialSelect(materialId: string, repairIndex: number, partIndex
       ...model.value.repairItems[repairIndex].parts[partIndex],
       materialId: material._id,
       name: material.name,
+      code: material.code,
+      unit: material.unit,
+      specification: material.specification,
       purchasePrice: material.purchasePrice,
       managementFee: material.managementFeeRate,
       managementDiscount: 0
