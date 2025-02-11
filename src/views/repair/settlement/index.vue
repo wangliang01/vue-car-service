@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import { ref, h } from 'vue';
+import { ref, h, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NCard, NSpace, NDataTable, NButton, NTag } from 'naive-ui';
 import { fetchSettlementList, updateSettlementStatus } from '@/service/api/settlement';
@@ -16,6 +16,8 @@ const pagination = ref({
 });
 const detailVisible = ref(false);
 const currentRow = ref<Api.Settlement.SettlementInfo | null>(null);
+
+
 
 const searchModel = ref({
   status: '',
@@ -50,12 +52,19 @@ const resolveVehicle = (row: any) => {
   )
 }
 
-const columns = [
-  { title: t('settlement.settlementNo'), key: 'settlementNo'},
-  { title: t('settlement.repairOrderNo'), key: 'repairOrderNo', render: (row) => row.repairOrder.orderNo },
+const columns: {
+  title: string;
+  key: string;
+  width?: number;
+  fixed?: 'left' | 'right';
+  render?: (row: any) => any;
+}[] = [
+  { title: t('settlement.settlementNo'), key: 'settlementNo', width: 150 },
+  { title: t('settlement.repairOrderNo'), key: 'repairOrderNo', width: 150, render: (row) => row.repairOrder.orderNo },
   {
     title: t('settlement.customer'),
     key: 'customer',
+    width: 150,
     render: (row) => (
       <div>
         <div>{row.customer.name}</div>
@@ -66,16 +75,19 @@ const columns = [
   {
     title: t('settlement.vehicle'),
     key: 'vehicle',
+    width: 150,
     render: resolveVehicle
   },
-  { title: t('settlement.partsAmount'), key: 'partsAmount', render: row => row.formattedPartsAmount },
-  { title: t('settlement.laborAmount'), key: 'laborAmount', render: row => row.formattedLaborAmount },
-  { title: t('settlement.totalAmount'), key: 'totalAmount', render: row => row.formattedTotalAmount },
-  { title: t('settlement.paymentMethod'), key: 'paymentMethod' },
-  { title: t('settlement.statusLabel'), key: 'paymentStatus', render: row => <NTag type={row.paymentStatus === 'paid' ? 'success' : 'warning'}>{paymentStatusMap[row.paymentStatus]}</NTag> },
+  { title: t('settlement.partsAmount'), key: 'partsAmount', width: 100, render: row => row.formattedPartsAmount },
+  { title: t('settlement.laborAmount'), key: 'laborAmount', width: 100, render: row => row.formattedLaborAmount },
+  { title: t('settlement.totalAmount'), key: 'totalAmount', width: 100, render: row => row.formattedTotalAmount },
+  { title: t('settlement.paymentMethod'), key: 'paymentMethod', width: 100 },
+  { title: t('settlement.statusLabel'), key: 'paymentStatus', width: 100, render: row => <NTag type={row.paymentStatus === 'paid' ? 'success' : 'warning'}>{paymentStatusMap[row.paymentStatus]}</NTag> },
   {
     title: t('common.action'),
     key: 'actions',
+    fixed: 'right',
+    width: 200,
     render: (row) => {
       return h(
         NSpace,
@@ -111,22 +123,26 @@ const columns = [
               },
               { default: () => t('common.edit') }
             ),
-            h(
-              NButton,
-              {
-                size: 'small',
-                type: 'success',
-                ghost: true,
-                onClick: () => handleDownload(row)
-              },
-              { default: () => t('common.download') }
-            ),
+            // h(
+            //   NButton,
+            //   {
+            //     size: 'small',
+            //     type: 'success',
+            //     ghost: true,
+            //     onClick: () => handleDownload(row)
+            //   },
+            //   { default: () => t('common.download') }
+            // ),
           ]
         }
       );
     }
   }
 ];
+
+const scrollX = computed(() => {
+  return columns.reduce((acc, col) => acc + Number(col.width || 0), 0);
+});
 
 async function loadData() {
   loading.value = true;

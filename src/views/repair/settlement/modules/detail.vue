@@ -146,7 +146,7 @@ console.log("nzh", nzh)
 
 interface Props {
   visible: boolean;
-  data?: Api.Settlement.SettlementInfo;
+  data?: any;
   type?: 'view' | 'download';
 }
 

@@ -797,6 +797,7 @@ const local: App.I18n.Schema = {
     totalLabel: '合计',
     paymentMethod: '支付方式',
     paymentStatus: '支付状态',
+    statusLabel: '状态',
     status: {
       unpaid: '未支付',
       paid: '已支付'

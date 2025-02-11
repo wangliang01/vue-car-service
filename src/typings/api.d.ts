@@ -530,6 +530,25 @@ declare namespace Api {
     }
   }
 
+  namespace Settlement {
+    interface SettlementInfo {
+      _id: string;
+      settlementNo: string;
+      createTime: string;
+      repairOrder: RepairOrder.RepairOrderInfo;
+      customer: Customer.CustomerInfo;
+      vehicle: Vehicle.VehicleInfo;
+      partsAmount: number;
+      laborAmount: number;
+      totalAmount: number;
+      formattedPartsAmount: string;
+      formattedLaborAmount: string;
+      formattedTotalAmount: string;
+      paymentStatus: 'paid' | 'unpaid';
+      paymentMethod?: string;
+    }
+  }
+
   interface ApiResponse<T> {
     data: T;
     status: number;
