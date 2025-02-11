@@ -26,7 +26,7 @@
             </div>
             <div class="info-item">
               <span class="label">排量：</span>
-              <span class="value">1.5</span>
+              <span class="value">{{ data?.vehicle?.displacement }}</span>
             </div>
             <div class="info-item">
               <span class="label">送修日期：</span>
