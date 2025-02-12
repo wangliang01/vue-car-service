@@ -65,14 +65,18 @@ async function handleSubmit() {
     if (props.type === 'add') {
       await createRepairItem(formModel.value);
     } else {
-      await updateRepairItem(props.editData!._id, formModel.value);
+      const params = {
+        name: formModel.value.name,
+        laborHours: formModel.value.laborHours,
+        laborPrice: formModel.value.laborPrice,
+        complexityFactor: formModel.value.complexityFactor,
+        laborDiscountRate: formModel.value.laborDiscountRate,
+        description: formModel.value.description
+      };
+      await updateRepairItem(props.editData!._id, params);
     }
-
-    window.$message?.success(t('common.success'));
     resetForm();
     emits('success');
-  } catch (error) {
-    window.$message?.error(t('common.error'));
   } finally {
     loading.value = false;
   }

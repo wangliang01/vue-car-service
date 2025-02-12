@@ -133,6 +133,7 @@ function handleModalClose() {
 
 function handleModalSuccess() {
   showModal.value = false;
+  window.$message?.success(t('common.success'));
   getData();
 }
 </script>
