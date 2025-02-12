@@ -332,6 +332,7 @@ watch(() => props.data, (newVal) => {
   table-layout: fixed;
 }
 
+
 :deep(.n-table col:nth-child(1)) { width: 60px; }  /* 序号 */
 :deep(.n-table col:nth-child(2)) { width: 140px; } /* 维修项目 */
 :deep(.n-table col:nth-child(3)),
@@ -407,6 +408,8 @@ watch(() => props.data, (newVal) => {
     padding: 20px;
     margin: 0;
     width: 100%;
+    transform: scale(0.9);
+    transform-origin: top center;
   }
 
   /* 隐藏不需要打印的元素 */
@@ -418,11 +421,22 @@ watch(() => props.data, (newVal) => {
   /* 确保表格边框显示 */
   :deep(.n-table) {
     border: 2px solid #000 !important;
+    font-size: 12px !important;
   }
 
   :deep(.n-table th),
   :deep(.n-table td) {
     border: 1px solid #000 !important;
+    padding: 6px 4px !important;
+  }
+
+  /* 调整表格内字体大小 */
+  :deep(.n-table th) {
+    font-size: 12px !important;
+  }
+
+  :deep(.n-table td) {
+    font-size: 12px !important;
   }
 
   /* 确保背景色打印 */
@@ -433,13 +447,31 @@ watch(() => props.data, (newVal) => {
 
   /* 分页设置 */
   @page {
-    size: A4;
-    margin: 10mm;
+    size: A4 landscape;  /* 改为横向打印 */
+    margin: 5mm;  /* 减小边距 */
   }
 
   /* 避免表格在页面间断开 */
   .repair-table {
     page-break-inside: avoid;
+  }
+
+  /* 调整标题和头部信息大小 */
+  .main-title {
+    font-size: 20px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .info-row {
+    margin-bottom: 15px !important;
+  }
+
+  .info-item {
+    font-size: 12px !important;
+  }
+
+  .label, .value {
+    font-size: 12px !important;
   }
 }
 
