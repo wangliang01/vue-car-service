@@ -6,6 +6,7 @@ export declare namespace Api {
       _id: string;
       settlementNo: string;
       createTime: string;
+      fillDate: string | number | null;
       repairOrder: {
         orderNo: string;
         inDate: string;

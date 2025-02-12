@@ -33,4 +33,13 @@ export function updateSettlementStatus(id: string, data: Api.Settlement.StatusUp
     method: 'patch',
     data
   });
-} 
+}
+
+/** 更新结算单 */
+export function updateSettlement(id: string, data: any) {
+  return request<Api.Settlement.SettlementInfo>({
+    url: `/settlement/${id}`,
+    method: 'put',
+    data
+  });
+}

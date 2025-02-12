@@ -1,19 +1,6 @@
 <template>
-  <n-drawer
-    :show="visible"
-    :width="1280"
-    :placement="placement"
-    :trap-focus="false"
-    @update:show="emit('update:visible', $event)"
-  >
-    <n-drawer-content :title="title" :native-scrollbar="false">
-      <template #footer>
-        <div style="text-align: right;">
-          <n-button @click="emit('update:visible', false)" type="default">关闭</n-button>
-          <n-button v-print="'#repairDetail'" type="primary" class="ml-2 w-20">打印</n-button>
-        </div>
-      </template>
-      <div id="repairDetail" class="repair-detail">
+  <div style="display: none;">
+    <div id="repairDetail" class="repair-detail">
         <div class="repair-header">
           <h2 class="main-title">在蓉省级单位公务用车维修项目清单</h2>
           <div class="info-row">
@@ -111,7 +98,7 @@
                 <td colspan="3" class="text-right">承修单位名称：</td>
                 <td colspan="4" class="text-left">蓉虹兴科</td>
                 <td colspan="2" class="text-right">填表日期：</td>
-                <td colspan="2" class="text-left">{{ data?.fillDate ? formatDate(data?.fillDate || data.createdAt, 'YYYY-MM-DD') : '' }}</td>
+                <td colspan="2" class="text-left"></td>
                 <td colspan="1" class="text-right">流水号：</td>
                 <td colspan="3" class="text-left">{{ data.settlementNo }}</td>
               </tr>
@@ -127,8 +114,7 @@
           </n-table>
         </div>
       </div>
-    </n-drawer-content>
-  </n-drawer>
+  </div>
 </template>
 
 <script setup lang="ts">

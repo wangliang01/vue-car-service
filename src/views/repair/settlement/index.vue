@@ -5,6 +5,7 @@ import { NCard, NSpace, NDataTable, NButton, NTag } from 'naive-ui';
 import { fetchSettlementList, updateSettlementStatus } from '@/service/api/settlement';
 import Search from './modules/search.vue';
 import Detail from './modules/detail.vue';
+import Edit from './modules/edit.vue';
 
 const { t } = useI18n();
 const loading = ref(false);
@@ -16,8 +17,8 @@ const pagination = ref({
 });
 const detailVisible = ref(false);
 const currentRow = ref<Api.Settlement.SettlementInfo | null>(null);
-
-
+const editVisible = ref(false);
+const editRow = ref<Api.Settlement.SettlementInfo | null>(null);
 
 const searchModel = ref({
   status: '',
@@ -43,10 +44,6 @@ const resolveVehicle = (row: any) => {
           alt={row.vehicle.brand}
         />
         <span>{row.vehicle.brand}</span><span>{row.vehicle.model} </span>
-
-      </div>
-      <div class="mt-1 text-gray-500">
-       {row.vehicle.licensePlate}
       </div>
     </div>
   )
@@ -64,24 +61,39 @@ const columns: {
   {
     title: t('settlement.customer'),
     key: 'customer',
-    width: 150,
+    width: 120,
     render: (row) => (
       <div>
         <div>{row.customer.name}</div>
+      </div>
+    )
+  },
+  {
+    title: t('settlement.contact'),
+    key: 'contact',
+    width: 120,
+    render: (row) => (
+      <div>
+        <div>{row.customer.contact}</div>
         <div class="text-gray-500 text-sm">{row.customer.phone}</div>
       </div>
     )
   },
   {
-    title: t('settlement.vehicle'),
-    key: 'vehicle',
-    width: 150,
+    title: t('settlement.licensePlate'),
+    key: 'licensePlate',
+    width: 100,
+    render: (row) => row?.vehicle?.licensePlate
+  },
+  {
+    title: t('settlement.vehicleBrand'),
+    key: 'vehicleBrand',
+    width: 130,
     render: resolveVehicle
   },
   { title: t('settlement.partsAmount'), key: 'partsAmount', width: 100, render: row => row.formattedPartsAmount },
   { title: t('settlement.laborAmount'), key: 'laborAmount', width: 100, render: row => row.formattedLaborAmount },
   { title: t('settlement.totalAmount'), key: 'totalAmount', width: 100, render: row => row.formattedTotalAmount },
-  { title: t('settlement.paymentMethod'), key: 'paymentMethod', width: 100 },
   { title: t('settlement.statusLabel'), key: 'paymentStatus', width: 100, render: row => <NTag type={row.paymentStatus === 'paid' ? 'success' : 'warning'}>{paymentStatusMap[row.paymentStatus]}</NTag> },
   {
     title: t('common.action'),
@@ -180,7 +192,14 @@ async function handleDownload(row: Api.Settlement.SettlementInfo) {
   detailVisible.value = true;
 }
 
-async function handleEdit(row) {}
+async function handleEdit(row: Api.Settlement.SettlementInfo) {
+  editRow.value = row;
+  editVisible.value = true;
+}
+
+function handleEditSuccess() {
+  loadData();
+}
 
 // 初始加载
 loadData();
@@ -218,6 +237,12 @@ loadData();
       v-model:visible="detailVisible"
       :data="currentRow"
       :type="'view'"
+    />
+
+    <Edit
+      v-model:visible="editVisible"
+      :data="editRow"
+      @submit-success="handleEditSuccess"
     />
   </div>
 </template>

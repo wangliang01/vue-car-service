@@ -534,7 +534,8 @@ declare namespace Api {
     interface SettlementInfo {
       _id: string;
       settlementNo: string;
-      createTime: string;
+      createdAt: string;
+      fillDate: string | number | null;
       repairOrder: RepairOrder.RepairOrderInfo;
       customer: Customer.CustomerInfo;
       vehicle: Vehicle.VehicleInfo;
