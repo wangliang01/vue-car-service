@@ -14,7 +14,7 @@ const { t } = useI18n();
 
 const searchModel = reactive<Api.RepairItem.SearchParams>({
   name: '',
-  isActive: true,
+  isActive: undefined,
   current: 1,
   size: 10
 });
@@ -48,7 +48,7 @@ const columns = ref([
     fixed: 'right',
     width: 120,
     render: (row: Api.RepairItem.RepairItemInfo) => {
-      return h(NSpace, { }, {
+      return h(NSpace, {}, {
         default: () => [
           h(
             NButton,
@@ -114,7 +114,7 @@ function handleSearch() {
 function handleReset() {
   Object.assign(searchModel, {
     name: '',
-    isActive: true,
+    isActive: undefined,
     current: 1,
     size: 10
   });
@@ -123,13 +123,8 @@ function handleReset() {
 }
 
 async function handleToggleStatus(row: Api.RepairItem.RepairItemInfo) {
-  try {
-    await updateRepairItemStatus(row._id, { isActive: !row.isActive });
-    window.$message?.success(t('common.success'));
-    getData();
-  } catch (error) {
-    window.$message?.error(t('common.error'));
-  }
+  await updateRepairItemStatus(row._id, { isActive: !row.isActive });
+  getData();
 }
 
 function handleModalClose() {
@@ -144,11 +139,7 @@ function handleModalSuccess() {
 
 <template>
   <div class="h-full">
-    <RepairItemSearch
-      v-model="searchModel"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
+    <RepairItemSearch v-model="searchModel" @search="handleSearch" @reset="handleReset" />
     <NCard :bordered="false" class="mt-4">
       <template #header>
         <div class="flex-y-center justify-between">
@@ -162,21 +153,11 @@ function handleModalSuccess() {
         </div>
       </template>
 
-      <NDataTable
-        :loading="loading"
-        :columns="tableColumns"
-        :data="dataList"
-        :pagination="pagination"
-        @update:page="getData"
-      />
+      <NDataTable :loading="loading" :columns="tableColumns" :data="dataList" :pagination="pagination"
+        @update:page="getData" />
     </NCard>
 
-    <RepairItemModal
-      v-model:show="showModal"
-      :type="modalType"
-      :edit-data="editData"
-      @close="handleModalClose"
-      @success="handleModalSuccess"
-    />
+    <RepairItemModal v-model:show="showModal" :type="modalType" :edit-data="editData" @close="handleModalClose"
+      @success="handleModalSuccess" />
   </div>
 </template>
