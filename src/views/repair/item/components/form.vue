@@ -11,9 +11,12 @@ import {
   NButton,
   NGrid,
   NFormItemGi,
+  NTooltip,
+  NIcon,
 } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { createRepairItem, updateRepairItem } from '@/service/api/repair-item';
+import { InformationCircleOutline } from '@vicons/ionicons5';
 
 const { t } = useI18n();
 
@@ -34,10 +37,10 @@ const loading = ref(false);
 
 const formModel = ref<Api.RepairItem.CreateParams>({
   name: '',
-  laborHours: 0,
-  laborPrice: 0,
-  complexityFactor: 1,
-  laborDiscountRate: 1,
+  laborHours: 1,
+  laborPrice: 36,
+  complexityFactor: 1.4,
+  laborDiscountRate: 0,
   description: ''
 });
 
@@ -66,6 +69,7 @@ async function handleSubmit() {
     }
 
     window.$message?.success(t('common.success'));
+    resetForm();
     emits('success');
   } catch (error) {
     window.$message?.error(t('common.error'));
@@ -74,16 +78,20 @@ async function handleSubmit() {
   }
 }
 
-function handleClose() {
-  formRef.value?.restoreValidation();
+function resetForm() {
   Object.assign(formModel.value, {
     name: '',
-    laborHours: 0,
-    laborPrice: 0,
-    complexityFactor: 1,
-    laborDiscountRate: 1,
+    laborHours: 1,
+    laborPrice: 36,
+    complexityFactor: 1.4,
+    laborDiscountRate: 0,
     description: ''
   });
+}
+
+function handleClose() {
+  formRef.value?.restoreValidation();
+  resetForm();
   emits('close');
 }
 </script>
@@ -119,7 +127,20 @@ function handleClose() {
           </NFormItemGi>
 
           <NFormItemGi :span="1">
-            <NFormItem :label="t('repairItem.laborDiscountRate')" path="laborDiscountRate" class="w-full">
+            <NFormItem path="laborDiscountRate" class="w-full">
+              <template #label>
+                <div class="flex items-center gap-1">
+                  {{ t('repairItem.laborDiscountRate') }}
+                  <NTooltip trigger="hover">
+                    <template #trigger>
+                      <NIcon size="16" class="text-gray-400 cursor-help">
+                        <InformationCircleOutline />
+                      </NIcon>
+                    </template>
+                    工时费优惠率范围为0-1，0表示不优惠，1表示全额优惠
+                  </NTooltip>
+                </div>
+              </template>
               <NInputNumber v-model:value="formModel.laborDiscountRate" :min="0" :max="1" :precision="2" class="w-full" />
             </NFormItem>
           </NFormItemGi>

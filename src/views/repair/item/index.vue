@@ -81,10 +81,11 @@ const {
   data: dataList,
   pagination,
   getData,
-  columns: tableColumns
+  columns: tableColumns,
+  updateSearchParams
 } = useTable({
   apiFn: fetchRepairItemList,
-  columns: () => columns.value,
+  columns: () => columns.value as any,
   apiParams: searchModel
 });
 
@@ -104,9 +105,9 @@ function handleEdit(row: Api.RepairItem.RepairItemInfo) {
   showModal.value = true;
 }
 
-function handleSearch(searchParams: Api.RepairItem.SearchParams) {
-  Object.assign(searchModel, searchParams);
-  pagination.current = 1;
+function handleSearch() {
+  updateSearchParams(searchModel);
+  pagination.page = 1;
   getData();
 }
 
@@ -117,6 +118,7 @@ function handleReset() {
     current: 1,
     size: 10
   });
+  updateSearchParams(searchModel);
   getData();
 }
 
@@ -143,7 +145,7 @@ function handleModalSuccess() {
 <template>
   <div class="h-full">
     <RepairItemSearch
-      :search-model="searchModel"
+      v-model="searchModel"
       @search="handleSearch"
       @reset="handleReset"
     />
@@ -152,6 +154,9 @@ function handleModalSuccess() {
         <div class="flex-y-center justify-between">
           <span class="text-16px font-medium">{{ t('repairItem.list') }}</span>
           <NButton type="primary" @click="handleAdd">
+            <template #icon>
+              <div class="i-material-symbols:add text-16px" />
+            </template>
             {{ t('common.add') }}
           </NButton>
         </div>

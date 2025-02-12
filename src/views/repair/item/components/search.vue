@@ -5,11 +5,16 @@ import type { SelectOption } from 'naive-ui';
 import { useNaiveForm } from '@/hooks/common/form';
 
 const { t } = useI18n();
-const { formRef, validate, restoreValidation } = useNaiveForm();
+const { formRef, validate } = useNaiveForm();
 
-const props = defineProps<{
-  searchModel: Api.RepairItem.SearchParams;
-}>();
+const searchModel = defineModel('modelValue', {
+  type: Object, default: () => ({
+    name: '',
+    isActive: undefined,
+    current: 1,
+    size: 10
+  })
+});
 
 const emits = defineEmits(['search', 'reset']);
 
@@ -19,32 +24,28 @@ const statusOptions: SelectOption[] = [
 ];
 
 function handleStatusChange(value: string | undefined) {
-  if (value === undefined) {
-    props.searchModel.isActive = undefined;
+  if (value === 'true') {
+    searchModel.value.isActive = true;
+  } else if (value === 'false') {
+    searchModel.value.isActive = false;
   } else {
-    props.searchModel.isActive = value === 'true';
+    searchModel.value.isActive = undefined;
   }
 }
 
 async function handleSearch() {
-  try {
-    await validate();
-    emits('search');
-  } catch (error) {
-    window.$message?.error(t('common.invalidForm'));
-  }
+  emits('search');
 }
 
 function handleReset() {
-  restoreValidation();
   emits('reset');
 }
 </script>
 
 <template>
   <NCard :bordered="false" class="mb-4">
-    <NCollapse>
-      <NCollapseItem>
+    <NCollapse :default-expanded-names="['0']">
+      <NCollapseItem name="0">
         <template #header>
           <div class="flex-y-center">
             <span>{{ t('common.search') }}</span>
@@ -54,36 +55,33 @@ function handleReset() {
           require-mark-placement="right-hanging" class="grid grid-cols-4 gap-4">
           <NGrid :cols="24" :x-gap="24">
             <NFormItemGi :span="6" :label="t('repairItem.name')" path="name">
-              <NInput v-model:value="searchModel.name" :placeholder="t('common.keywordSearch')" clearable />
+              <NInput v-model:value="searchModel.name" :placeholder="t('common.keywordSearch')" clearable
+                @keyup.enter="handleSearch" />
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('repairItem.isActive')" path="isActive">
-              <NSelect
-                :value="searchModel.isActive?.toString()"
-                :options="statusOptions"
-                :placeholder="t('common.select')"
-                clearable
-                @update:value="handleStatusChange"
-              />
+              <NSelect :value="searchModel.isActive?.toString()" :options="statusOptions"
+                :placeholder="t('common.select')" clearable @update:value="handleStatusChange" />
+            </NFormItemGi>
+            <NFormItemGi :span="12" class="flex justify-end">
+              <NSpace>
+                <NButton @click="handleReset">
+                  <template #icon>
+                    <div class="i-material-symbols:refresh text-16px" />
+                  </template>
+                  {{ t('common.reset') }}
+                </NButton>
+                <NButton type="primary" @click="handleSearch">
+                  <template #icon>
+                    <div class="i-material-symbols:search text-16px" />
+                  </template>
+                  {{ t('common.search') }}
+                </NButton>
+              </NSpace>
             </NFormItemGi>
           </NGrid>
         </NForm>
-        <div class="flex justify-end mt-16px">
-          <NSpace>
-            <NButton @click="handleReset">
-              <template #icon>
-                <div class="i-material-symbols:refresh text-16px" />
-              </template>
-              {{ t('common.reset') }}
-            </NButton>
-            <NButton type="primary" @click="handleSearch">
-              <template #icon>
-                <div class="i-material-symbols:search text-16px" />
-              </template>
-              {{ t('common.search') }}
-            </NButton>
-          </NSpace>
-        </div>
+
       </NCollapseItem>
     </NCollapse>
   </NCard>

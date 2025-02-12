@@ -437,6 +437,7 @@ declare namespace Api {
       laborDiscount?: number;
       estimatedHours: number;
       laborDiscountRate: number;
+      isActive: boolean;
       technicians: {
         _id: string;
         name: string;

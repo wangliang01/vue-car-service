@@ -10,42 +10,36 @@
         <NForm ref="formRef" :model="searchModel" label-placement="left">
           <NGrid :cols="24" :x-gap="24">
             <NFormItemGi :span="6" :label="t('menu.repairOrder.orderNo')" path="orderNo">
-              <NInput v-model:value="searchModel.orderNo"
-              :placeholder="t('menu.repairOrder.orderNoPlaceholder')"
-              clearable
-              @keyup.enter="handleSearch"
-              />
+              <NInput v-model:value="searchModel.orderNo" :placeholder="t('menu.repairOrder.orderNoPlaceholder')"
+                clearable @keyup.enter="handleSearch" />
             </NFormItemGi>
             <NFormItemGi :span="6" :label="t('menu.customer.name')" path="customerName">
-              <NInput v-model:value="searchModel.customerName" :placeholder="t('menu.repairOrder.customerNamePlaceholder')"
-              clearable
-              @keyup.enter="handleSearch"
-              />
+              <NInput v-model:value="searchModel.customerName"
+                :placeholder="t('menu.repairOrder.customerNamePlaceholder')" clearable @keyup.enter="handleSearch" />
             </NFormItemGi>
             <NFormItemGi :span="6" :label="t('menu.vehicle.licensePlate')" path="licensePlate">
-              <NInput v-model:value="searchModel.licensePlate" :placeholder="t('menu.repairOrder.licensePlatePlaceholder')"
-              clearable
-              @keyup.enter="handleSearch"
-              />
+              <NInput v-model:value="searchModel.licensePlate"
+                :placeholder="t('menu.repairOrder.licensePlatePlaceholder')" clearable @keyup.enter="handleSearch" />
+            </NFormItemGi>
+            <NFormItemGi :span="6" class="flex justify-end">
+              <NSpace>
+                <NButton @click="handleReset">
+                  <template #icon>
+                    <div class="i-material-symbols:refresh text-16px" />
+                  </template>
+                  {{ t('common.reset') }}
+                </NButton>
+                <NButton type="primary" @click="handleSearch">
+                  <template #icon>
+                    <div class="i-material-symbols:search text-16px" />
+                  </template>
+                  {{ t('common.search') }}
+                </NButton>
+              </NSpace>
             </NFormItemGi>
           </NGrid>
         </NForm>
-        <div class="flex justify-end mt-16px">
-          <NSpace>
-            <NButton @click="handleReset">
-              <template #icon>
-                <div class="i-material-symbols:refresh text-16px" />
-              </template>
-              {{ t('common.reset') }}
-            </NButton>
-            <NButton type="primary" @click="handleSearch">
-              <template #icon>
-                <div class="i-material-symbols:search text-16px" />
-              </template>
-              {{ t('common.search') }}
-            </NButton>
-          </NSpace>
-        </div>
+
       </NCollapseItem>
     </NCollapse>
   </NCard>
