@@ -184,8 +184,8 @@ const local: App.I18n.Schema = {
       female: '女'
     },
     status: {
-      active: '启用',
-      inactive: '禁用'
+      enable: '启用',
+      disable: '禁用'
     },
     export: '导出',
     exportSuccess: '导出成功',

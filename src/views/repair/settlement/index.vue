@@ -120,21 +120,22 @@ const columns: {
               NButton,
               {
                 size: 'small',
-                ghost: true,
-                onClick: () => handleView(row)
-              },
-              { default: () => t('common.view') }
-            ),
-            h(
-              NButton,
-              {
-                size: 'small',
                 type: 'primary',
                 ghost: true,
                 onClick: () => handleEdit(row)
               },
               { default: () => t('common.edit') }
             ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                ghost: true,
+                onClick: () => handleView(row)
+              },
+              { default: () => t('common.view') }
+            ),
+
             // h(
             //   NButton,
             //   {

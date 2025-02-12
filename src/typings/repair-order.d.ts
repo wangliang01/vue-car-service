@@ -1,3 +1,5 @@
+import { Api as CommonApi } from './common';
+
 export interface InspectionData {
   inspectionItems: Array<{
     name: string
@@ -47,4 +49,11 @@ declare namespace Api.RepairOrder {
     /** 备注 */
     remark?: string;
   }
+}
+
+export interface SearchParams extends CommonApi.Common.PaginationParams {
+  status?: string;
+  orderNo?: string;
+  customerName?: string;
+  licensePlate?: string;
 }

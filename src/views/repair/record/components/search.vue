@@ -1,7 +1,7 @@
 <template>
   <NCard :bordered="false" class="mb-16px">
-    <NCollapse>
-      <NCollapseItem>
+    <NCollapse :default-expanded-names="['0']">
+      <NCollapseItem name="0">
         <template #header>
           <div class="flex-y-center">
             <span>{{ t('common.search') }}</span>
@@ -10,13 +10,23 @@
         <NForm ref="formRef" :model="searchModel" label-placement="left">
           <NGrid :cols="24" :x-gap="24">
             <NFormItemGi :span="6" :label="t('menu.repairOrder.orderNo')" path="orderNo">
-              <NInput v-model:value="searchModel.orderNo" :placeholder="t('menu.repairOrder.orderNoPlaceholder')" />
+              <NInput v-model:value="searchModel.orderNo"
+              :placeholder="t('menu.repairOrder.orderNoPlaceholder')"
+              clearable
+              @keyup.enter="handleSearch"
+              />
             </NFormItemGi>
             <NFormItemGi :span="6" :label="t('menu.customer.name')" path="customerName">
-              <NInput v-model:value="searchModel.customerName" :placeholder="t('menu.repairOrder.customerNamePlaceholder')" />
+              <NInput v-model:value="searchModel.customerName" :placeholder="t('menu.repairOrder.customerNamePlaceholder')"
+              clearable
+              @keyup.enter="handleSearch"
+              />
             </NFormItemGi>
             <NFormItemGi :span="6" :label="t('menu.vehicle.licensePlate')" path="licensePlate">
-              <NInput v-model:value="searchModel.licensePlate" :placeholder="t('menu.repairOrder.licensePlatePlaceholder')" />
+              <NInput v-model:value="searchModel.licensePlate" :placeholder="t('menu.repairOrder.licensePlatePlaceholder')"
+              clearable
+              @keyup.enter="handleSearch"
+              />
             </NFormItemGi>
           </NGrid>
         </NForm>

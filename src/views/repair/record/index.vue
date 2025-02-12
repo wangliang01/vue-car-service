@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { reactive, h, ref, computed } from 'vue';
+import { reactive, h, ref, computed, nextTick } from 'vue';
 import { NButton, NSpace, NCard, NDataTable, NSelect, NTag, useDialog, useMessage } from 'naive-ui';
 import dayjs from 'dayjs';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
-import { fetchRepairOrderList, fetchUpdateRepairOrderStatus, checkRepairOrder, repairRepairOrder, fetchCompleteRepairOrder } from '@/service/api/repair-order';
+import { fetchRepairOrderList } from '@/service/api/repair-order';
 import RepairOrderSearch from './components/search.vue';
+import RepairOrderDetail from './components/Detail.vue';
 
 defineOptions({ name: 'RepairOrderList' });
 
@@ -18,13 +19,6 @@ const searchModel = reactive<Api.RepairOrder.SearchParams>({
   licensePlate: ''
 });
 
-const statusOptions = computed(() => [
-  { label: t('repairOrder.status.pending'), value: 'pending' },
-  { label: t('repairOrder.status.checked'), value: 'checked' },
-  { label: t('repairOrder.status.repairing'), value: 'repairing' },
-  { label: t('repairOrder.status.completed'), value: 'completed' },
-  { label: t('repairOrder.status.delivered'), value: 'delivered' }
-]);
 
 const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' | 'error'> = {
   pending: 'default',
@@ -35,7 +29,6 @@ const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' 
 };
 
 const columns = computed(() => [
-  // { type: 'selection' as const, width: 50 },
   { title: t('common.index'), key: 'index', width: 60 },
   { title: t('menu.repairOrder.orderNo'), key: 'orderNo', width: 150 },
   {
@@ -84,7 +77,28 @@ const columns = computed(() => [
     key: 'vehicleBrandModel',
     width: 150,
     render: (row: Api.RepairOrder.RepairOrderInfo) => {
-      return row.vehicle ? `${row.vehicle.brand || '-'}/${row.vehicle.model || '-'}` : '-';
+      return row.vehicle ? h(
+        'div',
+        {
+          style: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }
+        },
+        [
+          h('img', {
+            src: `/src/assets/imgs/brand/${row.vehicle.brand.toLowerCase()}.png`,
+            style: {
+              width: '24px',
+              height: '24px',
+              objectFit: 'contain'
+            },
+            alt: row.vehicle.brand
+          }),
+          `${row.vehicle.brand || '-'}/${row.vehicle.model || '-'}`
+        ]
+      ) : '-';
     }
   },
   {
@@ -160,7 +174,7 @@ const columns = computed(() => [
             {
               size: 'small',
               ghost: true,
-              onClick: () => handleView(row)
+              onClick: () => handleView(row as any)
             },
             { default: () => t('common.view') }
           ),
@@ -179,117 +193,49 @@ const {
   updateSearchParams,
   resetSearchParams
 } = useTable({
-  apiFn: fetchRepairOrderList,
-  columns: () => columns.value,
+  apiFn: fetchRepairOrderList as any,
+  columns: () => columns.value as any,
   apiParams: searchModel,
   immediate: true
 });
 
-const showDrawer = ref(false);
-const showInspectionDrawer = ref(false);
-const showRepairDrawer = ref(false);
-const drawerType = ref<'add' | 'edit' | 'view'>('add');
-const editData = ref<Api.RepairOrder.RepairOrderInfo | null>(null);
-const currentOrderId = ref<string | null>(null);
+const showDetail = ref(false);
+const currentOrder = ref(null);
 
-function handleAdd() {
-  drawerType.value = 'add';
-  showDrawer.value = true;
-}
 
 function handleSearch() {
-  updateSearchParams(searchModel);
+  updateSearchParams(searchModel as Partial<Api.Common.CommonSearchParams>);
   pagination.page = 1;
   getData();
 }
 
-function handleReset() {
+async function handleReset() {
   Object.assign(searchModel, {
-    status: '',
     orderNo: '',
     customerName: '',
     licensePlate: ''
   });
-  getData();
+  updateSearchParams(searchModel as Partial<Api.Common.CommonSearchParams>);
+  nextTick(() => {
+    console.log('reset', searchModel);
+    getData();
+  });
 }
 
 function handleRefresh() {
   getData();
 }
 
-function handleSubmitSuccess() {
-  showDrawer.value = false;
-  getData();
-}
-
-function handleEdit(row: Api.RepairOrder.RepairOrderInfo) {
-  drawerType.value = 'edit';
-  editData.value = row;
-  showDrawer.value = true;
-}
-
-function handleView(row: Api.RepairOrder.RepairOrderInfo) {
-  drawerType.value = 'view';
-  editData.value = row;
-  showDrawer.value = true;
-}
-
-function handleDrawerClose() {
-  editData.value = null;
-}
-
-async function handleCheck(row: Api.RepairOrder.RepairOrderInfo) {
-  currentOrderId.value = row._id;
-  showInspectionDrawer.value = true;
-}
-
-async function handleRepair(row: Api.RepairOrder.RepairOrderInfo) {
-  currentOrderId.value = row._id;
-  showRepairDrawer.value = true;
-}
-
-async function handleInspectionSubmit(orderId: string, data: Api.RepairOrder.InspectionData) {
-  console.log("data", data)
-  try {
-    await checkRepairOrder(orderId, data);
-    window.$message?.success(t('repairOrder.checkSuccess'));
-    showInspectionDrawer.value = false;
-    await getData();
-  } catch (error) {
-    window.$message?.error(t('repairOrder.checkFailed'));
-  }
-}
-
-async function handleRepairSubmit(orderId: string, data: Api.RepairOrder.RepairData) {
-  try {
-    console.log("data", orderId, data)
-    await repairRepairOrder(orderId, {...data, status: 'repaired'});
-    window.$message?.success(t('repairOrder.repairSuccess'));
-    showRepairDrawer.value = false;
-    await getData();
-  } catch (error) {
-    console.error(error)
-    window.$message?.error(t('repairOrder.repairFailed'));
-  }
-}
-
-async function handleComplete(row: Api.RepairOrder.RepairOrderInfo) {
-  try {
-    await fetchCompleteRepairOrder(row._id);
-    window.$message?.success(t('repairOrder.completeSuccess'));
-    await getData();
-  } catch (error) {
-    window.$message?.error(t('repairOrder.completeFailed'));
-  }
+function handleView(row: Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>) {
+  currentOrder.value = row;
+  showDetail.value = true;
 }
 
 const scrollX = computed(() => {
   return tableColumns.value.reduce((acc, col) => acc + Number(col.width || 0), 0);
 });
 
-const formatStatus = (status: string) => {
-  return t(`repairOrder.status.${status}`)
-}
+
 </script>
 
 <template>
@@ -306,12 +252,6 @@ const formatStatus = (status: string) => {
             <span class="text-16px font-medium">{{ t("menu.repairOrder.list") }}</span>
           </div>
           <NSpace>
-            <NButton type="primary" @click="handleAdd" ghost>
-              <template #icon>
-                <div class="i-material-symbols:add text-16px flex-center" />
-              </template>
-              <span class="flex-center">{{ t("common.add") }}</span>
-            </NButton>
             <NButton @click="handleRefresh" ghost>
               <template #icon>
                 <div class="i-material-symbols:refresh text-16px flex-center" />
@@ -333,5 +273,10 @@ const formatStatus = (status: string) => {
         @update:page="getData"
       />
     </NCard>
+
+    <RepairOrderDetail
+      v-model:show="showDetail"
+      :edit-data="currentOrder"
+    />
   </div>
 </template>
