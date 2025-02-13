@@ -95,12 +95,11 @@ declare namespace Api {
       total: number;
     }
 
-    interface CreateStockInParams {
+    interface   CreateStockInParams {
       materialId: string;
       quantity: number;
       unitPrice: number;
       supplier: string;
-      stockInDate: number;
       remarks?: string;
     }
   }

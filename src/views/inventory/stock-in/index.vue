@@ -52,9 +52,9 @@ const columns: DataTableColumns<Api.Inventory.StockIn> = [
   { title: t('inventory.stockIn.quantity'), key: 'quantity' },
   { title: t('inventory.stockIn.unitPrice'), key: 'unitPrice' },
   { title: t('inventory.stockIn.totalAmount'), key: 'totalAmount' },
-  { title: t('inventory.stockIn.supplier'), key: 'supplier' },
+  { title: t('inventory.stockIn.supplier'), key: 'supplier', render: (row) => row.material?.supplier?.name },
   { title: t('inventory.stockIn.stockInDate'), key: 'stockInDate', render: (row) => {
-    return formatDate(row.stockInDate)
+    return formatDate(row.stockInDate, 'YYYY-MM-DD')
   } },
   {
     title: t('inventory.stockIn.status'),
@@ -77,6 +77,8 @@ const columns: DataTableColumns<Api.Inventory.StockIn> = [
           NButton,
           {
             size: 'small',
+            type: 'error',
+            ghost: true,
             onClick: () => handleCancel(row._id)
           },
           { default: () => t('inventory.stockIn.cancel') }
@@ -124,7 +126,7 @@ function handleCreate() {
 }
 
 function handleRefresh () {
-
+  loadData();
 }
 
 // 取消入库

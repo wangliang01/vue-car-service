@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSelect, NDatePicker, NSpace, NButton } from 'naive-ui';
+import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton } from 'naive-ui';
 import type { FormInst } from 'naive-ui';
 import { fetchMaterialList } from '@/service/api/material';
 import { createStockIn } from '@/service/api/inventory';
@@ -33,15 +33,15 @@ const show = defineModel<boolean>('show', {
 });
 
 const model = ref<Api.Inventory.CreateStockInParams>({
-  materialId: '',
-  quantity: 0,
-  unitPrice: 0,
-  supplier: '',
-  stockInDate: Date.now(),
+  materialId: null,
+  quantity: null,
+  unitPrice: null,
+  supplier: null,
   remarks: ''
 });
 
-const materialOptions = ref<{ label: string; value: string }[]>([]);
+const materialOptions = ref<{ label: string; value: string; material: any }[]>([]);
+const selectedMaterial = ref<any>(null);
 
 // 获取物料列表
 const fetchMaterialOptions = async () => {
@@ -49,7 +49,8 @@ const fetchMaterialOptions = async () => {
     const res = await fetchMaterialList({});
     materialOptions.value = res.data.records.map(item => ({
       label: item.name,
-      value: item._id
+      value: item._id,
+      material: item
     }));
   } catch (error) {
     console.error('获取物料列表失败:', error);
@@ -66,22 +67,16 @@ const rules = {
   quantity: {
     required: true,
     message: t('inventory.stockIn.inputQuantity'),
-    trigger: ['blur', 'change']
-  },
-  unitPrice: {
-    required: true,
-    message: t('inventory.stockIn.inputUnitPrice'),
-    trigger: ['blur', 'change']
-  },
-  supplier: {
-    required: true,
-    message: t('inventory.stockIn.inputSupplier'),
-    trigger: ['blur', 'change']
-  },
-  stockInDate: {
-    required: true,
-    message: t('inventory.stockIn.selectDate'),
-    trigger: ['blur', 'change']
+    trigger: ['blur', 'change'],
+    validator: (rule: any, value: any) => {
+      if (value === null || value === undefined || value === '') {
+        return new Error(t('inventory.stockIn.inputQuantity'));
+      }
+      if (typeof value === 'number' && value > 0) {
+        return true;
+      }
+      return new Error(t('inventory.stockIn.inputQuantity'));
+    }
   }
 };
 
@@ -90,13 +85,24 @@ const totalAmount = computed(() => {
   return model.value.quantity * model.value.unitPrice;
 });
 
+// 处理物料选择变化
+const handleMaterialChange = (materialId: string) => {
+  const selected = materialOptions.value.find(item => item.value === materialId);
+  if (selected) {
+    selectedMaterial.value = selected.material;
+    model.value.unitPrice = selected.material.purchasePrice;
+    model.value.supplier = selected.material.supplier?.name || '';
+  } else {
+    selectedMaterial.value = null;
+    model.value.unitPrice = 0;
+    model.value.supplier = '';
+  }
+};
+
 // 提交表单
 async function handleSubmit() {
   try {
     await formRef.value?.validate();
-    if (typeof model.value.stockInDate === 'string') {
-      model.value.stockInDate = new Date(model.value.stockInDate).getTime();
-    }
     await createStockIn(model.value);
     show.value = false;
     emit('success');
@@ -105,16 +111,16 @@ async function handleSubmit() {
   }
 }
 
-// 重置表单时也要设置默认时间戳
+// 重置表单
 function resetForm() {
   model.value = {
-    materialId: '',
-    quantity: 0,
-    unitPrice: 0,
-    supplier: '',
-    stockInDate: Date.now(),
+    materialId: null,
+    quantity: null,
+    unitPrice: null,
+    supplier: null,
     remarks: ''
   };
+  selectedMaterial.value = null;
   formRef.value?.restoreValidation();
 }
 
@@ -126,7 +132,6 @@ watch(() => show.value, (newVal) => {
     resetForm();
   }
 });
-
 </script>
 
 <template>
@@ -145,47 +150,31 @@ watch(() => show.value, (newVal) => {
             filterable
             :options="materialOptions"
             :placeholder="t('inventory.stockIn.selectMaterial')"
+            @update:value="handleMaterialChange"
           />
         </NFormItem>
 
         <NFormItem :label="t('inventory.stockIn.quantity')" path="quantity">
           <NInputNumber
             v-model:value="model.quantity"
-            :min="0"
+            :min="1"
             :precision="0"
             style="width: 100%"
-            :value-format="v => Number(v)"
             :placeholder="t('inventory.stockIn.inputQuantity')"
-          />
-        </NFormItem>
-
-        <NFormItem :label="t('inventory.stockIn.unitPrice')" path="unitPrice">
-          <NInputNumber
-            v-model:value="model.unitPrice"
-            style="width: 100%;"
-            :min="0"
-            :value-format="v => Number(v)"
-            :placeholder="t('inventory.stockIn.inputUnitPrice')"
-          />
-        </NFormItem>
-
-        <NFormItem :label="t('inventory.stockIn.supplier')" path="supplier">
-          <NInput
-            v-model:value="model.supplier"
-            :placeholder="t('inventory.stockIn.inputSupplier')"
             clearable
           />
         </NFormItem>
 
-        <NFormItem :label="t('inventory.stockIn.stockInDate')" path="stockInDate">
-          <NDatePicker
-            v-model:value="model.stockInDate"
-            type="date"
-            style="width: 100%;"
-            :actions="['clear', 'now']"
-            :is-date-disabled="(ts: number) => ts > Date.now()"
-            :placeholder="t('inventory.stockIn.selectDate')"
-          />
+        <NFormItem :label="t('inventory.stockIn.unitPrice')">
+          <div class="border border-gray-300 rounded-md p-2 w-full h-[34px] bg-gray-100">{{ model.unitPrice }}</div>
+        </NFormItem>
+
+        <NFormItem :label="t('inventory.stockIn.supplier')">
+          <div class="border border-gray-300 rounded-md p-2 w-full h-[34px] bg-gray-100">{{ model.supplier  }}</div>
+        </NFormItem>
+
+        <NFormItem :label="t('inventory.stockIn.totalAmount')">
+          <div class="border border-gray-300 rounded-md p-2 w-full h-[34px] bg-gray-100">{{ totalAmount }}</div>
         </NFormItem>
 
         <NFormItem :label="t('inventory.stockIn.remarks')" path="remarks">
@@ -194,10 +183,6 @@ watch(() => show.value, (newVal) => {
             type="textarea"
             :placeholder="t('common.remarks')"
           />
-        </NFormItem>
-
-        <NFormItem :label="t('inventory.stockIn.totalAmount')">
-          <span>{{ totalAmount }}</span>
         </NFormItem>
       </NForm>
 

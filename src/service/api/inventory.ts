@@ -65,6 +65,6 @@ export function createStockIn(data: Api.Inventory.CreateStockInParams) {
 export function cancelStockIn(id: string) {
   return request<void>({
     url: `/stock-in/${id}/cancel`,
-    method: 'put'
+    method: 'post'
   });
 }
