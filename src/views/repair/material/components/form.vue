@@ -53,9 +53,9 @@ const formModel = ref<Api.Material.CreateParams>({
 });
 
 const categoryOptions = [
-  { label: t('material.categoryTypes.parts'), value: '油品' },
-  { label: t('material.categoryTypes.oil'), value: '耗材' },
-  { label: t('material.categoryTypes.parts'), value: '配件' }
+  { label: t('material.categoryTypes.parts'), value: '配件' },
+  { label: t('material.categoryTypes.oil'), value: '油品' },
+  { label: t('material.categoryTypes.consumables'), value: '耗材' }
 ];
 
 const unitOptions = [
@@ -71,7 +71,12 @@ const unitOptions = [
   { label: '盒', value: '盒' },
   { label: '袋', value: '袋' },
   { label: '双', value: '双' },
-  { label: '支', value: '支' }
+  { label: '支', value: '支' },
+  { label: '副', value: '副' },
+  { label: '片', value: '片' },
+  { label: '条', value: '条' },
+  { label: '卷', value: '卷' },
+  { label: '桶', value: '桶' },
 ];
 
 watch(
@@ -274,6 +279,7 @@ function handleClose() {
                 :min="0"
                 :precision="2"
                 class="w-full"
+                :status="formModel.purchasePrice > 0 ? 'success' : undefined"
               />
             </NFormItem>
           </NFormItemGi>
@@ -293,6 +299,7 @@ function handleClose() {
                 :min="0"
                 :precision="2"
                 class="w-full"
+                :status="formModel.sellingPrice > 0 ? 'success' : undefined"
               />
             </NFormItem>
           </NFormItemGi>
@@ -305,6 +312,7 @@ function handleClose() {
                 :min="0"
                 :precision="0"
                 class="w-full"
+                :status="formModel.stockQuantity > formModel.stockThreshold ? 'success' : formModel.stockQuantity <= 0 ? 'error' : 'warning'"
               />
             </NFormItem>
           </NFormItemGi>

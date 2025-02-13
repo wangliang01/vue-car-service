@@ -28,23 +28,23 @@ const columns = ref([
   { title: t('material.specification'), key: 'specification', width: 120 },
   { title: t('material.unit'), key: 'unit', width: 80 },
   {
-    title: t('material.price'),
-    key: 'price',
+    title: t('material.purchasePrice'),
+    key: 'purchasePrice',
     width: 120,
     render: (row: Api.Material.MaterialInfo) => {
-      return h('div', [
-        h('div', `${t('material.purchasePrice')}: ¥${row.purchasePrice}`),
-        h('div', `${t('material.sellingPrice')}: ¥${row.sellingPrice}`)
+      return h('div', { class: 'flex-y-center' }, [
+        h('div', { class: 'text-14px font-medium text-green-500' }, `¥${row.purchasePrice}`)
       ]);
     }
   },
   {
-    title: t('material.stock'),
-    key: 'stock',
+    title: t('material.sellingPrice'),
+    key: 'sellingPrice',
     width: 120,
     render: (row: Api.Material.MaterialInfo) => {
-      const color = row.stockQuantity <= row.stockThreshold ? 'error' : 'success';
-      return h(NTag, { type: color }, () => `${row.stockQuantity}${row.unit}`);
+      return h('div', { class: 'flex-y-center' }, [
+        h('div', { class: 'text-14px font-medium text-orange-500' }, `¥${row.sellingPrice}`)
+      ]);
     }
   },
   {

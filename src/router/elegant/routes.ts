@@ -44,7 +44,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/customer',
     component: 'layout.base',
     meta: {
-      order: 2,
+      order: 3,
       requiresAuth: true,
       title: 'menu.customer',
       i18nKey: 'route.customer',
@@ -95,12 +95,12 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/inventory',
     component: 'layout.base',
     meta: {
-      order: 3,
+      order: 2,
       requiresAuth: true,
       title: 'menu.inventory',
       i18nKey: 'route.inventory',
       i18nTitle: true,
-      icon: 'material-symbols:inventory-2-outline'
+      icon: 'material-symbols:inventory'
     },
     children: [
       {
@@ -121,7 +121,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.inventory_stock-in',
         meta: {
           title: 'inventory_stock-in',
-          i18nKey: 'route.inventory_stock_in'
+          i18nKey: 'route.inventory_stock_in',
+          icon: 'material-symbols:inventory-2-outline'
+
         }
       }
     ]
