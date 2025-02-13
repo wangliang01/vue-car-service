@@ -36,9 +36,9 @@ const loading = ref(false);
 const formModel = ref<Api.Material.CreateParams>({
   name: '',
   code: '',
-  category: '',
+  category: null,
   specification: '',
-  unit: '',
+  unit: null,
   purchasePrice: 0,
   managementFeeRate: 0,
   sellingPrice: 0,
@@ -53,15 +53,25 @@ const formModel = ref<Api.Material.CreateParams>({
 });
 
 const categoryOptions = [
-  { label: t('material.categoryTypes.parts'), value: 'parts' },
-  { label: t('material.categoryTypes.oil'), value: 'oil' },
-  { label: t('material.categoryTypes.consumables'), value: 'consumables' }
+  { label: t('material.categoryTypes.parts'), value: '油品' },
+  { label: t('material.categoryTypes.oil'), value: '耗材' },
+  { label: t('material.categoryTypes.parts'), value: '配件' }
 ];
 
 const unitOptions = [
-  { label: t('material.unitTypes.piece'), value: 'piece' },
-  { label: t('material.unitTypes.set'), value: 'set' },
-  { label: t('material.unitTypes.liter'), value: 'liter' }
+  { label: '升', value: '升' },
+  { label: '瓶', value: '瓶' },
+  { label: '个', value: '个' },
+  { label: '台', value: '台' },
+  { label: '套', value: '套' },
+  { label: '件', value: '件' },
+  { label: '包', value: '包' },
+  { label: '箱', value: '箱' },
+  { label: '条', value: '条' },
+  { label: '盒', value: '盒' },
+  { label: '袋', value: '袋' },
+  { label: '双', value: '双' },
+  { label: '支', value: '支' }
 ];
 
 watch(
@@ -77,6 +87,33 @@ function handleCancel() {
   show.value = false
 }
 
+// 定义更新接口的类型
+interface UpdateMaterialParams {
+  name: string;
+  code: string;
+  category: string;
+  specification?: string;
+  unit: string;
+  purchasePrice: number;
+  sellingPrice: number;
+  stockQuantity: number;
+  stockThreshold: number;
+  supplier: {
+    name: string;
+    contact: string;
+    phone: string;
+  };
+  remarks?: string;
+}
+
+// 从 formModel 中提取需要的字段
+const updateData = Object.keys(formModel.value).reduce((acc, key) => {
+  if (key in formModel.value) {
+    acc[key] = formModel.value[key];
+  }
+  return acc;
+}, {} as UpdateMaterialParams);
+
 async function handleSubmit() {
   try {
     await formRef.value?.validate();
@@ -85,7 +122,20 @@ async function handleSubmit() {
     if (props.type === 'add') {
       await createMaterial(formModel.value);
     } else {
-      await updateMaterial(props.editData!._id, formModel.value);
+      const updateData: UpdateMaterialParams = {
+        name: formModel.value.name,
+        code: formModel.value.code,
+        category: formModel.value.category,
+        specification: formModel.value.specification,
+        unit: formModel.value.unit,
+        purchasePrice: formModel.value.purchasePrice,
+        sellingPrice: formModel.value.sellingPrice,
+        stockQuantity: formModel.value.stockQuantity,
+        stockThreshold: formModel.value.stockThreshold,
+        supplier: formModel.value.supplier as any ,
+        remarks: formModel.value.remarks
+      };
+      await updateMaterial(props.editData!._id, updateData);
     }
 
     window.$message?.success(t('common.success'));

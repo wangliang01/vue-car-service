@@ -5,5 +5,5 @@ export interface RepairItemInfo {
   laborPrice: number;
   complexityFactor: number;
   description?: string;
-  isActive: boolean;
+  isActive: boolean | null;
 }

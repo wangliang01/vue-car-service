@@ -1,31 +1,37 @@
 <script setup lang="ts">
+import { nextTick } from 'vue';
 import { NCard, NForm, NFormItem, NInput, NSelect, NSpace, NButton } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const props = defineProps<{
-  searchModel: Api.Material.SearchParams;
-}>();
+
+const searchModel = defineModel<Api.Material.SearchParams>('searchModel', { required: true });
 
 const emits = defineEmits(['search', 'reset']);
 
 const categoryOptions = [
-  { label: t('material.categoryTypes.parts'), value: 'parts' },
-  { label: t('material.categoryTypes.oil'), value: 'oil' },
-  { label: t('material.categoryTypes.consumables'), value: 'consumables' }
+  { label: t('material.categoryTypes.parts'), value: '配件' },
+  { label: t('material.categoryTypes.oil'), value: '油品' },
+  { label: t('material.categoryTypes.consumables'), value: '耗材' }
 ];
 
 const statusOptions = [
   { label: t('common.status.enable'), value: true },
   { label: t('common.status.disable'), value: false }
 ];
+
+const handleSelectChange = () => {
+  nextTick(() => {
+    emits('search');
+  });
+};
 </script>
 
 <template>
   <NCard :bordered="false" class="mb-4">
-    <NCollapse>
-      <NCollapseItem>
+    <NCollapse :default-expanded-names="['0']">
+      <NCollapseItem name="0">
         <template #header>
           <div class="flex-y-center">
             <span>{{ t('common.search') }}</span>
@@ -36,21 +42,23 @@ const statusOptions = [
           <NGrid :cols="24" :x-gap="24">
 
             <NFormItemGi :span="6" :label="t('material.name')" path="name">
-              <NInput v-model:value="searchModel.name" :placeholder="t('common.keywordSearch')" clearable />
+              <NInput v-model:value="searchModel.name" :placeholder="t('common.keywordSearch')" clearable
+                @keyup.enter="emits('search')" />
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('material.code')" path="code">
-              <NInput v-model:value="searchModel.code" :placeholder="t('common.keywordSearch')" clearable />
+                <NInput v-model:value="searchModel.code" :placeholder="t('common.keywordSearch')" clearable
+                @keyup.enter="emits('search')" />
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('material.categoryLabel')" path="category">
               <NSelect v-model:value="searchModel.category" :options="categoryOptions" :placeholder="t('common.select')"
-                clearable />
+                clearable @change="handleSelectChange" />
             </NFormItemGi>
 
             <NFormItemGi :span="6" :label="t('material.status')" path="status">
-              <NSelect v-model:value="searchModel.isActive" :options="statusOptions" :placeholder="t('common.select')"
-                clearable />
+              <NSelect v-model:value="searchModel.isActive as any" :options="statusOptions as any" :placeholder="t('common.select')"
+                clearable @change="handleSelectChange" />
             </NFormItemGi>
           </NGrid>
 

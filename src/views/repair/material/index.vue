@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, h, ref } from 'vue';
+import { reactive, h, ref, nextTick } from 'vue';
 import { NButton, NSpace, NCard, NDataTable, NTag } from 'naive-ui';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
@@ -14,8 +14,10 @@ const { t } = useI18n();
 const searchModel = reactive<Api.Material.SearchParams>({
   name: '',
   code: '',
-  category: '',
-  isActive: true
+  category: null,
+  isActive: null,
+  current: 1,
+  size: 10
 });
 
 const columns = ref([
@@ -100,10 +102,11 @@ const {
   data: dataList,
   pagination,
   getData,
-  columns: tableColumns
+  columns: tableColumns,
+  updateSearchParams
 } = useTable({
-  apiFn: fetchMaterialList,
-  columns: () => columns.value,
+  apiFn: fetchMaterialList as any,
+  columns: () => columns.value as any,
   apiParams: searchModel,
   immediate: true
 });
@@ -124,6 +127,7 @@ function handleEdit(row: Api.Material.MaterialInfo) {
 }
 
 function handleSearch() {
+  updateSearchParams(searchModel);
   pagination.page = 1;
   getData();
 }
@@ -132,9 +136,12 @@ function handleReset() {
   Object.assign(searchModel, {
     name: '',
     code: '',
-    category: '',
-    isActive: true
+    category: null,
+    isActive: null,
+    current: 1,
+    size: 10
   });
+  updateSearchParams(searchModel);
   getData();
 }
 
@@ -169,9 +176,12 @@ async function handleToggleStatus(row: Api.Material.MaterialInfo) {
       <template #header>
         <div class="flex-y-center justify-between">
           <span class="text-16px font-medium">{{ t('material.list') }}</span>
-          <NButton type="primary" @click="handleAdd">
-            {{ t('common.add') }}
-          </NButton>
+          <NButton type="primary" @click="handleAdd" ghost>
+            <template #icon>
+              <div class="i-material-symbols:add text-16px flex-center" />
+              </template>
+              <span class="flex-center">{{ t('common.add') }}</span>
+            </NButton>
         </div>
       </template>
 

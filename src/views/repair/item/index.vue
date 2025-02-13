@@ -145,7 +145,7 @@ function handleModalSuccess() {
       <template #header>
         <div class="flex-y-center justify-between">
           <span class="text-16px font-medium">{{ t('repairItem.list') }}</span>
-          <NButton type="primary" @click="handleAdd">
+          <NButton type="primary" @click="handleAdd" ghost>
             <template #icon>
               <div class="i-material-symbols:add text-16px" />
             </template>
