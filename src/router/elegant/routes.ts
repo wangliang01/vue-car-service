@@ -123,7 +123,6 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'inventory_stock-in',
           i18nKey: 'route.inventory_stock_in',
           icon: 'material-symbols:inventory-2-outline'
-
         }
       }
     ]

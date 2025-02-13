@@ -40,6 +40,8 @@ declare namespace Api {
     interface UpdateInventoryParams {
       quantity: number;
       remarks?: string;
+      alertThreshold?: number;
+      maxQuantity?: number;
     }
 
     interface SearchParams {

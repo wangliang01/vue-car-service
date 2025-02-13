@@ -59,13 +59,14 @@ const columns = [
   { title: '单位', key: 'unit', width: '100px', render: (row: Api.Inventory.InventoryItem) => row.material.unit },
   { title: '采购单价', key: 'purchasePrice', width: '100px', render: (row: Api.Inventory.InventoryItem) => row.material.purchasePrice },
   { title: '销售单价', key: 'sellingPrice', width: '100px', render: (row: Api.Inventory.InventoryItem) => row.material.sellingPrice },
-  { title: '供应商', key: 'supplier', width: '200px', render: (row: Api.Inventory.InventoryItem) => {
+  { title: '供应商', key: 'supplier', width: '160px', render: (row: Api.Inventory.InventoryItem) => {
     const { name, contact, phone } = row.material.supplier;
     return h('div', {}, [
       h('div', {}, name),
       h('div', {}, contact + ' ' + phone)
     ]);
   } },
+  { title: '备注', key: 'remarks', width: '120px' },
   { title: '创建时间', key: 'createTime', width: '180px', render: (row: Api.Inventory.InventoryItem) => formatDate(row.createTime) },
   { title: '更新时间', key: 'updateTime', width: '180px', render: (row: Api.Inventory.InventoryItem) => formatDate(row.updateTime) },
   {
@@ -130,7 +131,9 @@ const handleFormSubmit = async (formData: Api.Inventory.CreateInventoryParams) =
     if (editData.value) {
       const updateParams: Api.Inventory.UpdateInventoryParams = {
         quantity: formData.quantity,
-        remarks: formData.remarks
+        remarks: formData.remarks,
+        alertThreshold: formData.alertThreshold,
+        maxQuantity: formData.maxQuantity
       };
       await adjustInventory(editData.value._id, updateParams);
       message.success('编辑成功');
