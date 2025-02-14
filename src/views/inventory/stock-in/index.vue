@@ -110,6 +110,7 @@ async function loadData() {
 // 搜索
 function handleSearch() {
   pagination.value.page = 1;
+  console.log("searchModel", searchModel.value)
   loadData();
 }
 

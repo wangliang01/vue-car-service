@@ -46,6 +46,7 @@ async function handleSearch() {
   }
 }
 
+const dateRange = ref<[number, number] | null>(null);
 // 重置
 function handleReset() {
   model.value = {
@@ -53,12 +54,13 @@ function handleReset() {
     supplier: '',
     status: undefined,
     startDate: null,
-    endDate: null
+    endDate: null,
   };
+  dateRange.value = null
   emit('reset');
 }
 
-const dateRange = ref<[number, number] | null>(null);
+
 
 function handleDateRangeUpdate(dates: [number, number] | null) {
   if (dates) {
@@ -67,6 +69,7 @@ function handleDateRangeUpdate(dates: [number, number] | null) {
     model.value.startDate = null;
     model.value.endDate = null;
   }
+  emit('search')
 }
 </script>
 
