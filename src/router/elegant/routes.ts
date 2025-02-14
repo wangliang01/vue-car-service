@@ -50,7 +50,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.customer',
       i18nTitle: true,
       icon: 'material-symbols:person-outline',
-      permissions: ['customer:view']
+      permissions: ['customer', 'customer:list']
     },
     children: [
       {
@@ -76,10 +76,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'home',
       i18nKey: 'route.home',
       icon: 'material-symbols:dashboard-outline',
-      order: 0,
-      // 如果是公共页面，不需要配置 permissions
-      // 如果需要权限控制，则取消注释下面的配置
-      // permissions: ['home:view']
+      order: 0
     }
   },
   {
@@ -106,7 +103,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.inventory',
       i18nTitle: true,
       icon: 'material-symbols:inventory',
-      permissions: ['inventory:view']
+      permissions: ['inventory', 'inventory:list']
     },
     children: [
       {
@@ -155,7 +152,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'repair',
       i18nKey: 'route.repair',
       icon: 'material-symbols:build-outline',
-      permissions: ['repair:view']
+      permissions: ['repair', 'repair:list']
     },
     children: [
       {
@@ -231,7 +228,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.system',
       i18nTitle: true,
       icon: 'material-symbols:settings-outline',
-      permissions: ['system:view']
+      permissions: ['system', 'system:user', 'system:role', 'system:store', 'system:technician', 'system:permission']
     },
     children: [
       {
@@ -316,7 +313,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.vehicle',
       i18nTitle: true,
       icon: 'material-symbols:directions-car',
-      permissions: ['vehicle:view']
+      permissions: ['vehicle', 'vehicle:list']
     },
     children: [
       {

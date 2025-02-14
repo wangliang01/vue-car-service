@@ -23,7 +23,7 @@ import {
   transformMenuToSearchMenus,
   updateLocaleOfGlobalMenus
 } from './shared';
-
+import { filterAsyncRoutes } from '@/utils/permission';
 export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   const appStore = useAppStore();
   const authStore = useAuthStore();
@@ -63,6 +63,8 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     });
 
     constantRoutes.value = Array.from(constantRoutesMap.values());
+
+    addAuthRoutes(constantRoutes.value);
   }
 
   /** auth routes */
@@ -198,6 +200,8 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
 
     const staticRoute = createStaticRoutes();
 
+    console.log('staticRoute', staticRoute);
+
     if (authRouteMode.value === 'static') {
       addConstantRoutes(staticRoute.constantRoutes);
     } else {
@@ -270,7 +274,12 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   function handleConstantAndAuthRoutes() {
     const allRoutes = [...constantRoutes.value, ...authRoutes.value];
 
+    console.log('allRoutes', allRoutes);
+
     const sortRoutes = sortRoutesByOrder(allRoutes);
+
+    const filteredRoutes = filterAsyncRoutes(sortRoutes);
+    console.log('filteredRoutes', filteredRoutes, sortRoutes);
 
     const vueRoutes = getAuthVueRoutes(sortRoutes);
 
@@ -278,7 +287,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
 
     addRoutesToVueRouter(vueRoutes);
 
-    getGlobalMenus(sortRoutes);
+    getGlobalMenus(filteredRoutes);
 
     getCacheRoutes(vueRoutes);
   }
