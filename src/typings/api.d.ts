@@ -70,6 +70,7 @@ declare namespace Api {
     }
 
     interface UserInfo {
+      isAdmin: boolean;
       userId: string;
       name: string;
       roles: string[];

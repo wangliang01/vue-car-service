@@ -49,7 +49,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'menu.customer',
       i18nKey: 'route.customer',
       i18nTitle: true,
-      icon: 'material-symbols:person-outline'
+      icon: 'material-symbols:person-outline',
+      permissions: ['customer:view']
     },
     children: [
       {
@@ -61,7 +62,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.customer_list',
           i18nTitle: true,
           icon: 'material-symbols:group-outline',
-          requiresAuth: true
+          requiresAuth: true,
+          permissions: ['customer:list']
         }
       }
     ]
@@ -74,7 +76,10 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'home',
       i18nKey: 'route.home',
       icon: 'material-symbols:dashboard-outline',
-      order: 0
+      order: 0,
+      // 如果是公共页面，不需要配置 permissions
+      // 如果需要权限控制，则取消注释下面的配置
+      // permissions: ['home:view']
     }
   },
   {
@@ -100,7 +105,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'menu.inventory',
       i18nKey: 'route.inventory',
       i18nTitle: true,
-      icon: 'material-symbols:inventory'
+      icon: 'material-symbols:inventory',
+      permissions: ['inventory:view']
     },
     children: [
       {
@@ -112,7 +118,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.inventory_list',
           i18nTitle: true,
           icon: 'material-symbols:list-alt-outline',
-          requiresAuth: true
+          requiresAuth: true,
+          permissions: ['inventory:list']
         }
       },
       {
@@ -121,8 +128,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.inventory_stock-in',
         meta: {
           title: 'inventory_stock-in',
-          i18nKey: 'route.inventory_stock_in',
-          icon: 'material-symbols:inventory-2-outline'
+          i18nKey: 'route.inventory_stock-in',
+          icon: 'material-symbols:inventory-2-outline',
+          permissions: ['inventory:stock-in']
         }
       }
     ]
@@ -146,7 +154,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'repair',
       i18nKey: 'route.repair',
-      icon: 'material-symbols:build-outline'
+      icon: 'material-symbols:build-outline',
+      permissions: ['repair:view']
     },
     children: [
       {
@@ -157,7 +166,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'repair_item',
           i18nKey: 'route.repair_item',
           icon: 'material-symbols:handyman-outline',
-          order: 4
+          order: 4,
+          permissions: ['repair:item']
         }
       },
       {
@@ -168,7 +178,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'repair_list',
           i18nKey: 'route.repair_list',
           icon: 'material-symbols:receipt-long-outline',
-          order: 1
+          order: 1,
+          permissions: ['repair:list']
         }
       },
       {
@@ -179,7 +190,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'repair_material',
           i18nKey: 'route.repair_material',
           icon: 'material-symbols:inventory-2-outline',
-          order: 5
+          order: 5,
+          permissions: ['repair:material']
         }
       },
       {
@@ -190,7 +202,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'repair_record',
           i18nKey: 'route.repair_record',
           icon: 'material-symbols:history',
-          order: 3
+          order: 3,
+          permissions: ['repair:record']
         }
       },
       {
@@ -201,7 +214,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'repair_settlement',
           i18nKey: 'route.repair_settlement',
           icon: 'material-symbols:payments-outline',
-          order: 2
+          order: 2,
+          permissions: ['repair:settlement']
         }
       }
     ]
@@ -216,7 +230,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'menu.system',
       i18nKey: 'route.system',
       i18nTitle: true,
-      icon: 'material-symbols:settings-outline'
+      icon: 'material-symbols:settings-outline',
+      permissions: ['system:view']
     },
     children: [
       {
@@ -229,7 +244,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           icon: 'material-symbols:admin-panel-settings',
           i18nKey: 'route.system_permission',
           i18nTitle: true,
-          requiresAuth: true
+          requiresAuth: true,
+          permissions: ['system:permission']
         }
       },
       {
@@ -242,7 +258,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.system_role',
           i18nTitle: true,
           icon: 'material-symbols:shield-person-outline',
-          requiresAuth: true
+          requiresAuth: true,
+          permissions: ['system:role']
         }
       },
       {
@@ -255,7 +272,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.system_store',
           i18nTitle: true,
           icon: 'material-symbols:store-outline',
-          requiresAuth: true
+          requiresAuth: true,
+          permissions: ['system:store']
         }
       },
       {
@@ -267,7 +285,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system_technician',
           i18nKey: 'route.system_technician',
           i18nTitle: true,
-          icon: 'material-symbols:engineering-outline'
+          icon: 'material-symbols:engineering-outline',
+          permissions: ['system:technician']
         }
       },
       {
@@ -280,7 +299,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.system_user',
           i18nTitle: true,
           icon: 'material-symbols:person-outline',
-          requiresAuth: true
+          requiresAuth: true,
+          permissions: ['system:user']
         }
       }
     ]
@@ -295,7 +315,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'menu.vehicle',
       i18nKey: 'route.vehicle',
       i18nTitle: true,
-      icon: 'material-symbols:directions-car'
+      icon: 'material-symbols:directions-car',
+      permissions: ['vehicle:view']
     },
     children: [
       {
@@ -307,7 +328,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.vehicle_list',
           i18nTitle: true,
           icon: 'material-symbols:directions-car-outline',
-          requiresAuth: true
+          requiresAuth: true,
+          permissions: ['vehicle:list']
         }
       }
     ]

@@ -23,6 +23,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   const userInfo: Api.Auth.UserInfo = reactive({
     userId: '',
     name: '',
+    isAdmin: false,
     roles: [],
     permissions: []
   });
@@ -41,8 +42,22 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   async function resetStore() {
     const authStore = useAuthStore();
 
+    // 清除存储的认证信息
     clearAuthStorage();
 
+    // 重置用户信息
+    Object.assign(userInfo, {
+      userId: '',
+      name: '',
+      isAdmin: false,
+      roles: [],
+      permissions: []
+    });
+
+    // 清除token
+    token.value = '';
+
+    // 重置store
     authStore.$reset();
 
     if (!route.meta.constant) {

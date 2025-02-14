@@ -334,10 +334,7 @@ const local: App.I18n.Schema = {
     system_technician: '技师管理',
     inventory: '库存管理',
     inventory_list: '库存列表',
-    inventory_stock_in: '入库管理',
-    inventory_stock_out: '出库管理',
-    inventory_stock_adjust: '库存调整',
-    inventory_stock_check: '库存盘点'
+    'inventory_stock-in': '入库管理',
   },
   page: {
     login: {
