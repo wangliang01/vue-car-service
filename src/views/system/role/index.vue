@@ -62,7 +62,7 @@ const columns: DataTableColumns<RoleInfo> = [
     key: 'status',
     render(row) {
       const type = row.status === 'inactive' ? 'warning' : 'success';
-      const text = row.status === 'inactive' ? t('common.status.inactive') : t('common.status.active');
+      const text = row.status === 'inactive' ? t('common.status.disable') : t('common.status.enable');
       return h(NTag, { type }, { default: () => text });
     }
   },
@@ -241,7 +241,7 @@ loadTableData();
       </template>
 
       <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
-        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" />
+        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" remote />
     </NCard>
 
     <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"

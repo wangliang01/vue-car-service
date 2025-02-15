@@ -15,7 +15,8 @@ const pagination = ref({
   pageSize: 10,
   itemCount: 0,
   showSizePicker: true,
-  pageSizes: [10, 20, 30, 40]
+  pageSizes: [10, 20, 30, 40],
+  prefix: page => `总共 ${page.itemCount} 条`
 });
 
 const handlePageChange = (page: number) => {
@@ -217,6 +218,7 @@ loadData();
           x-scroll="1000"
           @update:page="handlePageChange"
           @update:page-size="handlePageSizeChange"
+          remote
         />
       </NSpace>
     </NCard>

@@ -315,7 +315,7 @@ loadTableData();
       </template>
 
       <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
-        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" />
+        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" remote />
     </NCard>
 
     <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"

@@ -25,7 +25,8 @@ const pagination = ref({
   pageSize: 10,
   itemCount: 0,
   showSizePicker: true,
-  pageSizes: [10, 20, 30, 40]
+  pageSizes: [10, 20, 30, 40],
+  prefix: page => `总共 ${page.itemCount} 条`
 });
 
 // 表单控制
@@ -196,6 +197,7 @@ loadData();
         :loading="loading"
         :pagination="pagination"
         @update:page="handlePageChange"
+        remote
       />
     </NCard>
 
