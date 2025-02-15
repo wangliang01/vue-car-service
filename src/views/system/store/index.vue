@@ -18,25 +18,8 @@ import LinkUser from './modules/link-user.vue';
 import { formatDate } from '@/utils/common';
 const { t } = useI18n();
 const message = useMessage();
+import { useTable } from '@/hooks/common/table';
 
-// 搜索表单
-const searchModel = ref<Api.Store.SearchParams>({
-  name: '',
-  code: '',
-  status: null,
-  current: 1,
-  size: 10
-});
-
-// 表格数据
-const loading = ref(false);
-const dataList = ref<Api.Store.StoreInfo[]>([]);
-const pagination = ref({
-  current: 1,
-  size: 10,
-  total: 0,
-  pageSizes: [10, 20, 30, 50]
-});
 
 // 选中行
 const checkedRowKeys = ref<(string | number)[]>([]);
@@ -54,7 +37,7 @@ const currentStoreName = ref('');
 const linkedUserIds = ref<string[]>([]);
 
 // 表格列定义
-const columns: DataTableColumns<Api.Store.StoreInfo> = [
+const getColumns = () => [
   { type: 'selection' },
   { title: t('system.store.name'), key: 'name' },
   { title: t('system.store.code'), key: 'code' },
@@ -134,39 +117,39 @@ const columns: DataTableColumns<Api.Store.StoreInfo> = [
   }
 ];
 
-// 获取数据
-async function getData(page = pagination.value.current) {
-  loading.value = true;
-  try {
-    const { data } = await fetchStoreList({
-      ...searchModel.value,
-      current: page,
-      size: pagination.value.size,
-    });
-    dataList.value = data.records;
-    pagination.value.total = data.total;
-  } finally {
-    loading.value = false;
-  }
-}
+const {
+  loading,
+  data: dataList,
+  pagination,
+  getData,
+  searchParams: searchModel,
+  columns: tableColumns,
+  updateSearchParams,
+  resetSearchParams
+} = useTable({
+  apiFn: fetchStoreList,
+  columns: () => getColumns() as any,
+  apiParams: {
+    current: 1,
+    size: 10,
+      name: '',
+    code: '',
+    status: null,
+  },
+  immediate: true,
+  showTotal: true
+});
 
 // 搜索
 function handleSearch() {
-  console.log("搜索", searchModel.value);
-  getData(1);
+  updateSearchParams(searchModel);
+  getData();
 }
 
 // 重置
 function handleReset() {
-  Object.assign(searchModel.value, {
-    name: '',
-    code: '',
-    status: null,
-  });
-  searchModel.value.name = ''
-  searchModel.value.code = ''
-  searchModel.value.status = null
-  getData(1);
+  resetSearchParams();
+  getData();
 }
 
 // 新增
@@ -339,24 +322,15 @@ onMounted(() => {
       <!-- 表格 -->
       <NDataTable
         :loading="loading"
-        :columns="columns"
+        :columns="tableColumns"
         :data="dataList"
         :row-key="row => row._id"
         :checked-row-keys="checkedRowKeys"
         @update:checked-row-keys="checkedRowKeys = $event"
+        :pagination="pagination"
+        remote
       />
 
-      <!-- 分页 -->
-      <div class="mt-16px flex justify-end">
-        <NPagination
-          v-model:page="pagination.current"
-          v-model:page-size="pagination.size"
-          :item-count="pagination.total"
-          :page-sizes="pagination.pageSizes"
-          @update:page="getData"
-          @update:page-size="getData(1)"
-        />
-      </div>
     </NCard>
 
     <!-- 表单抽屉 -->
