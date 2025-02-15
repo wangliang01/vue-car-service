@@ -217,6 +217,8 @@ declare namespace Api {
     }
 
     interface SearchParams {
+      current?: number;
+      size?: number;
       status?: string;
       orderNo?: string;
       customerName?: string;

@@ -16,10 +16,12 @@ defineOptions({ name: 'RepairOrderList' });
 const { t } = useI18n();
 
 const searchModel = reactive<Api.RepairOrder.SearchParams>({
+  current: 1,
+  size: 10,
   status: null,
-  orderNo: '',
-  customerName: '',
-  licensePlate: ''
+  orderNo: null,
+  customerName: null,
+  licensePlate: null
 });
 
 const statusOptions = computed(() => [
@@ -38,7 +40,7 @@ const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' 
   delivered: 'success'
 };
 
-const columns = computed(() => [
+const getColumns = () => [
   // { type: 'selection' as const, width: 50 },
   { title: t('common.index'), key: 'index', width: 60 },
   { title: t('menu.repairOrder.orderNo'), key: 'orderNo', width: 150 },
@@ -221,22 +223,28 @@ const columns = computed(() => [
       });
     }
   }
-]);
+]
 
 const {
   loading,
-  data: dataList,
+  data,
   pagination,
-  getData,
-  columns: tableColumns,
+  searchParams,
+  mobilePagination,
+  columns,
   updateSearchParams,
-  resetSearchParams
+  resetSearchParams,
+  getData,
+  getDataByPage
 } = useTable({
   apiFn: fetchRepairOrderList as any,
-  columns: () => columns.value as any,
+  showTotal: true,
+  columns: () => getColumns() as any,
   apiParams: searchModel,
-  immediate: true
+  // immediate: true,
 });
+
+
 
 const showDrawer = ref(false);
 const showInspectionDrawer = ref(false);
@@ -337,12 +345,13 @@ async function handleComplete(row: Api.RepairOrder.RepairOrderInfo) {
 }
 
 const scrollX = computed(() => {
-  return tableColumns.value.reduce((acc, col) => acc + Number(col.width || 0), 0);
+  return columns.value.reduce((acc, col) => acc + Number(col.width || 0), 0);
 });
 
 const formatStatus = (status: string) => {
   return t(`repairOrder.status.${status}`)
 }
+
 </script>
 
 <template>
@@ -377,8 +386,9 @@ const formatStatus = (status: string) => {
 
       <NDataTable
         :loading="loading"
-        :columns="tableColumns"
-        :data="dataList"
+        :columns="columns"
+        :data="data"
+        remote
         :pagination="pagination"
         :scroll-x="scrollX"
         :style="{ maxWidth: '100%' }"
