@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, h, ref, computed } from 'vue';
+import { reactive, h, ref, computed, onMounted } from 'vue';
 import { NButton, NSpace, NCard, NDataTable, NSelect, useDialog, useMessage, NDrawer } from 'naive-ui';
 import { useTable } from '@/hooks/common/table';
 import { useI18n } from 'vue-i18n';
@@ -18,20 +18,9 @@ import { BRAND_LOGOS, DEFAULT_BRAND_LOGO, getBrandLogo, getBrandLabel } from '@/
 
 defineOptions({ name: 'VehicleList' });
 const { t } = useI18n();
-
-const searchModel = reactive<Api.Vehicle.VehicleSearchParams>({
-  customerId: '',
-  brand: '',
-  model: '',
-  licensePlate: ''
-});
-
-const appStore = useAppStore();
-
-const columns = computed(() => [
-  { type: 'selection' as const },
-  { title: t('common.index'), key: 'index', width: 80 },
-
+const getColumns = () => [
+  { type: 'selection' as const, width: 50 },
+  { title: t('common.index'), key: 'index', width: 50 },
   {
     title: t('menu.vehicle.brand') + ' / ' + t('menu.vehicle.model'),
     key: 'brand',
@@ -120,31 +109,41 @@ const columns = computed(() => [
       ]);
     }
   }
-]);
+]
 
 const checkedRowKeys = ref<string[]>([]);
 const brands = ref<string[]>([]);
 const models = ref<string[]>([]);
+
+interface SearchParams extends Api.Common.CommonSearchParams {
+  customerId?: string;
+  brand?: string;
+  model?: string;
+  licensePlate?: string;
+}
 
 const {
   loading,
   data: dataList,
   pagination,
   getData,
+  searchParams: searchModel,
   columns: tableColumns,
   updateSearchParams,
   resetSearchParams
 } = useTable({
   apiFn: fetchVehicleList,
-  columns: () => columns.value,
+  columns: () => getColumns() as any,
   apiParams: {
-    customerId: '',
-    brand: '',
-    model: '',
-    licensePlate: ''
-  },
+    current: 1,
+    size: 10,
+    customerId: null,
+    brand: null,
+    model: null,
+    licensePlate: null
+  } as SearchParams,
   immediate: true,
-  rowKey: '_id'
+  showTotal: true
 });
 
 const showDrawer = ref(false);
@@ -187,7 +186,6 @@ const exporting = ref(false);
 // Add handleSearch method
 const handleSearch = () => {
   updateSearchParams(searchModel);
-  pagination.page = 1;
   getData();
 };
 
@@ -202,9 +200,9 @@ async function getBrands() {
 }
 
 // 获取车型列表
-async function getModels(brand: string) {
+async function getModels() {
   try {
-    const { data } = await fetchVehicleModels(brand);
+    const { data } = await fetchVehicleModels();
     models.value = data;
   } catch (error) {
     console.error('Failed to fetch models:', error);
@@ -214,16 +212,7 @@ async function getModels(brand: string) {
 
 // 重置搜索条件的方法
 const handleReset = () => {
-   // 重置 searchModel
-   Object.assign(searchModel, {
-    customerId: '',
-    brand: '',
-    model: '',
-    licensePlate: ''
-  });
   resetSearchParams();
-  models.value = [];
-  pagination.page = 1;
   getData();
 };
 
@@ -236,10 +225,10 @@ const handleAdd = () => {
     customerId: '',
     brand: '',
     model: '',
-    year: '',
+    year: null,
     licensePlate: '',
     vin: '',
-    mileage: '',
+    mileage: null,
     createdAt: '',
     updatedAt: ''
   };
@@ -257,7 +246,7 @@ const handleBatchDelete = async () => {
       positiveText: t('common.confirm'),
       negativeText: t('common.cancel'),
       onPositiveClick: async () => {
-        await fetchDeleteVehicleBatch({ ids: checkedRowKeys.value });
+        await fetchDeleteVehicleBatch(checkedRowKeys.value);
         $message.success(t('common.deleteSuccess'));
         checkedRowKeys.value = [];
         getData();
@@ -312,8 +301,15 @@ const handleSubmitSuccess = () => {
   $message.success(drawerType.value === 'add' ? t('common.addSuccess') : t('common.updateSuccess'));
 };
 
+function handleCheckedRowKeys(keys: string[]) {
+  checkedRowKeys.value = keys;
+}
+
 // 初始化加载品牌列表
-getBrands();
+onMounted(() => {
+  getBrands();
+  getModels();
+});
 </script>
 
 <template>
@@ -324,9 +320,8 @@ getBrands();
       :models="models"
       @search="handleSearch"
       @reset="handleReset"
-      @brand-change="getModels"
     />
-    <NCard :bordered="false" class="flex-1 vehicle-list-card">
+    <NCard :bordered="false" class="flex-1 vehicle-list-card mt-4">
       <template #header>
         <div class="flex-y-center justify-between">
           <div class="flex-y-center">
@@ -368,7 +363,7 @@ getBrands();
         :pagination="pagination"
         :scroll-x="1600"
         :row-key="(row: Api.Vehicle.VehicleInfo) => row._id"
-        @update:checked-row-keys="checkedRowKeys = $event"
+        @update:checked-row-keys="handleCheckedRowKeys"
         @update:page="getData"
       />
     </NCard>
@@ -379,7 +374,6 @@ getBrands();
       :brands="brands"
       :models="models"
       @submit-success="handleSubmitSuccess"
-      @brand-change="getModels"
     />
   </div>
 </template>

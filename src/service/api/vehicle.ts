@@ -63,11 +63,10 @@ export function fetchVehicleBrands() {
 }
 
 /** 获取车型列表 */
-export function fetchVehicleModels(brand: string) {
+export function fetchVehicleModels() {
   return request({
     url: '/vehicle/models',
     method: 'get',
-    params: { brand }
   });
 }
 

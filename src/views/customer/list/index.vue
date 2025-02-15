@@ -132,6 +132,7 @@ function handleEdit(row: Api.Customer.CustomerInfo) {
 }
 
 function handleSearch() {
+  updateSearchParams(searchModel);
   getData();
 }
 
