@@ -9,22 +9,11 @@ import Search from './modules/search.vue';
 import Form from './modules/form.vue';
 import LinkRole from './modules/link-role.vue';
 import { formatDate } from '@/utils/common';
-
+import { useTable } from '@/hooks/common/table';
 defineOptions({ name: 'UserManagement' });
 
 const { t } = useI18n();
 const message = useMessage();
-
-// 表格数据
-const tableData = ref<UserInfo[]>([]);
-const loading = ref(false);
-const pagination = reactive({
-  page: 1,
-  pageSize: 10,
-  itemCount: 0,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30, 40]
-});
 
 // 关联角色控制
 const showLinkRole = ref(false);
@@ -33,13 +22,7 @@ const currentUserId = ref<string>();
 const currentUsername = ref('');
 const linkedRoleIds = ref<string[]>([]);
 
-// 搜索条件
-const searchModel = ref({
-  username: '',
-  name: '',
-  phone: '',
-  email: ''
-});
+
 
 // 表单控制
 const showForm = ref(false);
@@ -49,7 +32,7 @@ const formLoading = ref(false);
 const editData = ref<UserForm | null>(null);
 
 // 表格列定义
-const columns: DataTableColumns<UserInfo> = [
+const getColumns = () => [
   {
     title: t('system.user.username'),
     key: 'username'
@@ -166,47 +149,43 @@ const columns: DataTableColumns<UserInfo> = [
   }
 ];
 
-// 加载表格数据
-async function loadTableData() {
-  loading.value = true;
-  try {
-    const { data } = await getUserList({
-      page: pagination.page,
-      limit: pagination.pageSize,
-      ...searchModel.value
-    });
+const {
+  loading,
+  data: dataList,
+  pagination,
+  getData,
+  searchParams: searchModel,
+  columns: tableColumns,
+  updateSearchParams,
+  resetSearchParams
+} = useTable({
+  apiFn: getUserList as any,
+  columns: () => getColumns() as any,
+  apiParams: {
+    current: 1,
+    size: 10,
+    username: '',
+    name: '',
+    phone: '',
+    email: ''
+  },
+  immediate: true,
+  showTotal: true
+});
 
-    tableData.value = data.list;
-    pagination.itemCount = data.total;
-  } finally {
-    loading.value = false;
-  }
-}
 
 // 处理搜索
 function handleSearch() {
-  pagination.page = 1;
-  loadTableData();
+  updateSearchParams(searchModel);
+  getData();
 }
 
 // 处理重置
 function handleReset() {
-  pagination.page = 1;
-  loadTableData();
+  resetSearchParams();
+  getData();
 }
 
-// 处理分页变化
-function handlePageChange(page: number) {
-  pagination.page = page;
-  loadTableData();
-}
-
-// 处理每页条数变化
-function handlePageSizeChange(pageSize: number) {
-  pagination.pageSize = pageSize;
-  pagination.page = 1;
-  loadTableData();
-}
 
 // 新增用户
 function handleAdd() {
@@ -232,10 +211,10 @@ function handleEdit(row: UserInfo) {
 async function handleDelete(row: UserInfo) {
   await deleteUser(row.id);
   message.success(t('common.deleteSuccess'));
-  if (tableData.value.length === 1 && pagination.page > 1) {
+  if (dataList.value.length === 1 && pagination.page > 1) {
     pagination.page -= 1;
   }
-  loadTableData();
+  getData();
 
 }
 
@@ -252,7 +231,7 @@ async function handleFormSubmit(data: UserForm) {
       message.success(t('common.createSuccess'));
     }
     showForm.value = false;
-    loadTableData();
+    getData();
   } catch (err) {
     message.error(currentId.value ? t('common.updateError') : t('common.createError'));
   } finally {
@@ -285,7 +264,7 @@ async function handleLinkRoleSubmit(roleIds: string[]) {
     await updateUserRoles(currentUserId.value, roleIds);
     message.success(t('common.updateSuccess'));
     showLinkRole.value = false;
-    loadTableData();
+    getData();
   } catch (err) {
     message.error(t('common.updateError'));
   } finally {
@@ -293,8 +272,6 @@ async function handleLinkRoleSubmit(roleIds: string[]) {
   }
 }
 
-// 初始加载
-loadTableData();
 </script>
 
 <template>
@@ -314,8 +291,7 @@ loadTableData();
         </NSpace>
       </template>
 
-      <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
-        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" remote />
+      <NDataTable :loading="loading" :columns="tableColumns" :data="dataList" :pagination="pagination" remote />
     </NCard>
 
     <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"
