@@ -23,17 +23,8 @@ const statusOptions = [
   { label: t('common.status.disable'), value: 'disable' }
 ];
 
-const searchModel = reactive<Api.Customer.CustomerSearchParams>({
-  name: '',
-  gender: '',
-  email: '',
-  phone: '',
-  address: '',
-  userStatus: ''
-});
-
-const columns: DataTableColumns<Api.Customer.CustomerInfo> = [
-  { type: 'selection' },
+const getColumns = () => [
+  { type: 'selection' as const, width: 50 },
   { title: t('common.index'), key: 'index', width: 80 },
   { title: t('menu.customer.name'), key: 'name', width: 160 },
   { title: t('menu.customer.contact'), key: 'contact', width: 100 },
@@ -77,11 +68,26 @@ const columns: DataTableColumns<Api.Customer.CustomerInfo> = [
 // 添加选中行的状态
 const checkedRowKeys = ref<string[]>([]);
 
-// 修改表格配置，添加 rowKey 和选中行事件
-const { loading, data: dataList, pagination, getData, columns: tableColumns } = useTable({
-  apiFn: fetchCustomerList,
-  columns: () => columns,
+interface SearchParams extends Api.Common.CommonSearchParams {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}
+
+const { loading, data: dataList, pagination, getData, columns: tableColumns, searchParams: searchModel, updateSearchParams, resetSearchParams, getDataByPage } = useTable({
+  apiFn: fetchCustomerList as any,
+  columns: () => getColumns() as any,
   immediate: true,
+  showTotal: true,
+  apiParams: {
+    current: 1,
+    size: 10,
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+  } as SearchParams
 });
 
 const showDrawer = ref(false);
@@ -135,16 +141,7 @@ function handleRefresh() {
 
 // 重置函数
 function handleReset() {
-  // 重置搜索表单
-  Object.assign(searchModel, {
-    name: '',
-    gender: '',
-    email: '',
-    phone: '',
-    address: '',
-    userStatus: ''
-  });
-  // 重新获取数据
+  resetSearchParams();
   getData();
 }
 
@@ -261,8 +258,9 @@ function handleSubmitSuccess() {
         :pagination="pagination"
         :scroll-x="1300"
         :row-key="(row: Api.Customer.CustomerInfo) => row._id"
-        @update:checked-row-keys="checkedRowKeys = $event"
+        @update:checked-row-keys="handleCheckedRowKeys"
         @update:page="getData"
+        remote
       />
     </NCard>
     <CustomerForm

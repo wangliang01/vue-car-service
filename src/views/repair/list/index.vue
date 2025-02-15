@@ -15,23 +15,6 @@ defineOptions({ name: 'RepairOrderList' });
 
 const { t } = useI18n();
 
-// const searchModel = reactive<Api.RepairOrder.SearchParams>({
-//   current: 1,
-//   size: 10,
-//   status: null,
-//   orderNo: null,
-//   customerName: null,
-//   licensePlate: null
-// });
-
-const statusOptions = computed(() => [
-  { label: t('repairOrder.status.pending'), value: 'pending' },
-  { label: t('repairOrder.status.checked'), value: 'checked' },
-  { label: t('repairOrder.status.repaired'), value: 'repaired' },
-  { label: t('repairOrder.status.completed'), value: 'completed' },
-  { label: t('repairOrder.status.delivered'), value: 'delivered' }
-]);
-
 const statusTagTypes: Record<string, 'default' | 'warning' | 'info' | 'success' | 'error'> = {
   pending: 'default',
   checked: 'warning',
@@ -271,8 +254,7 @@ function handleAdd() {
 
 function handleSearch() {
   updateSearchParams(searchModel as Api.Common.CommonSearchParams);
-  pagination.page = 1;
-  getData();
+  getDataByPage();
 }
 
 function handleReset() {

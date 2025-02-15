@@ -14,7 +14,7 @@ interface Emits {
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
 
-const { formRef, validate, restoreValidation } = useNaiveForm();
+const { formRef } = useNaiveForm();
 
 const model = defineModel<Api.Customer.CustomerSearchParams>('model', { required: true });
 
@@ -42,12 +42,10 @@ const rules = computed<Record<RuleKey, App.Global.FormRule>>(() => {
 });
 
 async function reset() {
-  await restoreValidation();
   emit('reset');
 }
 
 async function search() {
-  await validate();
   emit('search');
 }
 
@@ -55,39 +53,23 @@ async function search() {
 
 <template>
   <NCard :bordered="false" size="small">
-    <NCollapse>
-      <NCollapseItem :title="t('common.search')" name="customer-search">
+    <NCollapse :default-expanded-names="['0']">
+      <NCollapseItem :title="t('common.search')" name="0">
         <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
-            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.name')" path="name" class="pr-24px">
-              <NInput v-model:value="model.name" :placeholder="t('menu.customer.nameSearch')" />
+            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.name')" path="name">
+              <NInput v-model:value="model.name" :placeholder="t('menu.customer.nameSearch')" clearable @keyup.enter="search"/>
             </NFormItemGi>
-            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.gender')" path="gender" class="pr-24px">
-              <NSelect
-                v-model:value="model.gender"
-                :placeholder="t('menu.customer.genderSearch')"
-                :options="genderOptions"
-                clearable
-              />
+            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.email')" path="email">
+              <NInput v-model:value="model.email" :placeholder="t('menu.customer.emailSearch')" clearable @keyup.enter="search"/>
             </NFormItemGi>
-            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.email')" path="email" class="pr-24px">
-              <NInput v-model:value="model.email" :placeholder="t('menu.customer.emailSearch')" />
+            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.phone')" path="phone">
+              <NInput v-model:value="model.phone" :placeholder="t('menu.customer.phoneSearch')" clearable @keyup.enter="search"/>
             </NFormItemGi>
-            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.phone')" path="phone" class="pr-24px">
-              <NInput v-model:value="model.phone" :placeholder="t('menu.customer.phoneSearch')" />
+            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.address')" path="address">
+              <NInput v-model:value="model.address" :placeholder="t('menu.customer.addressSearch')" clearable @keyup.enter="search"/>
             </NFormItemGi>
-            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.address')" path="address" class="pr-24px">
-              <NInput v-model:value="model.address" :placeholder="t('menu.customer.addressSearch')" />
-            </NFormItemGi>
-            <NFormItemGi span="24 s:12 m:6" :label="t('menu.customer.userStatus')" path="userStatus" class="pr-24px">
-              <NSelect
-                v-model:value="model.userStatus"
-                :placeholder="t('menu.customer.statusSearch')"
-                :options="statusOptions"
-                clearable
-              />
-            </NFormItemGi>
-            <NFormItemGi span="18 m:18">
+            <NFormItemGi span="24">
               <NSpace class="w-full" justify="end">
                 <NButton @click="reset" ghost>
                   <template #icon>
@@ -95,7 +77,7 @@ async function search() {
                   </template>
                   {{ t('common.reset') }}
                 </NButton>
-                <NButton type="primary" ghost @click="search">
+                <NButton type="primary"  @click="search">
                   <template #icon>
                     <div class="i-material-symbols:search text-16px flex-center" />
                   </template>
