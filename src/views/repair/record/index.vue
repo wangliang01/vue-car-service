@@ -267,6 +267,7 @@ const scrollX = computed(() => {
         :columns="tableColumns"
         :data="dataList"
         :pagination="pagination"
+        remote
         :scroll-x="scrollX"
         :style="{ maxWidth: '100%' }"
         :row-key="(row: Api.RepairOrder.RepairOrderInfo) => row._id"
