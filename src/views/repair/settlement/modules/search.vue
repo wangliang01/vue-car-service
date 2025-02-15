@@ -7,14 +7,10 @@ const { t } = useI18n();
 const loading = ref(false);
 
 const model = defineModel<{
-  status?: string;
+  current: number;
+  size: number;
   settlementNo?: string;
   repairOrderNo?: string;
-  paymentMethod?: string;
-  startDate?: string;
-  endDate?: string;
-  minAmount?: number;
-  maxAmount?: number;
 }>('model');
 
 const statusOptions = [
@@ -37,7 +33,12 @@ function handleSearch() {
 }
 
 function handleReset() {
-  model.value = {};
+  model.value = {
+    current: 1,
+    size: 10,
+    settlementNo: null,
+    repairOrderNo: null
+  };
   emit('reset');
 }
 </script>

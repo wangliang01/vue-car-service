@@ -15,14 +15,14 @@ defineOptions({ name: 'RepairOrderList' });
 
 const { t } = useI18n();
 
-const searchModel = reactive<Api.RepairOrder.SearchParams>({
-  current: 1,
-  size: 10,
-  status: null,
-  orderNo: null,
-  customerName: null,
-  licensePlate: null
-});
+// const searchModel = reactive<Api.RepairOrder.SearchParams>({
+//   current: 1,
+//   size: 10,
+//   status: null,
+//   orderNo: null,
+//   customerName: null,
+//   licensePlate: null
+// });
 
 const statusOptions = computed(() => [
   { label: t('repairOrder.status.pending'), value: 'pending' },
@@ -141,9 +141,11 @@ const getColumns = () => [
 
   { title: t('menu.repairOrder.faultDesc'), key: 'faultDesc', width: 150 },
   { title: t('common.remark'), key: 'remark', width: 150 },
-  { title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100, render: (row: Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>) => {
-    return row.mechanic ? `${row.mechanic.name || '-'}` : '-';
-  } },
+  {
+    title: t('menu.repairOrder.mechanic'), key: 'mechanic', width: 100, render: (row: Api.RepairOrder.RepairOrderInfo<Api.RepairOrder.MechanicInfo>) => {
+      return row.mechanic ? `${row.mechanic.name || '-'}` : '-';
+    }
+  },
   {
     title: t('menu.repairOrder.inDate'),
     key: 'inDate',
@@ -229,7 +231,7 @@ const {
   loading,
   data,
   pagination,
-  searchParams,
+  searchParams: searchModel,
   mobilePagination,
   columns,
   updateSearchParams,
@@ -240,7 +242,14 @@ const {
   apiFn: fetchRepairOrderList as any,
   showTotal: true,
   columns: () => getColumns() as any,
-  apiParams: searchModel,
+  apiParams: {
+    current: 1,
+    size: 10,
+    status: null,
+    orderNo: null,
+    customerName: null,
+    licensePlate: null
+  },
   // immediate: true,
 });
 
@@ -267,12 +276,7 @@ function handleSearch() {
 }
 
 function handleReset() {
-  Object.assign(searchModel, {
-    status: '',
-    orderNo: '',
-    customerName: '',
-    licensePlate: ''
-  });
+  resetSearchParams()
   getData();
 }
 
@@ -321,7 +325,7 @@ async function handleInspectionSubmit(orderId: string, data: Api.RepairOrder.Ins
   }
 }
 
-async function handleRepairSubmit( data: Api.RepairOrder.RepairData) {
+async function handleRepairSubmit(data: Api.RepairOrder.RepairData) {
   try {
     console.log("data", data)
     await repairRepairOrder(currentOrderId.value, data);
@@ -356,11 +360,7 @@ const formatStatus = (status: string) => {
 
 <template>
   <div class="h-full">
-    <RepairOrderSearch
-      :search-model="searchModel"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
+    <RepairOrderSearch :search-model="searchModel" @search="handleSearch" @reset="handleReset" />
     <NCard :bordered="false" class="flex-1">
       <template #header>
         <div class="flex-y-center justify-between">
@@ -384,38 +384,15 @@ const formatStatus = (status: string) => {
         </div>
       </template>
 
-      <NDataTable
-        :loading="loading"
-        :columns="columns"
-        :data="data"
-        remote
-        :pagination="pagination"
-        :scroll-x="scrollX"
-        :style="{ maxWidth: '100%' }"
-        :row-key="(row: Api.RepairOrder.RepairOrderInfo) => row._id"
-        @update:page="getData"
-      />
+      <NDataTable :loading="loading" :columns="columns" :data="data" remote :pagination="mobilePagination"
+        :scroll-x="scrollX" :style="{ maxWidth: '100%' }"
+        :row-key="(row: Api.RepairOrder.RepairOrderInfo) => row._id" />
     </NCard>
-    <RepairOrderForm
-      v-model:show="showDrawer"
-      :type="drawerType"
-      :edit-data="editData"
-      @submit-success="handleSubmitSuccess"
-      @update:show="handleDrawerClose"
-    />
-    <RepairOrderInspection
-      v-model:show="showInspectionDrawer"
-      :order-id="currentOrderId"
-      @submit="handleInspectionSubmit"
-    />
-    <RepairOrderRepair
-      v-model:show="showRepairDrawer"
-      :order-id="currentOrderId"
-      @submit="handleRepairSubmit"
-    />
-    <RepairOrderDetail
-      v-model:show="showDetail"
-      :edit-data="currentOrder"
-    />
+    <RepairOrderForm v-model:show="showDrawer" :type="drawerType" :edit-data="editData"
+      @submit-success="handleSubmitSuccess" @update:show="handleDrawerClose" />
+    <RepairOrderInspection v-model:show="showInspectionDrawer" :order-id="currentOrderId"
+      @submit="handleInspectionSubmit" />
+    <RepairOrderRepair v-model:show="showRepairDrawer" :order-id="currentOrderId" @submit="handleRepairSubmit" />
+    <RepairOrderDetail v-model:show="showDetail" :edit-data="currentOrder" />
   </div>
 </template>
