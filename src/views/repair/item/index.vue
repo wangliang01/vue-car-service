@@ -86,7 +86,8 @@ const {
 } = useTable({
   apiFn: fetchRepairItemList,
   columns: () => columns.value as any,
-  apiParams: searchModel
+  apiParams: searchModel,
+  showTotal: true
 });
 
 const showModal = ref(false);
@@ -155,7 +156,7 @@ function handleModalSuccess() {
       </template>
 
       <NDataTable :loading="loading" :columns="tableColumns" :data="dataList" :pagination="pagination"
-        @update:page="getData" />
+        @update:page="getData" remote />
     </NCard>
 
     <RepairItemModal v-model:show="showModal" :type="modalType" :edit-data="editData" @close="handleModalClose"

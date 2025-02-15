@@ -196,7 +196,8 @@ const {
   apiFn: fetchRepairOrderList as any,
   columns: () => columns.value as any,
   apiParams: searchModel,
-  immediate: true
+  immediate: true,
+  showTotal: true
 });
 
 const showDetail = ref(false);

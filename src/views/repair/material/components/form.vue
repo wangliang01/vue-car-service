@@ -42,8 +42,6 @@ const formModel = ref<Api.Material.CreateParams>({
   purchasePrice: 0,
   managementFeeRate: 0,
   sellingPrice: 0,
-  stockQuantity: 0,
-  stockThreshold: 10,
   supplier: {
     name: '',
     contact: '',
@@ -101,8 +99,6 @@ interface UpdateMaterialParams {
   unit: string;
   purchasePrice: number;
   sellingPrice: number;
-  stockQuantity: number;
-  stockThreshold: number;
   supplier: {
     name: string;
     contact: string;
@@ -135,8 +131,6 @@ async function handleSubmit() {
         unit: formModel.value.unit,
         purchasePrice: formModel.value.purchasePrice,
         sellingPrice: formModel.value.sellingPrice,
-        stockQuantity: formModel.value.stockQuantity,
-        stockThreshold: formModel.value.stockThreshold,
         supplier: formModel.value.supplier as any ,
         remarks: formModel.value.remarks
       };
@@ -144,6 +138,7 @@ async function handleSubmit() {
     }
 
     window.$message?.success(t('common.success'));
+    resetForm();
     emits('success');
   } catch (error) {
     window.$message?.error(t('common.error'));
@@ -152,26 +147,27 @@ async function handleSubmit() {
   }
 }
 
-function handleClose() {
-  formRef.value?.restoreValidation();
-  Object.assign(formModel.value, {
+function resetForm() {
+  formModel.value = {
     name: '',
     code: '',
     category: '',
     specification: '',
     unit: '',
     purchasePrice: 0,
-    managementFeeRate: 0,
     sellingPrice: 0,
-    stockQuantity: 0,
-    stockThreshold: 10,
     supplier: {
       name: '',
       contact: '',
       phone: ''
     },
     remarks: ''
-  });
+  };
+}
+
+function handleClose() {
+  formRef.value?.restoreValidation();
+  resetForm();
   emits('close');
 }
 </script>
@@ -300,30 +296,6 @@ function handleClose() {
                 :precision="2"
                 class="w-full"
                 :status="formModel.sellingPrice > 0 ? 'success' : undefined"
-              />
-            </NFormItem>
-          </NFormItemGi>
-
-          <!-- 库存信息 -->
-          <NFormItemGi :span="1">
-            <NFormItem :label="t('material.stockQuantity')" path="stockQuantity" class="w-full">
-              <NInputNumber
-                v-model:value="formModel.stockQuantity"
-                :min="0"
-                :precision="0"
-                class="w-full"
-                :status="formModel.stockQuantity > formModel.stockThreshold ? 'success' : formModel.stockQuantity <= 0 ? 'error' : 'warning'"
-              />
-            </NFormItem>
-          </NFormItemGi>
-
-          <NFormItemGi :span="1">
-            <NFormItem :label="t('material.stockThreshold')" path="stockThreshold" class="w-full">
-              <NInputNumber
-                v-model:value="formModel.stockThreshold"
-                :min="0"
-                :precision="0"
-                class="w-full"
               />
             </NFormItem>
           </NFormItemGi>

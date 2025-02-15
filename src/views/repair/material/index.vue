@@ -108,7 +108,8 @@ const {
   apiFn: fetchMaterialList as any,
   columns: () => columns.value as any,
   apiParams: searchModel,
-  immediate: true
+  immediate: true,
+  showTotal: true
 });
 
 const showModal = ref(false);
@@ -191,6 +192,7 @@ async function handleToggleStatus(row: Api.Material.MaterialInfo) {
         :data="dataList"
         :pagination="pagination"
         @update:page="getData"
+        remote
       />
     </NCard>
 
