@@ -22,7 +22,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
   const userInfo: Api.Auth.UserInfo = reactive({
     userId: '',
-    name: '',
+    username: '',
     isAdmin: false,
     roles: [],
     permissions: []
@@ -48,7 +48,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     // 重置用户信息
     Object.assign(userInfo, {
       userId: '',
-      name: '',
+      username: '',
       isAdmin: false,
       roles: [],
       permissions: []
@@ -90,7 +90,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
         if (routeStore.isInitAuthRoute) {
           window.$notification?.success({
             title: $t('page.login.common.loginSuccess'),
-            content: $t('page.login.common.welcomeBack', { userName: userInfo.name }),
+            content: $t('page.login.common.welcomeBack', { userName: userInfo.username }),
             duration: 4500
           });
         }

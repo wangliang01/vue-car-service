@@ -11,7 +11,7 @@ import { createPermissionGuard } from './permission';
  */
 export function createRouterGuard(router: Router) {
   createProgressGuard(router);
-  createPermissionGuard(router);
   createRouteGuard(router);
+  createPermissionGuard(router);
   createDocumentTitleGuard(router);
 }
