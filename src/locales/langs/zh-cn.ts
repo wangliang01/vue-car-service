@@ -163,7 +163,7 @@ const local: App.I18n.Schema = {
     operate: '操作',
     operation: '操作',
     createTime: '创建时间',
-    pay: '支付',
+    confirmPay: '确认支付',
     pleaseCheckValue: '请选择要操作的数据',
     refresh: '刷新',
     reset: '重置',

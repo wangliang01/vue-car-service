@@ -81,7 +81,7 @@ const getColumns = () => {
       title: t('common.action'),
       key: 'actions',
       fixed: 'right',
-      width: 200,
+      width: 220,
       render: (row) => {
         return h(
           NSpace,
@@ -96,7 +96,7 @@ const getColumns = () => {
                   ghost: true,
                   onClick: () => handlePay(row._id)
                 },
-                { default: () => t('common.pay') }
+                { default: () => t('common.confirmPay') }
               ),
               h(
                 NButton,
@@ -161,6 +161,8 @@ const {
   // immediate: true,
 });
 
+console.log("searchParams", searchParams);
+
 
 
 const scrollX = computed(() => {
@@ -197,11 +199,21 @@ function handleEditSuccess() {
 }
 
 
+function handleSearch() {
+  getData();
+}
+
+function handleReset() {
+  resetSearchParams();
+  getData();
+}
+
+
 </script>
 
 <template>
   <div class="settlement-container">
-    <Search v-model:model="searchParams" @search="getData" @reset="getData" />
+    <Search v-model:model="searchParams" @search="handleSearch" @reset="handleReset" />
 
     <NCard>
       <template #header>

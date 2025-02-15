@@ -7,8 +7,8 @@ const { t } = useI18n();
 const loading = ref(false);
 
 const model = defineModel<{
-  current: number;
-  size: number;
+  current?: number;
+  size?: number;
   settlementNo?: string;
   repairOrderNo?: string;
 }>('model');
