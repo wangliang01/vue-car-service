@@ -65,58 +65,165 @@ const todos = ref([
   }
 ]);
 
-// 工单趋势图表
+// 生成最近30天的日期数据
+const getLast30Days = () => {
+  const dates = [];
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    dates.push(`${date.getMonth() + 1}月${date.getDate()}日`);
+  }
+  return dates;
+};
+
+// 生成模拟的收入数据
+const generateRevenueData = () => {
+  return Array.from({ length: 30 }, () => Math.floor(Math.random() * 50000 + 10000));
+};
+
+// 收入趋势图表
 const getOrderTrendOptions = (): ECOption => ({
   tooltip: {
-    trigger: 'axis'
+    trigger: 'axis',
+    formatter: '{b}<br />{a}: ¥{c}'
   },
   xAxis: {
     type: 'category',
-    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    data: getLast30Days(),
+    axisLabel: {
+      interval: 'auto',
+      rotate: 45,
+      fontSize: 12,
+      margin: 8
+    }
   },
   yAxis: {
-    type: 'value'
+    type: 'value',
+    axisLabel: {
+      formatter: (value: number) => `¥${value}`
+    }
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '15%',
+    containLabel: true
   },
   series: [
     {
-      name: t('page.home.chart.orderCount'),
+      name: t('page.home.chart.revenueTrend'),
       type: 'line',
       smooth: true,
-      data: [23, 35, 28, 42, 36, 48, 35]
+      data: generateRevenueData(),
+      itemStyle: {
+        color: '#67c23a'
+      },
+      areaStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            {
+              offset: 0,
+              color: 'rgba(103,194,58,0.3)'
+            },
+            {
+              offset: 1,
+              color: 'rgba(103,194,58,0.1)'
+            }
+          ]
+        }
+      }
     }
   ]
 });
 
+// 获取最近12个月
+const getLast12Months = () => {
+  const months = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(`${month.getFullYear()}年${month.getMonth() + 1}月`);
+  }
+  return months;
+};
+
+// 生成模拟的月度收入数据
+const generateMonthlyRevenueData = () => {
+  return Array.from({ length: 12 }, () => ({
+    parts: Math.floor(Math.random() * 200000 + 100000),
+    labor: Math.floor(Math.random() * 150000 + 80000)
+  }));
+};
+
 // 收入分析图表
-const getRevenueOptions = (): ECOption => ({
-  tooltip: {
-    trigger: 'axis'
-  },
-  legend: {
-    data: [t('page.home.chart.partsRevenue'), t('page.home.chart.laborRevenue')]
-  },
-  xAxis: {
-    type: 'category',
-    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [
-    {
-      name: t('page.home.chart.partsRevenue'),
-      type: 'bar',
-      stack: 'revenue',
-      data: [8520, 9332, 8301, 9334, 11390, 9330, 8920]
+const getRevenueOptions = (): ECOption => {
+  const monthlyData = generateMonthlyRevenueData();
+  return {
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any) => {
+        const month = params[0].axisValue;
+        let html = `${month}<br/>`;
+        params.forEach((param: any) => {
+          html += `${param.seriesName}: ¥${param.value.toLocaleString()}<br/>`;
+        });
+        const total = params.reduce((sum: number, param: any) => sum + param.value, 0);
+        html += `总计: ¥${total.toLocaleString()}`;
+        return html;
+      }
     },
-    {
-      name: t('page.home.chart.laborRevenue'),
-      type: 'bar',
-      stack: 'revenue',
-      data: [5220, 4182, 4891, 5234, 6290, 5330, 4910]
-    }
-  ]
-});
+    legend: {
+      data: [t('page.home.chart.partsRevenue'), t('page.home.chart.laborRevenue')]
+    },
+    xAxis: {
+      type: 'category',
+      data: getLast12Months(),
+      axisLabel: {
+        interval: 0,
+        rotate: 45,
+        fontSize: 12,
+        margin: 8
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: (value: number) => `¥${value.toLocaleString()}`
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      containLabel: true
+    },
+    series: [
+      {
+        name: t('page.home.chart.partsRevenue'),
+        type: 'bar',
+        stack: 'revenue',
+        data: monthlyData.map(d => d.parts),
+        itemStyle: {
+          color: '#409EFF'
+        }
+      },
+      {
+        name: t('page.home.chart.laborRevenue'),
+        type: 'bar',
+        stack: 'revenue',
+        data: monthlyData.map(d => d.labor),
+        itemStyle: {
+          color: '#67C23A'
+        }
+      }
+    ]
+  };
+};
 
 const { domRef: orderTrendRef } = useEcharts(getOrderTrendOptions);
 const { domRef: revenueChartRef } = useEcharts(getRevenueOptions);
@@ -144,9 +251,9 @@ onMounted(() => {
       <NGi span="24 s:12 m:6">
         <NCard :bordered="false">
           <NStatistic :label="t('page.home.stats.totalOrders')" :value="stats.repairOrders.total">
-            <template #suffix>
+            <!-- <template #suffix>
               <NTag type="success">{{ stats.repairOrders.completed }} {{ t('page.home.stats.completed') }}</NTag>
-            </template>
+            </template> -->
           </NStatistic>
         </NCard>
       </NGi>
@@ -160,18 +267,18 @@ onMounted(() => {
       <NGi span="24 s:12 m:6">
         <NCard :bordered="false">
           <NStatistic :label="t('page.home.stats.totalCustomers')" :value="stats.customers.total">
-            <template #suffix>
+            <!-- <template #suffix>
               <NTag type="info">+{{ stats.customers.monthlyNew }}</NTag>
-            </template>
+            </template> -->
           </NStatistic>
         </NCard>
       </NGi>
       <NGi span="24 s:12 m:6">
         <NCard :bordered="false">
           <NStatistic :label="t('page.home.stats.inventoryAlert')" :value="stats.inventory.lowStock">
-            <template #suffix>
+            <!-- <template #suffix>
               <NTag type="warning">{{ stats.inventory.outOfStock }}</NTag>
-            </template>
+            </template> -->
           </NStatistic>
         </NCard>
       </NGi>
@@ -180,7 +287,7 @@ onMounted(() => {
     <!-- 图表区域 -->
     <NGrid :x-gap="gap" :y-gap="16" responsive="screen" item-responsive>
       <NGi span="24 s:24 m:14">
-        <NCard :bordered="false" :title="t('page.home.chart.orderTrend')">
+        <NCard :bordered="false" :title="t('page.home.chart.revenueTrend')">
           <div ref="orderTrendRef" class="h-80" />
         </NCard>
       </NGi>
