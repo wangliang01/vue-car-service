@@ -1,58 +1,20 @@
 <script setup lang="ts">
-import { ref, h } from 'vue';
+import { ref, h, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NCard, NSpace, NButton, NInput, NDataTable, NPopconfirm, useMessage } from 'naive-ui';
 import { getInventoryList, createInventory, adjustInventory } from '@/service/api/inventory';
 import { formatDate } from '@/utils/common';
 import InventoryForm from './components/form.vue';
 import InventorySearch from './components/search.vue';
+import { useTable } from '@/hooks/common/table';
+
 const { t } = useI18n();
 const message = useMessage();
 const tableRef = ref(null);
-const loading = ref(false);
-const pagination = ref({
-  page: 1,
-  pageSize: 10,
-  itemCount: 0,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30, 40],
-  prefix: page => `总共 ${page.itemCount} 条`
-});
-
-const handlePageChange = (page: number) => {
-  pagination.value.page = page;
-  loadData();
-};
-
-const handlePageSizeChange = (pageSize: number) => {
-  pagination.value.pageSize = pageSize;
-  loadData();
-};
-
 const showModal = ref(false);
 const editData = ref<Api.Inventory.InventoryItem | null>(null);
 
-const openModal = (data?: Api.Inventory.InventoryItem) => {
-  editData.value = data || null;
-  console.log('editData', editData.value);
-  showModal.value = true;
-};
-
-const closeModal = () => {
-  showModal.value = false;
-  editData.value = null;
-};
-
-const searchModel = ref<Api.Inventory.SearchParams>({
-  code: '',
-  name: '',
-  category: '',
-  supplier: '',
-  page: 1,
-  size: 10
-});
-
-const columns = [
+const getColumns = () => [
   { title: '材料编号', key: 'code', width: '100px', render: (row: Api.Inventory.InventoryItem) => row.material.code },
   { title: '材料名称', key: 'name', width: '100px', render: (row: Api.Inventory.InventoryItem) => row.material.name },
   { title: '类别', key: 'category', width: '100px', render: (row: Api.Inventory.InventoryItem) => row.material.category },
@@ -90,34 +52,50 @@ const columns = [
   }
 ];
 
-const data = ref<Api.Inventory.InventoryItem[]>([]);
+const {
+  loading,
+  data: dataList,
+  pagination,
+  getData,
+  searchParams: searchModel,
+  columns: tableColumns,
+  updateSearchParams,
+  resetSearchParams
+} = useTable({
+  apiFn: getInventoryList as any,
+  columns: () => getColumns() as any,
+  apiParams: {
+    current: 1,
+    size: 10,
+    code: '',
+    name: '',
+    category: '',
+    supplier: '',
+  },
+  immediate: true,
+  showTotal: true
+});
+
+const scrollX = computed(() => {
+  return tableColumns.value.reduce((acc, col) => acc + (parseInt(col.width as string) || 0), 0);
+})
 
 const handleAdd = () => {
   openModal();
 };
 
-const handleRefresh = () => {
-  loadData();
+
+
+
+const openModal = (data?: Api.Inventory.InventoryItem) => {
+  editData.value = data || null;
+  console.log('editData', editData.value);
+  showModal.value = true;
 };
 
-// 获取数据
-const loadData = async () => {
-  loading.value = true;
-  try {
-    data.value = [];
-    const params = {
-      ...searchModel.value,
-      page: pagination.value.page,
-      size: pagination.value.pageSize
-    };
-    const res = await getInventoryList(params);
-    data.value = res.data.records;
-    pagination.value.itemCount = res.data.total;
-  } catch (error) {
-    message.error('加载数据失败');
-  } finally {
-    loading.value = false;
-  }
+const closeModal = () => {
+  showModal.value = false;
+  editData.value = null;
 };
 
 // 编辑记录
@@ -143,7 +121,7 @@ const handleFormSubmit = async (formData: Api.Inventory.CreateInventoryParams) =
       message.success('新增成功');
     }
     closeModal();
-    await loadData();
+    getData();
   } catch (error) {
     message.error(editData.value ? '编辑失败' : '新增失败');
   } finally {
@@ -153,29 +131,15 @@ const handleFormSubmit = async (formData: Api.Inventory.CreateInventoryParams) =
 
 // 处理搜索
 const handleSearch = () => {
-  pagination.value.page = 1;
-  console.log('search', searchModel.value);
-  loadData();
+  updateSearchParams(searchModel);
+  getData();
 };
 
 // 处理重置
 const handleReset = () => {
-  searchModel.value = {
-    code: '',
-    name: '',
-    category: '',
-    supplier: '',
-    minQuantity: undefined,
-    maxQuantity: undefined,
-    minPrice: undefined,
-    maxPrice: undefined
-  };
-  pagination.value.page = 1;
-  loadData();
+  resetSearchParams();
+  getData();
 };
-
-// 初始加载
-loadData();
 </script>
 
 <template>
@@ -199,12 +163,6 @@ loadData();
               </template>
               <span class="flex-center">{{ t("common.add") }}</span>
             </NButton>
-            <NButton @click="handleRefresh" ghost>
-              <template #icon>
-                <div class="i-material-symbols:refresh text-16px flex-center" />
-              </template>
-              <span class="flex-center">{{ t("common.refresh") }}</span>
-            </NButton>
           </NSpace>
         </div>
       </template>
@@ -212,12 +170,10 @@ loadData();
         <NDataTable
           ref="tableRef"
           :loading="loading"
-          :columns="columns"
-          :data="data"
+          :columns="tableColumns"
+          :data="dataList"
           :pagination="pagination"
-          x-scroll="1000"
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
+          :x-scroll="scrollX"
           remote
         />
       </NSpace>

@@ -69,7 +69,7 @@ const columns = ref([
     fixed: 'right',
     width: 200,
     render: (row: Api.Material.MaterialInfo) => {
-      return h(NSpace, { justify: 'center' }, {
+      return h(NSpace, { justify: 'start' }, {
         default: () => [
           h(
             NButton,
