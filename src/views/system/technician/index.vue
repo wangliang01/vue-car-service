@@ -6,33 +6,12 @@ import type { DataTableColumns } from 'naive-ui';
 import { getTechnicianList, deleteTechnician, updateTechnicianStatus } from '@/service/api/technician';
 import Search from './modules/search.vue';
 import Form from './modules/form.vue';
+import { useTable } from '@/hooks/common/table';
 
 defineOptions({ name: 'TechnicianManagement' });
 
 const { t } = useI18n();
 const message = useMessage();
-
-
-
-// 表格相关
-const loading = ref(false);
-const tableData = ref<Api.Technician.TechnicianInfo[]>([]);
-const pagination = ref({
-  page: 1,
-  pageSize: 10,
-  itemCount: 0,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30, 40]
-});
-
-// 搜索相关
-const searchModel = ref({
-  name: '',
-  phone: '',
-  email: '',
-  level: undefined,
-  status: undefined
-});
 
 // 表单相关
 const formRef = ref();
@@ -42,7 +21,7 @@ const currentId = ref('');
 const editData = ref<Api.Technician.TechnicianInfo | null>(null);
 
 // 表格列定义
-const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
+const getColumns = () => [
   {
     title: t('system.technician.employeeId'),
     key: 'employeeId',
@@ -121,47 +100,44 @@ const columns: DataTableColumns<Api.Technician.TechnicianInfo> = [
   }
 ];
 
-// 加载表格数据
-async function loadTableData() {
-  loading.value = true;
-  try {
-    const params = {
-      ...searchModel.value,
-      page: pagination.value.page,
-      size: pagination.value.pageSize
-    };
-    const { data } = await getTechnicianList(params) as any
-    tableData.value = data.records;
-    pagination.value.itemCount = data.total;
-  } finally {
-    loading.value = false;
-  }
-}
+const {
+  loading,
+  data: dataList,
+  pagination,
+  getData,
+  searchParams: searchModel,
+  columns: tableColumns,
+  updateSearchParams,
+  resetSearchParams
+} = useTable({
+  apiFn: getTechnicianList as any,
+  columns: () => getColumns() as any,
+  apiParams: {
+    current: 1,
+    size: 10,
+    name: '',
+    phone: '',
+    email: '',
+    level: undefined,
+    status: undefined
+  },
+  immediate: true,
+  showTotal: true
+});
+
 
 // 搜索
 async function handleSearch() {
-  pagination.value.page = 1;
-  await loadTableData();
+  updateSearchParams(searchModel);
+  getData();
 }
 
 // 重置搜索
 async function handleReset() {
-  pagination.value.page = 1;
-  await loadTableData();
+  resetSearchParams();
+  getData();
 }
 
-// 分页改变
-async function handlePageChange(page: number) {
-  pagination.value.page = page;
-  await loadTableData();
-}
-
-// 每页条数改变
-async function handlePageSizeChange(pageSize: number) {
-  pagination.value.pageSize = pageSize;
-  pagination.value.page = 1;
-  await loadTableData();
-}
 
 // 新增
 function handleAdd() {
@@ -187,10 +163,10 @@ async function handleDelete(row: Api.Technician.TechnicianInfo) {
     onPositiveClick: async () => {
       await deleteTechnician(row._id);
       message.success(t('common.deleteSuccess'));
-      if (tableData.value.length === 1 && pagination.value.page > 1) {
-        pagination.value.page -= 1;
+      if (dataList.value.length === 1 && pagination.page > 1) {
+        pagination.page -= 1;
       }
-      await loadTableData();
+      getData();
     }
   });
 }
@@ -199,17 +175,14 @@ async function handleDelete(row: Api.Technician.TechnicianInfo) {
 async function handleUpdateStatus(id: string, status: Api.Technician.TechnicianInfo['status']) {
   await updateTechnicianStatus(id, { status });
   message.success(t('common.updateSuccess'));
-  await loadTableData();
+  getData();
 }
 
 // 表单提交
 async function handleFormSubmit() {
-  await loadTableData();
+  getData();
   showForm.value = false;
 }
-
-// 初始化
-loadTableData();
 
 </script>
 
@@ -230,8 +203,7 @@ loadTableData();
         </NSpace>
       </template>
 
-      <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
-        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" remote />
+      <NDataTable :loading="loading" :columns="tableColumns" :data="dataList" :pagination="pagination" remote />
     </NCard>
 
     <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"
