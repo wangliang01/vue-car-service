@@ -5,6 +5,8 @@ import { NSpace, NGrid, NGi, NCard, NStatistic, NList, NListItem, NTag, NButton 
 import { useAppStore } from '@/store/modules/app';
 import { useEcharts } from '@/hooks/common/echarts';
 import type { ECOption } from '@/hooks/common/echarts';
+import RevenueTrend from './modules/revenue-trend.vue';
+import RevenueAnalysis from './modules/revenue-analysis.vue';
 
 const { t } = useI18n();
 const appStore = useAppStore();
@@ -82,14 +84,14 @@ const generateRevenueData = () => {
 };
 
 // 收入趋势图表
-const getOrderTrendOptions = (): ECOption => ({
+const { domRef: orderTrendRef, updateOptions: updateOrderTrendOptions } = useEcharts(() => ({
   tooltip: {
     trigger: 'axis',
     formatter: '{b}<br />{a}: ¥{c}'
   },
   xAxis: {
     type: 'category',
-    data: getLast30Days(),
+    data: [],
     axisLabel: {
       interval: 'auto',
       rotate: 45,
@@ -114,7 +116,7 @@ const getOrderTrendOptions = (): ECOption => ({
       name: t('page.home.chart.revenueTrend'),
       type: 'line',
       smooth: true,
-      data: generateRevenueData(),
+      data: [],
       itemStyle: {
         color: '#67c23a'
       },
@@ -139,7 +141,7 @@ const getOrderTrendOptions = (): ECOption => ({
       }
     }
   ]
-});
+}));
 
 // 获取最近12个月
 const getLast12Months = () => {
@@ -161,86 +163,99 @@ const generateMonthlyRevenueData = () => {
 };
 
 // 收入分析图表
-const getRevenueOptions = (): ECOption => {
-  const monthlyData = generateMonthlyRevenueData();
-  return {
-    tooltip: {
-      trigger: 'axis',
-      formatter: (params: any) => {
-        const month = params[0].axisValue;
-        let html = `${month}<br/>`;
-        params.forEach((param: any) => {
-          html += `${param.seriesName}: ¥${param.value.toLocaleString()}<br/>`;
-        });
-        const total = params.reduce((sum: number, param: any) => sum + param.value, 0);
-        html += `总计: ¥${total.toLocaleString()}`;
-        return html;
+const { domRef: revenueChartRef, updateOptions: updateRevenueOptions } = useEcharts(() => ({
+  tooltip: {
+    trigger: 'axis',
+    formatter: (params: any) => {
+      const month = params[0].axisValue;
+      let html = `${month}<br/>`;
+      params.forEach((param: any) => {
+        html += `${param.seriesName}: ¥${param.value.toLocaleString()}<br/>`;
+      });
+      const total = params.reduce((sum: number, param: any) => sum + param.value, 0);
+      html += `总计: ¥${total.toLocaleString()}`;
+      return html;
+    }
+  },
+  legend: {
+    data: [t('page.home.chart.partsRevenue'), t('page.home.chart.laborRevenue')]
+  },
+  xAxis: {
+    type: 'category',
+    data: [],
+    axisLabel: {
+      interval: 0,
+      rotate: 45,
+      fontSize: 12,
+      margin: 8
+    }
+  },
+  yAxis: {
+    type: 'value',
+    axisLabel: {
+      formatter: (value: number) => `¥${value.toLocaleString()}`
+    }
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '15%',
+    containLabel: true
+  },
+  series: [
+    {
+      name: t('page.home.chart.partsRevenue'),
+      type: 'bar',
+      stack: 'revenue',
+      data: [],
+      itemStyle: {
+        color: '#409EFF'
       }
     },
-    legend: {
-      data: [t('page.home.chart.partsRevenue'), t('page.home.chart.laborRevenue')]
-    },
-    xAxis: {
-      type: 'category',
-      data: getLast12Months(),
-      axisLabel: {
-        interval: 0,
-        rotate: 45,
-        fontSize: 12,
-        margin: 8
+    {
+      name: t('page.home.chart.laborRevenue'),
+      type: 'bar',
+      stack: 'revenue',
+      data: [],
+      itemStyle: {
+        color: '#67C23A'
       }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        formatter: (value: number) => `¥${value.toLocaleString()}`
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '15%',
-      containLabel: true
-    },
-    series: [
-      {
-        name: t('page.home.chart.partsRevenue'),
-        type: 'bar',
-        stack: 'revenue',
-        data: monthlyData.map(d => d.parts),
-        itemStyle: {
-          color: '#409EFF'
-        }
-      },
-      {
-        name: t('page.home.chart.laborRevenue'),
-        type: 'bar',
-        stack: 'revenue',
-        data: monthlyData.map(d => d.labor),
-        itemStyle: {
-          color: '#67C23A'
-        }
-      }
-    ]
-  };
-};
+    }
+  ]
+}));
 
-const { domRef: orderTrendRef } = useEcharts(getOrderTrendOptions);
-const { domRef: revenueChartRef } = useEcharts(getRevenueOptions);
+// 模拟数据加载
+async function mockData() {
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
-// 获取首页数据
-const fetchHomeData = async () => {
+  // 更新收入趋势图表
+  updateOrderTrendOptions(opts => {
+    opts.xAxis.data = getLast30Days();
+    opts.series[0].data = generateRevenueData();
+    return opts;
+  });
+
+  // 更新收入分析图表
+  updateRevenueOptions(opts => {
+    const monthlyData = generateMonthlyRevenueData();
+    opts.xAxis.data = getLast12Months();
+    opts.series[0].data = monthlyData.map(d => d.parts);
+    opts.series[1].data = monthlyData.map(d => d.labor);
+    return opts;
+  });
+}
+
+// 初始化数据
+async function init() {
   try {
-    // TODO: 调用后端API获取数据
-    // const { data } = await fetchHomeStats();
-    // stats.value = data;
+    await mockData();
   } catch (error) {
     console.error('获取首页数据失败:', error);
   }
-};
+}
 
 onMounted(() => {
-  fetchHomeData();
+  init();
 });
 </script>
 
@@ -288,12 +303,12 @@ onMounted(() => {
     <NGrid :x-gap="gap" :y-gap="16" responsive="screen" item-responsive>
       <NGi span="24 s:24 m:14">
         <NCard :bordered="false" :title="t('page.home.chart.revenueTrend')">
-          <div ref="orderTrendRef" class="h-80" />
+          <RevenueTrend />
         </NCard>
       </NGi>
       <NGi span="24 s:24 m:10">
         <NCard :bordered="false" :title="t('page.home.chart.revenueAnalysis')">
-          <div ref="revenueChartRef" class="h-80" />
+          <RevenueAnalysis />
         </NCard>
       </NGi>
     </NGrid>
