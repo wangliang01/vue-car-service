@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NSpace, NGrid, NGi, NCard, NStatistic, NList, NListItem, NTag, NButton } from 'naive-ui';
+import { NSpace, NGrid, NGi, NCard, NStatistic, NList, NListItem, NTag, NButton, NEmpty } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useEcharts } from '@/hooks/common/echarts';
 import type { ECOption } from '@/hooks/common/echarts';
@@ -346,17 +346,22 @@ onMounted(() => {
     <!-- 待办事项和快捷操作 -->
     <NGrid :x-gap="gap" :y-gap="16" responsive="screen" item-responsive>
       <NGi span="24 s:24 m:14">
-        <NCard :bordered="false" :title="t('page.home.todo.title')">
-          <NList>
-            <NListItem v-for="todo in todos" :key="todo.title">
-              <NSpace align="center" justify="space-between">
-                <span>{{ todo.title }}</span>
-                <NTag :type="todo.priority === 'high' ? 'error' : todo.priority === 'medium' ? 'warning' : 'info'">
-                  {{ todo.status }}
-                </NTag>
-              </NSpace>
-            </NListItem>
-          </NList>
+        <NCard :bordered="false" :title="t('page.home.todo.title')" class="todo-card">
+          <div class="todo-content">
+            <NList v-if="todos.length > 0">
+              <NListItem v-for="todo in todos" :key="todo.title">
+                <NSpace align="center" justify="space-between">
+                  <span>{{ todo.title }}</span>
+                  <NTag :type="todo.priority === 'high' ? 'error' : todo.priority === 'medium' ? 'warning' : 'info'">
+                    {{ todo.status }}
+                  </NTag>
+                </NSpace>
+              </NListItem>
+            </NList>
+            <div v-else class="empty-state">
+              <NEmpty description="暂无待办事项" />
+            </div>
+          </div>
         </NCard>
       </NGi>
       <NGi span="24 s:24 m:10">
@@ -440,5 +445,39 @@ onMounted(() => {
 
 .quick-action-item:hover .text {
   color: var(--primary-color);
+}
+
+.todo-card {
+  height: 100%;
+}
+
+.todo-card :deep(.n-card__content) {
+  padding: 0;
+}
+
+.todo-content {
+  height: 200px;
+  overflow-y: auto;
+  padding: 8px 16px;
+}
+
+.todo-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.todo-content::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.empty-state {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
