@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, h, ref, computed } from 'vue';
+import { reactive, h, ref, computed, onMounted } from 'vue';
 import { NButton, NSpace, NCard, NDataTable, NSelect, NTag, useDialog, useMessage, NDrawer, NDrawerContent } from 'naive-ui';
 import dayjs from 'dayjs';
 import { useTable } from '@/hooks/common/table';
@@ -10,8 +10,10 @@ import RepairOrderForm from './modules/form.vue';
 import RepairOrderInspection from './modules/inspection.vue';
 import RepairOrderRepair from './modules/repair.vue';
 import RepairOrderDetail from './modules/Detail.vue';
-
+import { useRoute } from 'vue-router';
 defineOptions({ name: 'RepairOrderList' });
+
+const route = useRoute();
 
 const { t } = useI18n();
 
@@ -337,6 +339,15 @@ const scrollX = computed(() => {
 const formatStatus = (status: string) => {
   return t(`repairOrder.status.${status}`)
 }
+
+onMounted(() => {
+  const { immediate, orderNo } = route.query
+  if (immediate && orderNo) {
+    updateSearchParams({ orderNo })
+  }
+
+  getData()
+})
 
 </script>
 

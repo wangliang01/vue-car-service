@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NSpace, NGrid, NGi, NCard, NStatistic, NList, NListItem, NTag, NButton, NEmpty } from 'naive-ui';
+import { NSpace, NGrid, NGi, NCard, NStatistic, NList, NListItem, NTag, NButton, NEmpty, useThemeVars } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useEcharts } from '@/hooks/common/echarts';
 import type { ECOption } from '@/hooks/common/echarts';
 import RevenueTrend from './modules/revenue-trend.vue';
 import RevenueAnalysis from './modules/revenue-analysis.vue';
 import { fetchDashboardStats, fetchTodoList } from '@/service/api/dashboard';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
 const appStore = useAppStore();
 const gap = computed(() => (appStore.isMobile ? 0 : 16));
+const router = useRouter();
+const themeVars = useThemeVars();
 
 // 统计数据
 const stats = ref({
@@ -287,6 +290,29 @@ async function init() {
   ]);
 }
 
+// 添加处理函数
+function handleTodoClick(todo: any) {
+  if (todo.type === 'repair_order') {
+    // 跳转到维修工单列表，并带入工单号作为筛选条件，immediate=true表示立即触发查询
+    router.push({
+      path: '/repair/list',
+      query: {
+        orderNo: todo.orderNo,
+        immediate: 'true'
+      }
+    });
+  } else if (todo.type === 'inventory') {
+    // 跳转到库存列表，并带入物料名称作为筛选条件，immediate=true表示立即触发查询
+    router.push({
+      path: '/inventory/list',
+      query: {
+        name: todo.title.replace('库存不足', '').trim(),
+        immediate: 'true'
+      }
+    });
+  }
+}
+
 onMounted(() => {
   init();
 });
@@ -352,7 +378,11 @@ onMounted(() => {
         <NCard :bordered="false" :title="t('page.home.todo.title')" class="todo-card">
           <div class="todo-content">
             <NList v-if="todos.length > 0">
-              <NListItem v-for="todo in todos" :key="todo.orderNo || todo.title">
+              <NListItem
+                v-for="todo in todos"
+                :key="todo.orderNo || todo.title"
+                @click="handleTodoClick(todo)"
+              >
                 <NSpace align="center" justify="space-between">
                   <span>
                     {{ todo.type === 'repair_order' ?
@@ -414,7 +444,7 @@ onMounted(() => {
   </NSpace>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .h-80 {
   height: 320px;
 }
@@ -467,19 +497,31 @@ onMounted(() => {
   height: 200px;
   overflow-y: auto;
   padding: 8px 16px;
-}
 
-.todo-content::-webkit-scrollbar {
-  width: 6px;
-}
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
 
-.todo-content::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
 
-.todo-content::-webkit-scrollbar-track {
-  background-color: transparent;
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  :deep(.n-list-item) {
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 4px;
+    padding: 8px 4px;
+    margin: 4px 0;
+    box-sizing: content-box;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
 }
 
 .empty-state {
@@ -492,5 +534,21 @@ onMounted(() => {
 .todo-subtitle {
   font-size: 12px;
   color: #666;
+}
+
+.todo-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-radius: 4px;
+}
+
+:root {
+  --hover-color: rgba(0, 0, 0, 0.04);
+}
+
+html.dark {
+  --hover-color: rgba(255, 255, 255, 0.04);
 }
 </style>
