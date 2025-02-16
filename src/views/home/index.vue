@@ -78,14 +78,17 @@ async function loadTodos() {
     const todoList = [
       ...data.pendingOrders.map((order: any) => ({
         type: 'repair_order',
-        title: `${order.vehicleInfo.brand} ${order.vehicleInfo.model} ${order.type}`,
+        title: `工单号：${order.orderNo}`,
+        subTitle: `${order.vehicle.brand} ${order.vehicle.model} / ${order.vehicle.plateNumber}`,
+        desc: order.faultDesc,
         status: t(`repairOrder.status.${order.status}`),
-        priority: 'high',
-        createTime: order.createdAt
+        priority: order.priority === 2 ? 'high' : order.priority === 1 ? 'medium' : 'low',
+        createTime: order.createdAt,
+        orderNo: order.orderNo
       })),
       ...data.warningInventory.map((item: any) => ({
         type: 'inventory',
-        title: `${item.materialName}库存不足`,
+        title: `${item.name}库存不足`,
         status: '待补货',
         priority: 'high',
         createTime: new Date().toISOString()
@@ -349,9 +352,14 @@ onMounted(() => {
         <NCard :bordered="false" :title="t('page.home.todo.title')" class="todo-card">
           <div class="todo-content">
             <NList v-if="todos.length > 0">
-              <NListItem v-for="todo in todos" :key="todo.title">
+              <NListItem v-for="todo in todos" :key="todo.orderNo || todo.title">
                 <NSpace align="center" justify="space-between">
-                  <span>{{ todo.title }}</span>
+                  <span>
+                    {{ todo.type === 'repair_order' ?
+                      `【${todo.title}】${todo.desc} - ${todo.subTitle}` :
+                      todo.title
+                    }}
+                  </span>
                   <NTag :type="todo.priority === 'high' ? 'error' : todo.priority === 'medium' ? 'warning' : 'info'">
                     {{ todo.status }}
                   </NTag>
@@ -479,5 +487,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.todo-subtitle {
+  font-size: 12px;
+  color: #666;
 }
 </style>
