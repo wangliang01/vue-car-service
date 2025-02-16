@@ -434,7 +434,7 @@ const local: App.I18n.Schema = {
       },
       quickAction: {
         title: '快捷操作',
-        newOrder: '新建工单',
+        newOrder: '维修登记',
         newCustomer: '添加客户',
         inventory: '库存管理',
         settlement: '结算中心'

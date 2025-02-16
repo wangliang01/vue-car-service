@@ -209,52 +209,40 @@ onMounted(() => {
       </NGi>
       <NGi span="24 s:24 m:10">
         <NCard :bordered="false" :title="t('page.home.quickAction.title')">
-          <NSpace vertical>
-            <NButton
-              type="primary"
-              ghost
-              block
-              @click="$router.push('/repair/create')"
-            >
-              <template #icon>
-                <div class="i-material-symbols:add" />
-              </template>
-              {{ t('page.home.quickAction.newOrder') }}
-            </NButton>
-            <NButton
-              type="info"
-              ghost
-              block
-              @click="$router.push('/customer/create')"
-            >
-              <template #icon>
-                <div class="i-material-symbols:person-add" />
-              </template>
-              {{ t('page.home.quickAction.newCustomer') }}
-            </NButton>
-            <NButton
-              type="warning"
-              ghost
-              block
-              @click="$router.push('/inventory/list')"
-            >
-              <template #icon>
-                <div class="i-material-symbols:inventory" />
-              </template>
-              {{ t('page.home.quickAction.inventory') }}
-            </NButton>
-            <NButton
-              type="success"
-              ghost
-              block
-              @click="$router.push('/settlement/list')"
-            >
-              <template #icon>
-                <div class="i-material-symbols:payments" />
-              </template>
-              {{ t('page.home.quickAction.settlement') }}
-            </NButton>
-          </NSpace>
+          <NGrid :cols="2" :x-gap="12" :y-gap="12">
+            <NGi>
+              <div class="quick-action-item" @click="$router.push('/repair/list')">
+                <div class="icon">
+                  <div class="i-material-symbols:build-circle text-24px" />
+                </div>
+                <div class="text">{{ t('page.home.quickAction.newOrder') }}</div>
+              </div>
+            </NGi>
+            <NGi>
+              <div class="quick-action-item" @click="$router.push('/customer/list')">
+                <div class="icon">
+                  <div class="i-material-symbols:person-add text-24px" />
+                </div>
+                <div class="text">{{ t('page.home.quickAction.newCustomer') }}</div>
+              </div>
+            </NGi>
+            <NGi>
+              <div class="quick-action-item" @click="$router.push('/inventory/list')">
+                <div class="icon">
+                  <div class="i-material-symbols:inventory text-24px" />
+                </div>
+                <div class="text">{{ t('page.home.quickAction.inventory') }}</div>
+              </div>
+            </NGi>
+            <NGi>
+              <div class="quick-action-item" @click="$router.push('/repair/settlement')">
+                <div class="icon">
+                  <div class="i-material-symbols:payments text-24px" />
+                </div>
+                <div class="text">{{ t('page.home.quickAction.settlement') }}</div>
+              </div>
+            </NGi>
+          </NGrid>
         </NCard>
       </NGi>
     </NGrid>
@@ -264,5 +252,41 @@ onMounted(() => {
 <style scoped>
 .h-80 {
   height: 320px;
+}
+
+.quick-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.quick-action-item:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+}
+
+.quick-action-item .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  color: var(--primary-color);
+}
+
+.quick-action-item .text {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.quick-action-item:hover .text {
+  color: var(--primary-color);
 }
 </style>
