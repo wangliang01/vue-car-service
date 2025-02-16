@@ -392,7 +392,6 @@ const local: App.I18n.Schema = {
       greeting: '欢迎，{userName}, 今天又是充满活力的一天!',
       weatherDesc: '今日多云转晴，20℃ - 25℃!',
       projectCount: '项目数',
-      todo: '待办',
       message: '消息',
       downloadCount: '下载量',
       registerCount: '注册量',
@@ -413,7 +412,33 @@ const local: App.I18n.Schema = {
         desc4: 'Soybean 正在忙于为soybean-admin写项目说明文档！',
         desc5: 'Soybean 刚才把工作台页面随便写了一些，凑合能看了！'
       },
-      creativity: '创意'
+      creativity: '创意',
+      stats: {
+        totalOrders: '总工单数',
+        completed: '已完成',
+        monthlyRevenue: '本月收入',
+        totalCustomers: '客户总数',
+        newThisMonth: '本月新增',
+        inventoryAlert: '库存预警',
+        outOfStock: '缺货'
+      },
+      chart: {
+        orderTrend: '工单趋势',
+        orderCount: '工单数量',
+        revenueAnalysis: '收入分析',
+        partsRevenue: '配件收入',
+        laborRevenue: '工时收入'
+      },
+      todo: {
+        title: '待办事项'
+      },
+      quickAction: {
+        title: '快捷操作',
+        newOrder: '新建工单',
+        newCustomer: '添加客户',
+        inventory: '库存管理',
+        settlement: '结算中心'
+      }
     }
   },
   form: {
@@ -840,19 +865,13 @@ const local: App.I18n.Schema = {
       operator: '操作人',
       status: '状态',
       remarks: '备注',
-
-      // 表单相关
       selectMaterial: '请选择物料',
       inputQuantity: '请输入数量',
       inputUnitPrice: '请输入单价',
       inputSupplier: '请输入供应商',
       selectDate: '请选择入库日期',
-
-      // 状态
       statusActive: '已入库',
       statusInactive: '已取消',
-
-      // 按钮
       create: '新建入库单',
       cancel: '取消入库'
     }
