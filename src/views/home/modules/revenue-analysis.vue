@@ -1,27 +1,17 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEcharts } from '@/hooks/common/echarts';
+import { fetchIncomeAnalysis } from '@/service/api/dashboard';
+import dayjs from 'dayjs';
 
 const { t } = useI18n();
+const loading = ref(true);
 
-// 获取最近12个月
-const getLast12Months = () => {
-  const months = [];
-  const now = new Date();
-  for (let i = 11; i >= 0; i--) {
-    const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(`${month.getFullYear()}年${month.getMonth() + 1}月`);
-  }
-  return months;
-};
-
-// 生成模拟的月度收入数据
-const generateMonthlyRevenueData = () => {
-  return Array.from({ length: 12 }, () => ({
-    parts: Math.floor(Math.random() * 200000 + 100000),
-    labor: Math.floor(Math.random() * 150000 + 80000)
-  }));
+// 格式化月份
+const formatMonth = (dateStr: string) => {
+  const date = dayjs(dateStr);
+  return `${date.year()}年${date.month() + 1}月`;
 };
 
 const { domRef, updateOptions } = useEcharts(() => ({
@@ -85,30 +75,27 @@ const { domRef, updateOptions } = useEcharts(() => ({
   ]
 }));
 
-// 模拟数据加载
-async function mockData() {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  updateOptions(opts => {
-    const monthlyData = generateMonthlyRevenueData();
-    opts.xAxis.data = getLast12Months();
-    opts.series[0].data = monthlyData.map(d => d.parts);
-    opts.series[1].data = monthlyData.map(d => d.labor);
-    return opts;
-  });
-}
-
-// 初始化数据
-async function init() {
+// 加载数据
+async function loadData() {
   try {
-    await mockData();
+    loading.value = true;
+    const { data } = await fetchIncomeAnalysis();
+
+    updateOptions(opts => {
+      opts.xAxis.data = data.map((item: any) => formatMonth(item.date));
+      opts.series[0].data = data.map((item: any) => item.partsIncome);
+      opts.series[1].data = data.map((item: any) => item.laborIncome);
+      return opts;
+    });
   } catch (error) {
     console.error('获取收入分析数据失败:', error);
+  } finally {
+    loading.value = false;
   }
 }
 
 onMounted(() => {
-  init();
+  loadData();
 });
 </script>
 

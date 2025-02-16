@@ -7,6 +7,7 @@ import { useEcharts } from '@/hooks/common/echarts';
 import type { ECOption } from '@/hooks/common/echarts';
 import RevenueTrend from './modules/revenue-trend.vue';
 import RevenueAnalysis from './modules/revenue-analysis.vue';
+import { fetchDashboardStats, fetchTodoList } from '@/service/api/dashboard';
 
 const { t } = useI18n();
 const appStore = useAppStore();
@@ -15,57 +16,87 @@ const gap = computed(() => (appStore.isMobile ? 0 : 16));
 // 统计数据
 const stats = ref({
   repairOrders: {
-    total: 156,
-    pending: 23,
-    repairing: 45,
-    completed: 88
+    total: 0,
+    pending: 0,
+    repairing: 0,
+    completed: 0
   },
   customers: {
-    total: 1234,
-    monthlyNew: 45
+    total: 0,
+    monthlyNew: 0
   },
   revenue: {
-    today: 12580,
-    month: 356789,
-    yearToDate: 2345678
+    today: 0,
+    month: 0,
+    yearToDate: 0
   },
   inventory: {
-    lowStock: 12,
-    outOfStock: 3
+    lowStock: 0,
+    outOfStock: 0
   }
 });
 
 // 待办事项
-const todos = ref([
-  {
-    type: 'repair_order',
-    title: '奔驰C200维修检查',
-    status: '待处理',
-    priority: 'high',
-    createTime: '2024-03-18 10:30'
-  },
-  {
-    type: 'inspection',
-    title: '宝马320Li年检',
-    status: '进行中',
-    priority: 'medium',
-    createTime: '2024-03-18 09:15'
-  },
-  {
-    type: 'payment',
-    title: '奥迪A6L结算待确认',
-    status: '待确认',
-    priority: 'low',
-    createTime: '2024-03-18 08:45'
-  },
-  {
-    type: 'inventory',
-    title: '机油库存不足',
-    status: '待补货',
-    priority: 'high',
-    createTime: '2024-03-18 08:30'
+const todos = ref([]);
+
+// 加载统计数据
+async function loadStats() {
+  try {
+    const { data } = await fetchDashboardStats();
+    stats.value = {
+      repairOrders: {
+        total: data.totalOrders,
+        pending: 0,
+        repairing: 0,
+        completed: 0
+      },
+      customers: {
+        total: data.totalCustomers,
+        monthlyNew: 0
+      },
+      revenue: {
+        today: 0,
+        month: data.monthlyIncome,
+        yearToDate: 0
+      },
+      inventory: {
+        lowStock: data.inventoryWarnings,
+        outOfStock: 0
+      }
+    };
+  } catch (error) {
+    console.error('获取统计数据失败:', error);
   }
-]);
+}
+
+// 加载待办事项
+async function loadTodos() {
+  try {
+    const { data } = await fetchTodoList();
+
+    // 合并待处理工单和库存预警
+    const todoList = [
+      ...data.pendingOrders.map((order: any) => ({
+        type: 'repair_order',
+        title: `${order.vehicleInfo.brand} ${order.vehicleInfo.model} ${order.type}`,
+        status: t(`repairOrder.status.${order.status}`),
+        priority: 'high',
+        createTime: order.createdAt
+      })),
+      ...data.warningInventory.map((item: any) => ({
+        type: 'inventory',
+        title: `${item.materialName}库存不足`,
+        status: '待补货',
+        priority: 'high',
+        createTime: new Date().toISOString()
+      }))
+    ];
+
+    todos.value = todoList;
+  } catch (error) {
+    console.error('获取待办事项失败:', error);
+  }
+}
 
 // 生成最近30天的日期数据
 const getLast30Days = () => {
@@ -247,11 +278,10 @@ async function mockData() {
 
 // 初始化数据
 async function init() {
-  try {
-    await mockData();
-  } catch (error) {
-    console.error('获取首页数据失败:', error);
-  }
+  await Promise.all([
+    loadStats(),
+    loadTodos()
+  ]);
 }
 
 onMounted(() => {
