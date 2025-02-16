@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref } from 'vue';
+import { h, ref, computed } from 'vue';
 import { useMessage, NTag, NButton } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { getStockInList, cancelStockIn } from '@/service/api/inventory';
@@ -7,7 +7,7 @@ import StockInForm from './components/form.vue';
 import StockInSearch from './components/search.vue';
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '@/utils/common';
-
+import { useTable } from '@/hooks/common/table'
 
 defineOptions({ name: 'StockIn' });
 
@@ -15,35 +15,12 @@ const { t } = useI18n();
 
 const message = useMessage();
 
-// 表格数据
-const loading = ref(false);
-const tableData = ref<Api.Inventory.StockIn[]>([]);
-
-// 分页
-const pagination = ref({
-  page: 1,
-  pageSize: 10,
-  itemCount: 0,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30, 40],
-  prefix: page => `总共 ${page.itemCount} 条`
-});
-
 // 表单控制
 const showForm = ref(false);
 const formData = ref<Partial<Api.Inventory.CreateStockInParams> | null>(null);
 
-// 搜索条件
-const searchModel = ref({
-  materialId: '',
-  supplier: '',
-  status: undefined as 'active' | 'inactive' | undefined,
-  startDate: null as number | null,
-  endDate: null as number | null
-});
 
-// 表格列定义
-const columns: DataTableColumns<Api.Inventory.StockIn> = [
+const getColumns = () => [
   { title: t('inventory.stockIn.stockInNo'), key: 'stockInNo', width: '160px' },
   {
     title: t('inventory.stockIn.material'),
@@ -54,9 +31,11 @@ const columns: DataTableColumns<Api.Inventory.StockIn> = [
   { title: t('inventory.stockIn.unitPrice'), key: 'unitPrice' },
   { title: t('inventory.stockIn.totalAmount'), key: 'totalAmount' },
   { title: t('inventory.stockIn.supplier'), key: 'supplier', render: (row) => row.material?.supplier?.name },
-  { title: t('inventory.stockIn.stockInDate'), key: 'stockInDate', render: (row) => {
-    return formatDate(row.stockInDate, 'YYYY-MM-DD')
-  } },
+  {
+    title: t('inventory.stockIn.stockInDate'), key: 'stockInDate', render: (row) => {
+      return formatDate(row.stockInDate, 'YYYY-MM-DD')
+    }
+  },
   {
     title: t('inventory.stockIn.status'),
     key: 'status',
@@ -90,35 +69,43 @@ const columns: DataTableColumns<Api.Inventory.StockIn> = [
   }
 ];
 
-// 获取数据
-async function loadData() {
-  loading.value = true;
-  try {
-    const res = await getStockInList({
-      page: pagination.value.page,
-      size: pagination.value.pageSize,
-      ...searchModel.value
-    });
-    tableData.value = res.data.records;
-    pagination.value.itemCount = res.data.total;
-  } catch (error) {
-    message.error(t('common.loadError'));
-  } finally {
-    loading.value = false;
-  }
-}
+const {
+  loading,
+  data: dataList,
+  pagination,
+  searchParams: searchModel,
+  getData,
+  columns: tableColumns,
+  updateSearchParams,
+  resetSearchParams
+} = useTable({
+  apiFn: getStockInList as any,
+  columns: () => getColumns() as any,
+  apiParams: {
+    current: 1,
+    size: 10,
+    materialId: '',
+    supplier: '',
+    status: undefined as 'active' | 'inactive' | undefined,
+    startDate: null as number | null,
+    endDate: null as number | null
+  },
+  immediate: true,
+  showTotal: true
+});
+
+
 
 // 搜索
 function handleSearch() {
-  pagination.value.page = 1;
-  console.log("searchModel", searchModel.value)
-  loadData();
+  updateSearchParams(searchModel);
+  getData();
 }
 
 // 重置搜索
 function handleReset() {
-  pagination.value.page = 1;
-  loadData();
+  resetSearchParams();
+  getData();
 }
 
 // 新建入库单
@@ -127,8 +114,8 @@ function handleCreate() {
   showForm.value = true;
 }
 
-function handleRefresh () {
-  loadData();
+function handleRefresh() {
+  getData();
 }
 
 // 取消入库
@@ -136,7 +123,7 @@ async function handleCancel(id: string) {
   try {
     await cancelStockIn(id);
     message.success(t('common.success'));
-    loadData();
+    getData();
   } catch (error) {
     message.error(t('common.error'));
   }
@@ -145,27 +132,17 @@ async function handleCancel(id: string) {
 // 表单提交成功
 function handleSuccess() {
   message.success(t('common.success'));
-  loadData();
+  getData();
 }
 
-// 分页变化
-function handlePageChange(page: number) {
-  pagination.value.page = page;
-  loadData();
-}
 
-// 初始加载
-loadData();
+
 </script>
 
 <template>
   <div class="h-full flex flex-col">
     <!-- 搜索区域 -->
-    <StockInSearch
-      v-model:model="searchModel"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
+    <StockInSearch v-model:model="searchModel" @search="handleSearch" @reset="handleReset" />
 
 
     <!-- 列表 -->
@@ -191,21 +168,19 @@ loadData();
           </NSpace>
         </div>
       </template>
-      <NDataTable
-        :columns="columns"
-        :data="tableData"
-        :loading="loading"
-        :pagination="pagination"
-        @update:page="handlePageChange"
-        remote
-      />
+      <NSpace vertical :size="16">
+        <NDataTable
+          ref="tableRef"
+          :loading="loading"
+          :columns="tableColumns"
+          :data="dataList"
+          :pagination="pagination"
+          remote
+        />
+      </NSpace>
     </NCard>
 
     <!-- 新建/编辑弹窗 -->
-    <StockInForm
-      v-model:show="showForm"
-      :form-data="formData"
-      @success="handleSuccess"
-    />
+    <StockInForm v-model:show="showForm" :form-data="formData" @success="handleSuccess" />
   </div>
 </template>

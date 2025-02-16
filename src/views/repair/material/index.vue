@@ -11,16 +11,7 @@ defineOptions({ name: 'MaterialList' });
 
 const { t } = useI18n();
 
-const searchModel = reactive<Api.Material.SearchParams>({
-  name: '',
-  code: '',
-  category: null,
-  isActive: null,
-  current: 1,
-  size: 10
-});
-
-const columns = ref([
+const getColumns = () => [
   { title: t('common.index'), key: 'index', width: 60 },
   { title: t('material.name'), key: 'name', width: 120 },
   { title: t('material.code'), key: 'code', width: 100 },
@@ -95,19 +86,27 @@ const columns = ref([
       });
     }
   }
-]);
+]
 
 const {
   loading,
   data: dataList,
   pagination,
+  searchParams: searchModel,
   getData,
   columns: tableColumns,
   updateSearchParams
 } = useTable({
   apiFn: fetchMaterialList as any,
-  columns: () => columns.value as any,
-  apiParams: searchModel,
+  columns: () => getColumns() as any,
+  apiParams: {
+    current: 1,
+    size: 10,
+    name: '',
+    code: '',
+    category: null,
+    isActive: null,
+  },
   immediate: true,
   showTotal: true
 });
@@ -168,11 +167,7 @@ async function handleToggleStatus(row: Api.Material.MaterialInfo) {
 
 <template>
   <div class="h-full">
-    <MaterialSearch
-      :search-model="searchModel"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
+    <MaterialSearch :search-model="searchModel" @search="handleSearch" @reset="handleReset" />
     <NCard :bordered="false" class="mt-4">
       <template #header>
         <div class="flex-y-center justify-between">
@@ -180,28 +175,17 @@ async function handleToggleStatus(row: Api.Material.MaterialInfo) {
           <NButton type="primary" @click="handleAdd" ghost>
             <template #icon>
               <div class="i-material-symbols:add text-16px flex-center" />
-              </template>
-              <span class="flex-center">{{ t('common.add') }}</span>
-            </NButton>
+            </template>
+            <span class="flex-center">{{ t('common.add') }}</span>
+          </NButton>
         </div>
       </template>
 
-      <NDataTable
-        :loading="loading"
-        :columns="tableColumns"
-        :data="dataList"
-        :pagination="pagination"
-        @update:page="getData"
-        remote
-      />
+      <NDataTable :loading="loading" :columns="tableColumns" :data="dataList" :pagination="pagination"
+        @update:page="getData" remote />
     </NCard>
 
-    <MaterialModal
-      v-model:show="showModal"
-      :type="modalType"
-      :edit-data="editData"
-      @close="handleModalClose"
-      @success="handleModalSuccess"
-    />
+    <MaterialModal v-model:show="showModal" :type="modalType" :edit-data="editData" @close="handleModalClose"
+      @success="handleModalSuccess" />
   </div>
 </template>
