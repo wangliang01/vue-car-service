@@ -10,27 +10,10 @@ import Form from './modules/form.vue';
 import LinkPermission from './modules/link-permission.vue';
 import { formatDate } from '@/utils/common';
 defineOptions({ name: 'RoleManagement' });
+import { useTable } from '@/hooks/common/table';
 
 const { t } = useI18n();
 const message = useMessage();
-
-// 表格数据
-const tableData = ref<RoleInfo[]>([]);
-const loading = ref(false);
-const pagination = reactive({
-  page: 1,
-  pageSize: 10,
-  itemCount: 0,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30, 40]
-});
-
-// 搜索条件
-const searchModel = ref({
-  name: '',
-  code: '',
-  status: ''
-});
 
 // 表单控制
 const formRef = ref();
@@ -44,7 +27,7 @@ const showPermission = ref(false);
 const currentRoleId = ref('');
 
 // 表格列定义
-const columns: DataTableColumns<RoleInfo> = [
+const getColumns = () => [
   {
     title: t('system.role.name'),
     key: 'name'
@@ -119,46 +102,43 @@ const columns: DataTableColumns<RoleInfo> = [
   }
 ];
 
-// 加载表格数据
-async function loadTableData() {
-  loading.value = true;
-  try {
-    const { data } = await getRoleList({
-      ...searchModel.value,
-      page: pagination.page,
-      size: pagination.pageSize,
-    });
-    tableData.value = data.records;
-    pagination.itemCount = data.total;
-  } finally {
-    loading.value = false;
-  }
-}
+const {
+  loading,
+  data: dataList,
+  pagination,
+  getData,
+  searchParams: searchModel,
+  columns: tableColumns,
+  updateSearchParams,
+  resetSearchParams
+} = useTable({
+  apiFn: getRoleList as any,
+  columns: () => getColumns() as any,
+  apiParams: {
+    current: 1,
+    size: 10,
+    name: '',
+    code: '',
+    status: ''
+  },
+  immediate: true,
+  showTotal: true
+});
+
+
 
 // 处理搜索
 function handleSearch() {
-  pagination.page = 1;
-  loadTableData();
+  updateSearchParams(searchModel);
+  getData();
 }
 
 // 处理重置
 function handleReset() {
-  pagination.page = 1;
-  loadTableData();
+  resetSearchParams();
+  getData();
 }
 
-// 处理分页变化
-function handlePageChange(page: number) {
-  pagination.page = page;
-  loadTableData();
-}
-
-// 处理每页条数变化
-function handlePageSizeChange(pageSize: number) {
-  pagination.pageSize = pageSize;
-  pagination.page = 1;
-  loadTableData();
-}
 
 // 新增角色
 function handleAdd() {
@@ -184,10 +164,10 @@ async function handleDelete(row: RoleInfo) {
     onPositiveClick: async () => {
       await deleteRole(row._id);
       message.success(t('common.deleteSuccess'));
-      if (tableData.value.length === 1 && pagination.page > 1) {
+      if (dataList.value.length === 1 && pagination.page > 1) {
         pagination.page -= 1;
       }
-      loadTableData();
+      getData();
     }
   });
 
@@ -205,7 +185,7 @@ async function handleFormSubmit(data: RoleForm) {
       message.success(t('common.createSuccess'));
     }
     showForm.value = false;
-    loadTableData();
+    getData();
   } catch (err) {
     message.error(currentId.value ? t('common.updateError') : t('common.createError'));
   } finally {
@@ -219,8 +199,6 @@ function handlePermission(row: RoleInfo) {
   showPermission.value = true;
 }
 
-// 初始加载
-loadTableData();
 </script>
 
 <template>
@@ -240,8 +218,7 @@ loadTableData();
         </NSpace>
       </template>
 
-      <NDataTable :loading="loading" :columns="columns" :data="tableData" :pagination="pagination"
-        @update:page="handlePageChange" @update:page-size="handlePageSizeChange" remote />
+      <NDataTable :loading="loading" :columns="tableColumns" :data="dataList" :pagination="pagination" remote />
     </NCard>
 
     <Form ref="formRef" v-model:show="showForm" :loading="formLoading" :is-edit="!!currentId" :edit-data="editData"
