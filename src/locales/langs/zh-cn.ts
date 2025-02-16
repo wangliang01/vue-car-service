@@ -425,8 +425,8 @@ const local: App.I18n.Schema = {
       chart: {
         orderTrend: '工单趋势',
         orderCount: '工单数量',
-        revenueTrend: '收入趋势',
-        revenueAnalysis: '收入分析',
+        revenueTrend: '月收入分析',
+        revenueAnalysis: '年收入分析',
         partsRevenue: '配件收入',
         laborRevenue: '工时收入'
       },
